@@ -3,7 +3,9 @@ services:
     entrypoint:
     - sleep
     - infinity
-    image: docker/dev-environments-default:stable-1
+    build:
+      context: .
+      dockerfile: Dockerfile
     init: true
     volumes:
     - type: bind
