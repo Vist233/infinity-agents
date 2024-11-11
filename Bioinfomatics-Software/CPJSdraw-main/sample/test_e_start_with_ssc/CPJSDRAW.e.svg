@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg height="380" width="1530.866" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<rect fill="white" height="380" stroke="white" stroke-opacity="1" width="1530.866" x="../../bin/CPJSdraw.pl" y="0" />
+	<path d="M 480.866  40 L 480.866  330" fill="none" stroke="#9D9D9D" stroke-width="0.5" style="stroke" />
+	<path d="M 730.866 40 L 730.866 330" fill="none" stroke="#9D9D9D" stroke-width="0.5" style="stroke" />
+	<path d="M 1030.866 40 L 1030.866 330" fill="none" stroke="#9D9D9D" stroke-width="0.5" style="stroke" />
+	<path d="M 1280.866 40 L 1280.866 330" fill="none" stroke="#9D9D9D" stroke-width="0.5" style="stroke" />
+	<text font-family="times new roman" font-size="20" font-style="italic" text-anchor="end" x="310.866" y="100">Camellia achrysantha</text>
+	<path d="M 433.866 110 L 439.866 117.5 L 493.866 117.5 L 493.866 102.5 L 439.866 102.5 " fill="#228B22" stroke="#228B22" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="463.866" y="115.5">rps19</text>
+	<path d="M 433.866 127.5 L 478.866 127.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 433.866 122.5 L 433.866 132.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 478.866 122.5 L 478.866 132.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 482.866 127.5 L 493.866 127.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 482.866 122.5 L 482.866 132.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 493.866 122.5 L 493.866 132.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="end" x="470.866" y="147.5">233 bp</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="487.866" y="147.5">46 bp</text>
+	<path d="M 745.866 110 L 751.866 117.5 L 825.866 117.5 L 825.866 102.5 L 751.866 102.5 " fill="#8B4500" stroke="#8B4500" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="785.866" y="115.5">ndhF</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="785.866" y="129.5">2247 bp</text>
+	<path d="M 738.366  117.5 A 25 25 0 0 0 763.366  142.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 763.366  142.5 L 760.366 139.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 763.366  142.5 L 760.366 145.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="765.366" y="147">56 bp</text>
+	<path d="M 962.866 110 L 968.866 117.5 L 1062.866 117.5 L 1062.866 102.5 L 968.866 102.5 " fill="#1E90FF" stroke="#1E90FF" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="1012.866" y="115.5">ycf1</text>
+	<path d="M 962.866 127.5 L 1028.866 127.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 962.866 122.5 L 962.866 132.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 1028.866 122.5 L 1028.866 132.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 1032.866 127.5 L 1062.866 127.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 1032.866 122.5 L 1032.866 132.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 1062.866 122.5 L 1062.866 132.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="end" x="1020.866" y="147.5">4553 bp</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="1037.866" y="147.5">1069 bp</text>
+	<path d="M 1285.866 110 L 1291.866 117.5 L 1330.866 117.5 L 1330.866 102.5 L 1291.866 102.5 " fill="#8B8B83" stroke="#8B8B83" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="1308.366" y="115.5">trnH</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="1308.366" y="129.5">75 bp</text>
+	<path d="M 1283.366  117.5 A 25 25 0 0 0 1308.366  142.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1308.366  142.5 L 1305.366 139.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1308.366  142.5 L 1305.366 145.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="1310.366" y="147">1 bp</text>
+	<path d="M 497.866 70 L 503.866 77.5 L 573.866 77.5 L 573.866 62.5 L 503.866 62.5 " fill="#08c1c9" stroke="#08c1c9" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="535.866" y="75.5">rpl2</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="535.866" y="60.5">1495 bp</text>
+	<path d="M 489.366  62.5 A 25 25 0 0 1 514.366  37.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 514.366  37.5 L 511.366 34.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 514.366  37.5 L 511.366 40.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="516.366" y="42">106 bp</text>
+	<path d="M 653.866 70 L 659.866 77.5 L 698.866 77.5 L 698.866 62.5 L 659.866 62.5 " fill="#d57b2a" stroke="#d57b2a" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="676.366" y="75.5">trnN</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="676.366" y="60.5">72 bp</text>
+	<path d="M 714.866  62.5 A 25 25 0 0 0 689.866  37.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 689.866  37.5 L 692.866 34.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 689.866  37.5 L 692.866 40.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="end" x="687.866" y="42">1381 bp</text>
+	<path d="M 1107.866 70 L 1101.866 62.5 L 1062.866 62.5 L 1062.866 77.5 L 1101.866 77.5 " fill="#d57b2a" stroke="#d57b2a" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="1085.366" y="75.5">trnN</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="1085.366" y="60.5">72 bp</text>
+	<path d="M 1046.866  62.5 A 25 25 0 0 1 1071.866  37.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1071.866  37.5 L 1068.866 34.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1071.866  37.5 L 1068.866 40.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="1073.866" y="42">1381 bp</text>
+	<path d="M 1263.866 70 L 1257.866 62.5 L 1187.866 62.5 L 1187.866 77.5 L 1257.866 77.5 " fill="#08c1c9" stroke="#08c1c9" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="1225.866" y="75.5">rpl2</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="1225.866" y="60.5">1495 bp</text>
+	<path d="M 1272.366  62.5 A 25 25 0 0 0 1247.366  37.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1247.366  37.5 L 1250.366 34.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1247.366  37.5 L 1250.366 40.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="end" x="1245.366" y="42">106 bp</text>
+	<text font-family="times new roman" font-size="15" text-anchor="end" x="310.866" y="118">156,658 bp</text>
+	<rect fill="#D1EEEE" height="25" stroke="black" stroke-opacity="1" width="150" x="330.866" y="77.5" />
+	<path d="M 380.866 77.5 L 390.866 77.5 L 380.866 102.5 L 370.866 102.5 L 380.866 77.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<rect fill="#EEAD0E" height="25" stroke="black" stroke-opacity="1" width="250" x="480.866" y="77.5" />
+	<path d="M 605.866 77.5 L 615.866 77.5 L 605.866 102.5 L 595.866 102.5 L 605.866 77.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<rect fill="#B4EEB4" height="25" stroke="black" stroke-opacity="1" width="300" x="730.866" y="77.5" />
+	<path d="M 880.866 77.5 L 890.866 77.5 L 880.866 102.5 L 870.866 102.5 L 880.866 77.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<rect fill="#EEAD0E" height="25" stroke="black" stroke-opacity="1" width="250" x="1030.866" y="77.5" />
+	<path d="M 1155.866 77.5 L 1165.866 77.5 L 1155.866 102.5 L 1145.866 102.5 L 1155.866 77.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<rect fill="#D1EEEE" height="25" stroke="black" stroke-opacity="1" width="150" x="1280.866" y="77.5" />
+	<path d="M 1355.866 77.5 L 1365.866 77.5 L 1355.866 102.5 L 1345.866 102.5 L 1355.866 77.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="335.866" y="98">LSC</text>
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="485.866" y="98">IRb</text>
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="735.866" y="98">SSC</text>
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="1035.866" y="98">IRa</text>
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="1285.866" y="98">LSC</text>
+	<text font-family="times new roman" font-size="16" text-anchor="end" x="475.866" y="98">86,249 bp</text>
+	<text font-family="times new roman" font-size="16" text-anchor="end" x="725.866" y="98">26,083 bp</text>
+	<text font-family="times new roman" font-size="16" text-anchor="end" x="1025.866" y="98">18,243 bp</text>
+	<text font-family="times new roman" font-size="16" text-anchor="end" x="1275.866" y="98">26,083 bp</text>
+	<text font-family="times new roman" font-size="15" text-anchor="middle" x="480.866" y="25">JLB</text>
+	<text font-family="times new roman" font-size="15" text-anchor="middle" x="730.866" y="25">JSB</text>
+	<text font-family="times new roman" font-size="15" text-anchor="middle" x="1030.866" y="25">JSA</text>
+	<text font-family="times new roman" font-size="15" text-anchor="middle" x="1280.866" y="25">JLA</text>
+	<text font-family="times new roman" font-size="20" font-style="italic" text-anchor="end" x="310.866" y="240">Camellia chrysanthoides</text>
+	<path d="M 433.866 250 L 439.866 257.5 L 493.866 257.5 L 493.866 242.5 L 439.866 242.5 " fill="#228B22" stroke="#228B22" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="463.866" y="255.5">rps19</text>
+	<path d="M 433.866 267.5 L 478.866 267.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 433.866 262.5 L 433.866 272.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 478.866 262.5 L 478.866 272.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 482.866 267.5 L 493.866 267.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 482.866 262.5 L 482.866 272.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 493.866 262.5 L 493.866 272.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="end" x="470.866" y="287.5">233 bp</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="487.866" y="287.5">46 bp</text>
+	<path d="M 735.866 250 L 741.866 257.5 L 815.866 257.5 L 815.866 242.5 L 741.866 242.5 " fill="#8B4500" stroke="#8B4500" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="775.866" y="255.5">ndhF</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="775.866" y="269.5">2247 bp</text>
+	<path d="M 733.366  257.5 A 25 25 0 0 0 758.366  282.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 758.366  282.5 L 755.366 279.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 758.366  282.5 L 755.366 285.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="760.366" y="287">5 bp</text>
+	<path d="M 962.866 250 L 968.866 257.5 L 1062.866 257.5 L 1062.866 242.5 L 968.866 242.5 " fill="#1E90FF" stroke="#1E90FF" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="1012.866" y="255.5">ycf1</text>
+	<path d="M 962.866 267.5 L 1028.866 267.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 962.866 262.5 L 962.866 272.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 1028.866 262.5 L 1028.866 272.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 1032.866 267.5 L 1062.866 267.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 1032.866 262.5 L 1032.866 272.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<path d="M 1062.866 262.5 L 1062.866 272.5" fill="none" stroke="black" stroke-width="0.7" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="end" x="1020.866" y="287.5">4579 bp</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="1037.866" y="287.5">1043 bp</text>
+	<path d="M 1285.866 250 L 1291.866 257.5 L 1330.866 257.5 L 1330.866 242.5 L 1291.866 242.5 " fill="#8B8B83" stroke="#8B8B83" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="1308.366" y="255.5">trnH</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="1308.366" y="269.5">75 bp</text>
+	<path d="M 1283.366  257.5 A 25 25 0 0 0 1308.366  282.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1308.366  282.5 L 1305.366 279.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1308.366  282.5 L 1305.366 285.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="1310.366" y="287">1 bp</text>
+	<path d="M 497.866 210 L 503.866 217.5 L 573.866 217.5 L 573.866 202.5 L 503.866 202.5 " fill="#08c1c9" stroke="#08c1c9" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="535.866" y="215.5">rpl2</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="535.866" y="200.5">1495 bp</text>
+	<path d="M 489.366  202.5 A 25 25 0 0 1 514.366  177.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 514.366  177.5 L 511.366 174.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 514.366  177.5 L 511.366 180.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="516.366" y="182">106 bp</text>
+	<path d="M 653.866 210 L 659.866 217.5 L 698.866 217.5 L 698.866 202.5 L 659.866 202.5 " fill="#d57b2a" stroke="#d57b2a" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="676.366" y="215.5">trnN</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="676.366" y="200.5">72 bp</text>
+	<path d="M 714.866  202.5 A 25 25 0 0 0 689.866  177.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 689.866  177.5 L 692.866 174.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 689.866  177.5 L 692.866 180.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="end" x="687.866" y="182">1355 bp</text>
+	<path d="M 1107.866 210 L 1101.866 202.5 L 1062.866 202.5 L 1062.866 217.5 L 1101.866 217.5 " fill="#d57b2a" stroke="#d57b2a" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="1085.366" y="215.5">trnN</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="1085.366" y="200.5">72 bp</text>
+	<path d="M 1046.866  202.5 A 25 25 0 0 1 1071.866  177.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1071.866  177.5 L 1068.866 174.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1071.866  177.5 L 1068.866 180.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="start" x="1073.866" y="182">1355 bp</text>
+	<path d="M 1263.866 210 L 1257.866 202.5 L 1187.866 202.5 L 1187.866 217.5 L 1257.866 217.5 " fill="#08c1c9" stroke="#08c1c9" stroke-width="0.5" style="stroke" />
+	<text fill="white" font-family="times new roman" font-size="13" font-style="italic" text-anchor="middle" x="1225.866" y="215.5">rpl2</text>
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="middle" x="1225.866" y="200.5">1495 bp</text>
+	<path d="M 1272.366  202.5 A 25 25 0 0 0 1247.366  177.5 " fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1247.366  177.5 L 1250.366 174.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<path d="M 1247.366  177.5 L 1250.366 180.5" fill="none" stroke="black" stroke-width="0.5" style="stroke" />
+	<text fill="black" font-family="times new roman" font-size="13" text-anchor="end" x="1245.366" y="182">106 bp</text>
+	<text font-family="times new roman" font-size="15" text-anchor="end" x="310.866" y="258">156,959 bp</text>
+	<rect fill="#D1EEEE" height="25" stroke="black" stroke-opacity="1" width="150" x="330.866" y="217.5" />
+	<path d="M 380.866 217.5 L 390.866 217.5 L 380.866 242.5 L 370.866 242.5 L 380.866 217.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<rect fill="#EEAD0E" height="25" stroke="black" stroke-opacity="1" width="250" x="480.866" y="217.5" />
+	<path d="M 605.866 217.5 L 615.866 217.5 L 605.866 242.5 L 595.866 242.5 L 605.866 217.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<rect fill="#B4EEB4" height="25" stroke="black" stroke-opacity="1" width="300" x="730.866" y="217.5" />
+	<path d="M 880.866 217.5 L 890.866 217.5 L 880.866 242.5 L 870.866 242.5 L 880.866 217.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<rect fill="#EEAD0E" height="25" stroke="black" stroke-opacity="1" width="250" x="1030.866" y="217.5" />
+	<path d="M 1155.866 217.5 L 1165.866 217.5 L 1155.866 242.5 L 1145.866 242.5 L 1155.866 217.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<rect fill="#D1EEEE" height="25" stroke="black" stroke-opacity="1" width="150" x="1280.866" y="217.5" />
+	<path d="M 1355.866 217.5 L 1365.866 217.5 L 1355.866 242.5 L 1345.866 242.5 L 1355.866 217.5" fill="white" stroke="black" stroke-width="1" style="stroke" />
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="335.866" y="238">LSC</text>
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="485.866" y="238">IRb</text>
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="735.866" y="238">SSC</text>
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="1035.866" y="238">IRa</text>
+	<text font-family="times new roman" font-size="16" text-anchor="start" x="1285.866" y="238">LSC</text>
+	<text font-family="times new roman" font-size="16" text-anchor="end" x="475.866" y="238">86,564 bp</text>
+	<text font-family="times new roman" font-size="16" text-anchor="end" x="725.866" y="238">26,064 bp</text>
+	<text font-family="times new roman" font-size="16" text-anchor="end" x="1025.866" y="238">18,267 bp</text>
+	<text font-family="times new roman" font-size="16" text-anchor="end" x="1275.866" y="238">26,064 bp</text>
+	<text font-family="times new roman" font-size="15" text-anchor="middle" x="480.866" y="25">JLB</text>
+	<text font-family="times new roman" font-size="15" text-anchor="middle" x="730.866" y="25">JSB</text>
+	<text font-family="times new roman" font-size="15" text-anchor="middle" x="1030.866" y="25">JSA</text>
+	<text font-family="times new roman" font-size="15" text-anchor="middle" x="1280.866" y="25">JLA</text>
+	<!--
+	Generated using the Perl SVG Module V2.84
+	by Ronan Oger
+	Info: http://www.roitsystems.com/
+	-->
+</svg>

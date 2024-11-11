@@ -1,0 +1,2 @@
+Sequence	Method	Ka	Ks	Ka/Ks	P-Value(Fisher)	Length	S-Sites	N-Sites	Fold-Sites(0:2:4)	Substitutions	S-Substitutions	N-Substitutions	Fold-S-Substitutions(0:2:4)	Fold-N-Substitutions(0:2:4)	Divergence-Time	Substitution-Rate-Ratio(rTC:rAG:rTA:rCG:rTG:rCA/rCA)	GC(1:2:3)	ML-Score	AICc	Akaike-Weight	Model
+>Dsuz_cyp33_vs_>Dsub_cyp33	YN	1.30672	3.96999	0.32915	6.66468e-06	807	199.002	607.998	NA	532	156.555	375.445	NA	NA	1.96347	1.6821:1.6821:1:1:1:1	0.474466(0.423398:0.462396:0.537604)	NA	NA	NA	NA

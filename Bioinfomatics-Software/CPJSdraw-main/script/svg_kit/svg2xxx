@@ -1,0 +1,232 @@
+#!/usr/bin/perl -w
+#Author:Li Shengting
+#E-mail:lishengting@genomics.org.cn
+#Program Date:2002-12-20 17:35
+#Last Update:2006-11-14 0:20
+#Describe:将svg批量转化为图片
+my $ver=1.00; #
+use strict;
+#use diagnostics;
+use Getopt::Long;
+
+######################################################################################################################
+#	Usage
+######################################################################################################################
+my $usage=<<"USAGE";
+#$ver Usage: svg2xxx <in_dir|in_file> [<out_dir>] [-t] [-v] [-p] [-dpi] [-h] [-w] [-q] [-D] [-single] [-m work_memory(M)] [-fop]
+	-t type [ jpg | jpeg | jpe | png | tiff | pdf | ps ]
+	-v verbose
+	-p for PowerPoint
+	-dpi dots per inch (default 96)
+	-h height
+	-w width
+	-q jpeg quality <=1 (default 1)
+	-D display IP (needn't in java 1.4)
+	-single convert once
+	-m work memory (M bytes) (i.e. 131072 for ibm 690)
+	   in case that 'java.lang.OutOfMemoryError' occurs
+	-fop use fop to convert pdf and ps
+USAGE
+my $argvNumber=1;
+die $usage if (@ARGV<$argvNumber);
+######################################################################################################################
+my %opts;
+GetOptions(\%opts,"v!","t:s","p!","dpi:s","h:f","w:f","q:f","D:s","single!","m:i","fop!");
+######################################################################################################################
+#	Constant
+######################################################################################################################
+#use constant PI => 3.1415926535897932384626433832795;
+######################################################################################################################
+#	Variable
+######################################################################################################################
+my ($inputD,$outD)=@ARGV;
+my ($i,$file,$tmp);
+my $type=$opts{t};
+my $v=$opts{v};
+my $pp=$opts{p};
+my $dpi=$opts{dpi};
+my $height=$opts{h};
+my $width=$opts{w};
+my $quality=$opts{q};
+my $display=$opts{D};
+my $single=$opts{single};
+my $fop=$opts{fop};
+my $MEM_USE=$opts{m} ? "-mx$opts{m}M" : '';
+my $os=`uname -s`;
+chomp $os;
+my $cygwin=$os=~/cygwin/i;
+my $sep=$cygwin ? ';' : ':';
+my $javaop=$MEM_USE.' -Djava.awt.headless=true';
+my $fop_dir;
+$fop_dir='fop-0.20.5';
+#$fop_dir='fop-0.90alpha1';
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#	Begin
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+die "Input must not equal with output!\n" if ($outD && $inputD eq $outD);
+$type='png' if (!$type);
+if ($type ne 'png' && $type ne 'jpg' && $type ne 'jpeg' && $type ne 'jpe' && $type ne 'tiff' && $type ne 'pdf' && $type ne 'ps') {
+	die "Type must be one of [ jpg | jpeg | jpe | png | tiff | pdf | ps ] !\n";
+}
+
+$fop &&=($type eq 'pdf' || $type eq 'ps');
+my $bin_path=set_bin_path();
+my $local_path=`pwd`;
+chomp $local_path;
+$local_path="'$local_path'";
+$dpi=96 if (!$dpi);
+$height=$dpi/300*2220 if (!$height);
+if ($display) {
+	$ENV{DISPLAY}=$display;
+}elsif (!exists($ENV{DISPLAY}) || $ENV{DISPLAY} eq '') {
+	$ENV{DISPLAY}="127.0.0.1:0";
+}
+my $bat=(-d $inputD) ? 2 : (-f $inputD) ? 1 : 0;
+
+if ($bat==2) {
+	if ($outD) {
+		system("mkdir '$outD' 2> /dev/null");
+		die "Output dir $outD is not a directory!\n" if (! -d $outD);
+	}else{
+		die "Output dir name must be provided!\n";
+	}
+	if ($fop) {
+		my $wc=`ls $inputD/*.svg|wc`;
+		$wc=~/\d+/;
+		print "About to transcode $& SVG file(s)\n\n";
+	}
+	foreach $i (`ls $inputD/*.svg`) {
+		chomp $i;
+		$file=basename($i);
+		if ($fop) {
+			svg2zzz($i,$file);
+		}else{
+			$tmp="buildInFont '$i' x '$outD/$file'";
+			print "$tmp\n" if ($v);
+			system ($tmp);
+			if ($single) {
+				svg2yyy($file);
+			}
+		}
+	}
+	if ($fop) {
+	}else{
+		if (!$single) {
+			svg2yyy("*.svg");
+		}
+	}
+	system ("rm '$outD'/*.svg");
+}
+
+if ($bat==1) {
+	if ($outD) {
+		system("mkdir '$outD' 2> /dev/null");
+		die "Out dir $outD must be a directory!\n" if (! -d $outD);
+	}else{
+		$outD=dirname($inputD);
+	}
+	$file=basename($inputD,".svg");
+	$file.=".xxx";
+	if ($fop) {
+		print "About to transcode 1 SVG file(s)\n\n";
+		svg2zzz($inputD,$file);
+	}else{
+		$tmp="buildInFont '$inputD' x '$outD/$file'";
+		print "$tmp\n" if ($v);
+		system ($tmp);
+		svg2yyy($file);
+	}
+	system ("rm '$outD/$file'");
+}
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#	Subprogram
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+sub set_bin_path{
+	my $BIN_PATH='.';
+	my $pwd=`pwd`;
+	chomp $pwd;
+	if ($0=~/(^\..*)\/.*?/) {
+		$BIN_PATH=$pwd."/".$1;
+	}elsif ($0=~/(^\/.*)\/.*?/) {
+		$BIN_PATH=$1;
+		if ($cygwin) {
+			chdir $BIN_PATH;
+			$BIN_PATH=`pwd`;
+			chomp $BIN_PATH;
+			chdir $pwd;
+		}
+	}elsif ($0=~/(.+)\/.*$/) {
+		$BIN_PATH=$pwd."/".$1;
+	}else{
+		$BIN_PATH="./";
+	}
+	$ENV{PATH}=$BIN_PATH.":".$ENV{PATH};
+	$BIN_PATH=~s/\/cygdrive\/(.)/$1:/ if $cygwin;
+	return "'$BIN_PATH'";
+}
+sub cd {
+	my ($path)=@_;
+	if ($cygwin) {
+		$path=~s/^'?(.):/\/cygdrive\/$1/;
+	}
+	$path=~s/'//g;
+	chdir("$path");
+}
+
+sub svg2zzz {
+	my ($svgI,$zzz)=@_;
+	my ($tmp,$tmpd,$tmpIn,$tmpOut);
+	$tmp="buildFo '$svgI' '$outD/$zzz'";
+	print "$tmp\n" if ($v);
+	system ($tmp);
+	cd("$bin_path/$fop_dir");
+	$tmpd=($outD=~/^\// ? $outD : "$local_path/'$outD'");
+	$tmpd=~s/\/cygdrive\/(.)/$1:/ if $cygwin;
+	$tmpIn= "$tmpd/'$zzz'";
+	$tmp=basename($svgI,".svg");
+	chomp $tmp;
+	$tmp.=".$type";
+	$tmpOut= "$tmpd/'$tmp'";
+	print "Converting $zzz to $outD/$tmp ... ";
+	#fop-0.20.5 
+	$tmp="java $javaop -cp \"build/fop.jar${sep}lib/avalon-framework-cvs-20020806.jar${sep}lib/batik.jar\" org.apache.fop.apps.Fop ".($v ? '' : '-q')." -c conf/userconfig.xml $tmpIn $tmpOut";
+	#fop-0.90alpha1
+	#$tmp="java $javaop -cp \"build/fop.jar${sep}lib/avalon-framework-4.2.0.jar${sep}lib/batik-all-1.6.jar${sep}lib/commons-io-1.1.jar${sep}lib/commons-logging-1.0.4.jar\" org.apache.fop.cli.Main ".($v ? '' : '-q')." -c conf/fop.xconf $tmpIn $tmpOut";
+	print "\n$tmp\n" if ($v);
+	system ($tmp);
+	print "... success\n\n";
+	cd($local_path);
+}
+
+sub svg2yyy {
+	my ($svgI)=@_;
+	my $tmp="java $javaop -jar $bin_path/batik-rasterizer.jar '$outD'/".($svgI=~/[\*\?]/ ? $svgI : "'$svgI'")." -d '$outD' -m ".(($type eq 'pdf' || $type eq 'ps') ? "application/$type" : "image/$type -dpi $dpi")." -h $height";
+	$tmp.=" -w $width" if ($width);
+	$tmp.=" -q $quality" if ($quality);
+	$tmp.=" -bg 255.255.255.255" if (!$pp);
+	print "$tmp\n" if ($v);
+	system ($tmp);
+}
+
+
+sub dirname {
+	my ($path)=@_;
+	if ($path=~/(.*)\/.+$/) {
+		return $1;
+	}else{
+		return '.';
+	}
+}
+
+sub basename {
+	my ($path,$ext)=@_;
+	$ext='' if !$ext;
+	if ($path=~/\/?(.+)$ext$/) {
+		return $1;
+	}else{
+		return $path;
+	}
+}
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#	End
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,111 @@
+<!--<!DOCTYPE configuration SYSTEM "config.dtd">-->
+<!-- 
+     this file contains templates which allow an user easy 
+     configuration of Fop. Actually normally you don't need this configuration 
+     file, but if you need to change configuration, you should
+     always use this file and *not* config.xml. 
+     Usage: java org.apache.fop.apps.Fop -c userconfig.xml -fo fo-file -pdf pdf-file
+-->
+
+
+<configuration>
+
+<!--  
+baseDir: normally the base directory is the directory where the fo file is 
+         located. if you want to specify your own, uncomment this entry.
+         This value can also be a URL. Actually, the value is converted to 
+         a URL.
+-->
+<!-- 
+  <entry>
+    <key>baseDir</key>
+    <value></value>
+  </entry>
+-->
+
+<!--  
+fontBaseDir: Similar to baseDir, except that this value is used for fonts. If
+         it isn't specified, the value from baseDir is used.
+-->
+
+  <entry>
+    <key>fontBaseDir</key>
+    <value>fonts</value>
+  </entry>
+
+  <entry>
+    <key>strokeSVGText</key>
+    <value>false</value>
+  </entry>
+
+<!--
+************************************************************************
+                        HYPHENATION 
+************************************************************************
+-->
+  
+<!--
+   hyphenation directory 
+   if you want to specify your own directory with hyphenation pattern
+   then uncomment the next entry and add the directory name
+-->
+
+<!--
+  <entry>
+    <key>hyphenation-dir</key>
+    <value>/java/xml-fop/hyph</value>
+  </entry>
+-->
+
+<!--
+************************************************************************
+  Add fonts here
+************************************************************************
+-->
+
+<fonts>
+ <!-- example -->
+
+ <font metrics-file="ARIAL.XML" kerning="yes" embed-file="ARIAL.TTF">
+    <font-triplet name="Arial" style="normal" weight="normal"/>
+    <!--<font-triplet name="ArialMT" style="normal" weight="normal"/>-->
+ </font>
+ <font metrics-file="ARIALBD.XML" kerning="yes" embed-file="ARIALBD.TTF">
+    <font-triplet name="Arial-Bold" style="normal" weight="normal"/>
+    <font-triplet name="Arial-Bold" style="normal" weight="bold"/>
+ </font>
+ <font metrics-file="ARIALI.XML" kerning="yes" embed-file="ARIALI.TTF">
+    <font-triplet name="Arial-Italic" style="normal" weight="normal"/>
+    <font-triplet name="Arial-Italic" style="italic" weight="normal"/>
+ </font>
+ <font metrics-file="ARIALBI.XML" kerning="yes" embed-file="ARIALBI.TTF">
+    <font-triplet name="Arial-BoldItalic" style="normal" weight="normal"/>
+    <font-triplet name="Arial-BoldItalic" style="normal" weight="bold"/>
+    <font-triplet name="Arial-BoldItalic" style="italic" weight="normal"/>
+    <font-triplet name="Arial-BoldItalic" style="italic" weight="bold"/>
+ </font>
+
+ <font metrics-file="ARIALN.XML" kerning="yes" embed-file="ARIALN.TTF">
+    <font-triplet name="ArialNarrow" style="normal" weight="normal"/>
+ </font>
+ <font metrics-file="ARIALNB.XML" kerning="yes" embed-file="ARIALNB.TTF">
+    <font-triplet name="ArialNarrow-Bold" style="normal" weight="normal"/>
+    <font-triplet name="ArialNarrow-Bold" style="normal" weight="bold"/>
+ </font>
+ <font metrics-file="ARIALNI.XML" kerning="yes" embed-file="ARIALNI.TTF">
+    <font-triplet name="ArialNarrow-Italic" style="normal" weight="normal"/>
+    <font-triplet name="ArialNarrow-Italic" style="italic" weight="normal"/>
+ </font>
+ <font metrics-file="ARIALNBI.XML" kerning="yes" embed-file="ARIALNBI.TTF">
+    <font-triplet name="ArialNarrow-BoldItalic" style="normal" weight="normal"/>
+    <font-triplet name="ArialNarrow-BoldItalic" style="normal" weight="bold"/>
+    <font-triplet name="ArialNarrow-BoldItalic" style="italic" weight="normal"/>
+    <font-triplet name="ArialNarrow-BoldItalic" style="italic" weight="bold"/>
+ </font>
+</fonts>
+
+
+</configuration>
+
+
+

@@ -1,0 +1,91 @@
+#!/usr/bin/perl -w
+#Author:Li Shengting
+#E-mail:lishengting@genomics.org.cn
+#Program Date:2002-12-5 23:45
+#Last Update:2002-12-5 23:45
+#Describe:生成插入幻灯片的VBscript
+#svg列表制作:
+#find ~/rice3/rice/Kikuchi/draw/B_nr -name "*pp.svg" >> pp.svg1.list
+#find ~/rice3/rice/Kikuchi/draw/B_nr_NH -name "*pp.svg" >> pp.svg2.list
+#find ~/rice3/rice/Kikuchi/draw/B_nr_WH -name "*pp.svg" >> pp.svg3.list
+#paste pp.svg1.list pp.svg2.list pp.svg3.list |tr '\t' '\n' >pp.svg.list
+my $ver=1.00; #
+use strict;
+#use diagnostics;
+#use Getopt::Long;
+#use constant PI => 3.1415926535897932384626433832795;
+
+#my %opts;
+#GetOptions(\%opts,"a!","b:s");
+######################################################################################################################
+#	Usage
+######################################################################################################################
+my $usage=<<"USAGE";
+#$ver Usage: genVBforPP <svg_list|pic_list> dir_prefix <out.bas> [type]
+	type	Need by svg list
+USAGE
+my $argvNumber=3;
+die $usage if (@ARGV<$argvNumber);
+undef($argvNumber);
+######################################################################################################################
+#	Constant
+######################################################################################################################
+use constant WIDTH=>720;
+use constant HEIGHT=>540;
+
+######################################################################################################################
+#	Variable
+######################################################################################################################
+my ($svgL,$dirPrefix,$bas,$type)=@ARGV;
+my ($i,$line,$width,$height,$file);
+#$type="wmf" if (!$type);
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#	Begin
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+open (O,">$bas") || die "Can't write $bas!\n";
+print O <<"HEAD";
+Sub InsertWmf()
+'
+' 宏由 lst 记录，日期： 2002-12-5
+'
+	ActiveWindow.ViewType = ppViewSlideSorter
+	ActivePresentation.Slides.Range.Select
+	ActiveWindow.Selection.SlideRange.Delete
+
+	ActiveWindow.ViewType = ppViewSlide
+
+HEAD
+open(F,"$svgL") || die "Can't open $svgL!\n";
+$i=0;
+while (<F>) {
+	$i++;
+	chomp;
+	if ($type) {
+		$file=`basename $_ .svg`;
+		chomp $file;
+		$file.=".$type";
+	}else{
+		$file=$_;
+	}
+	print O "\tActiveWindow.View.GotoSlide Index:=ActivePresentation.Slides.Add(Index:=$i, Layout:=ppLayoutBlank).SlideIndex\n";
+	print O "\tActiveWindow.Selection.SlideRange.Shapes.AddPicture(FileName:=\"$dirPrefix\\$file\", LinkToFile:=msoFalse, SaveWithDocument:=msoTrue, Left:=0, Top:=0).Select\n";
+	print O "\tActiveWindow.Selection.ShapeRange.IncrementLeft ((".(WIDTH)." - ActiveWindow.Selection.ShapeRange.Width) / 2)\n";
+	print O "\tActiveWindow.Selection.ShapeRange.IncrementTop ((".(HEIGHT)." - ActiveWindow.Selection.ShapeRange.Height) / 2)\n";
+}
+close(F);    
+print O <<"END";
+
+	ActiveWindow.ViewType = ppViewSlideSorter
+	ActiveWindow.View.GotoSlide Index:=1
+
+End Sub
+END
+close(O);
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#	Subprogram
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#	End
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

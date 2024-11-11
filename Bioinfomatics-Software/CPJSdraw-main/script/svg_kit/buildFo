@@ -1,0 +1,93 @@
+#!/usr/bin/perl -w
+#Author:Li Shengting
+#E-mail:lishengting@genomics.org.cn
+#Program Date:2003-08-13 23:18
+#Last Update:2006-11-14 0:21
+#Describe:add fonts defs to svg for batik
+my $ver=1.00; #
+use strict;
+#use diagnostics;
+#use Getopt::Long;
+
+######################################################################################################################
+#	Usage
+######################################################################################################################
+my $usage=<<"USAGE";
+#$ver Usage: buildFo <svg_file> <out_fo>
+USAGE
+my $argvNumber=2;
+die $usage if (@ARGV<$argvNumber);
+undef($usage);
+undef($argvNumber);
+######################################################################################################################
+#my %opts;
+#GetOptions(\%opts,"a!","b:s");
+######################################################################################################################
+#	Constant
+######################################################################################################################
+#use constant PI => 3.1415926535897932384626433832795;
+######################################################################################################################
+#	Variable
+######################################################################################################################
+my ($svgF,$outFo)=@ARGV;
+my ($width,$height,$preOK,$tmp);
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#	Begin
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+open(F,"$svgF") || die "Can't open $svgF!\n";
+open(O,">$outFo") || die "Can't write $outFo\n";
+
+$preOK=0;
+while (<F>) {
+	next if (/<Author>/);
+	next if (/<E-mail>/);
+	next if (/<Version>/);
+	next if (/<Drawer>/);
+	next if (/<Date>/);
+	print O if ($preOK);
+	if (/<svg (.+)/) {
+		$tmp=$1;
+		/width=\"([^\"]+)\"/;
+		$width=$1;
+		/height=\"([^\"]+)\"/;
+		$height=$1;
+
+my $preXML=<<"PREXML";
+<?xml version="1.0" encoding="UTF-8"?>
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
+	<fo:layout-master-set>
+		<fo:simple-page-master page-width="${width}px" page-height="${height}px" master-name="first">
+			<fo:region-body />
+		</fo:simple-page-master>
+	</fo:layout-master-set>
+	<fo:page-sequence master-reference="first">
+		<fo:flow flow-name="xsl-region-body">
+			<fo:block>
+				<fo:instream-foreign-object>
+PREXML
+my $xmlns='xmlns="http://www.w3.org/2000/svg"';
+
+		print O $preXML;
+		print O "<svg $xmlns $tmp\n";
+		$preOK=1;
+	}
+}
+
+my $endXML=<<"ENDXML";
+				</fo:instream-foreign-object>
+			</fo:block>
+		</fo:flow>
+	</fo:page-sequence>
+</fo:root>
+ENDXML
+
+print O $endXML;
+close(O);
+close(F);
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#	Subprogram
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#	End
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
