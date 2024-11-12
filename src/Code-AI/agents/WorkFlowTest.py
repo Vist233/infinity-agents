@@ -6,10 +6,10 @@ import os
 def main() -> None:
     session_id = str(uuid.uuid4())
     
-    # Initialize AI instances with debug mode enabled
-    talk_ai = TalkAI(table_name=session_id, debug=True)
-    task_splitter_ai = TaskSplitterAI(table_name=session_id, debug=True)
-    output_checker_ai = OutputCheckerAI(table_name=session_id, debug=True)
+    # Initialize AI instances with debug_mode enabled
+    talk_ai = TalkAI(table_name=session_id, debug_mode=True)
+    task_splitter_ai = TaskSplitterAI(table_name=session_id, debug_mode=True)
+    output_checker_ai = OutputCheckerAI(table_name=session_id, debug_mode=True)
     
     messages = []
     

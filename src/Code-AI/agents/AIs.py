@@ -29,7 +29,7 @@ class BaseAI:
         )
 
 class TalkAI(BaseAI):
-    def __init__(self, table_name="talk_ai", debug=False):
+    def __init__(self, table_name="talk_ai", debug_mode=False):
         super().__init__(
             model_id="yi-lightning",
             description="An AI assistant that receives user input and generates a task execution plan.",
@@ -38,7 +38,7 @@ class TalkAI(BaseAI):
                 "Provide the task execution plan to TaskSplitterAI."
             ],
             table_name=table_name,
-            debug_mode=debug,
+            debug_mode=debug_mode,
             add_history_to_messages=True
         )
 
@@ -80,7 +80,7 @@ class ToolsAI(BaseAI):
         return False  # Placeholder implementation
 
 class TaskSplitterAI(BaseAI):
-    def __init__(self, table_name="task_splitter"):
+    def __init__(self, table_name="task_splitter", debug_mode=False):
         super().__init__(
             model_id="yi-large-fc",
             description="An AI that analyzes tasks and distributes them to the appropriate ToolsAI.",
@@ -90,7 +90,7 @@ class TaskSplitterAI(BaseAI):
                 "Ensure the task is safe before execution."
             ],
             table_name=table_name,
-            debug_mode=False,
+            debug_mode=debug_mode,
             add_history_to_messages=False
         )
         self.tools_agents = {
@@ -125,7 +125,7 @@ class TaskSplitterAI(BaseAI):
             return "Could not determine appropriate agent for this task"
 
 class OutputCheckerAI(BaseAI):
-    def __init__(self, table_name="output_checker"):
+    def __init__(self, table_name="output_checker", debug_mode=False):
         super().__init__(
             model_id="yi-lightning",
             description="An AI that checks the output of executed tasks.",
@@ -134,7 +134,7 @@ class OutputCheckerAI(BaseAI):
                 "Ensure the output meets the required standards."
             ],
             table_name=table_name,
-            debug_mode=False,
+            debug_mode=debug_mode,
             add_history_to_messages=False
         )
 
