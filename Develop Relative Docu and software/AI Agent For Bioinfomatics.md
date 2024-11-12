@@ -32,6 +32,6 @@ pdf查询用pdf翻译成对应的文本
 图像处理专用ai
 code分析ai 代码执行使用workflow模式，做更改：去除联网模块，添加纠错模块，添加一个可视化ai。详细化
 研究ai 检索功能+分析执行模块+代码执行模块：使用lighting作为主模块，pdf使用向量，图片询问交给vision ai（添加语义筛选）、搜索的话就添加搜索子ai
-![[2eb3ec50b4c1f2207d25d5c7c3f37444.png]]
+(1)![./2eb3ec50b4c1f2207d25d5c7c3f37444.png]
 ![[f6fe4b9d2e09fca4ea51d56c11302fb0.png]]
 
