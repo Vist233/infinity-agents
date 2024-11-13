@@ -85,20 +85,56 @@ class TaskSplitterAI(BaseAI):
             model_id="yi-lightning",
             description="An AI that validates and distributes executable tasks to ToolsAI.",
             instruction=[
-                "Verify that tasks only use available system tools and Python packages.",
-                "Reject tasks requiring external software installation or system changes.",
-                "Split complex tasks into executable subtasks.",
-                "Ensure each subtask can be handled by current ToolsAI capabilities.",
-                "Flag and filter out any non-executable tasks."
+                "Split input into two sections: description and executable tasks.",
+                "First section should explain the overall process.",
+                "Second section should be a numbered list of executable commands.",
+                "Ensure tasks are properly formatted for ToolsAI execution.",
+                "Filter out any non-executable or invalid tasks."
             ],
             table_name=table_name,
             debug_mode=debug_mode,
             add_history_to_messages=False
         )
 
-    def split_tasks(self, task_plan: str) -> list:
-        # Split the task plan into a list of tasks
-        tasks = [task.strip() for task in task_plan.strip().split('\n') if task.strip()]
+    def split_tasks(self, task_plan: str) -> dict:
+        # Process the input to ensure it has two sections
+        sections = self._parse_sections(task_plan)
+        if not sections:
+            return {"description": "", "tasks": []}
+
+        description, tasks_text = sections
+        # Convert task text into list of executable tasks
+        tasks = self._parse_tasks(tasks_text)
+        
+        return {
+            "description": description.strip(),
+            "tasks": tasks
+        }
+
+    def _parse_sections(self, task_plan: str) -> tuple:
+        # Split by double newline or numbered list marker
+        parts = task_plan.split('\n\n')
+        if len(parts) < 2:
+            # Try to find the boundary between description and tasks
+            for i, line in enumerate(task_plan.split('\n')):
+                if line.strip().startswith('1.') or line.strip().startswith('1)'):
+                    return (
+                        '\n'.join(task_plan.split('\n')[:i]),
+                        '\n'.join(task_plan.split('\n')[i:])
+                    )
+            return None
+        return (parts[0], '\n'.join(parts[1:]))
+
+    def _parse_tasks(self, tasks_text: str) -> list:
+        # Extract numbered tasks, cleaning up formatting
+        tasks = []
+        for line in tasks_text.split('\n'):
+            line = line.strip()
+            # Remove numbering and clean up
+            if line and (line[0].isdigit() or line[0] in ['•', '-', '*']):
+                task = line.split('.', 1)[-1].split(')', 1)[-1].strip()
+                if task:
+                    tasks.append(task)
         return tasks
 
 class OutputCheckerAI(BaseAI):
