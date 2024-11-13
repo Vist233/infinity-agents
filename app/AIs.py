@@ -60,8 +60,10 @@ class ToolsAI(BaseAI):
                 "Execute only tasks that use existing Python packages and system tools.",
                 "Do not attempt to install new software or modify system configurations.",
                 "Process biological data using available resources.",
-                "Report if a task cannot be executed with current tools.",
-                "Focus on data analysis, file operations, and calculations."
+                "If a command is not a task skip it and return NOT A TASK.",
+                "Focus on data analysis, file operations, and calculations.",
+                "If a task cannot be executed, report the reason and suggest alternative approaches.",
+                "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10, python3.10-pip, python3.10-dev."
             ],
             table_name=table_name,
             debug_mode=debug_mode,

@@ -1,1 +1,11 @@
 phidata
+biopython
+pandas
+numpy
+scipy
+matplotlib
+seaborn
+scikit-learn
+HTSeq
+PyVCF
+pysam
