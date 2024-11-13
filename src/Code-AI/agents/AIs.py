@@ -9,7 +9,7 @@ from phi.model.openai.like import OpenAILike
 
 
 class BaseAI:
-    def __init__(self, model_id: str, description: str, instruction: list, table_name: str, debug_mode=False, add_history_to_messages=True):
+    def __init__(self, model_id: str, description: str, instruction: list, table_name: str, debug_mode=False, add_history_to_messages=True, stream=False):
         self.storage = SqlAgentStorage(
             table_name=table_name,
             db_file="db/data.db"
@@ -25,21 +25,25 @@ class BaseAI:
             markdown=True,
             debug_mode=debug_mode,
             storage=self.storage,
-            add_history_to_messages=add_history_to_messages
+            add_history_to_messages=add_history_to_messages,
+            stream=stream
         )
 
 class TalkAI(BaseAI):
-    def __init__(self, table_name="talk_ai", debug_mode=False):
+    def __init__(self, table_name="talk_ai", debug_mode=False, stream=False):
         super().__init__(
             model_id="yi-lightning",
-            description="An AI assistant that receives user input and generates a task execution plan.",
+            description="An AI assistant that converts user requests into executable bioinformatics tasks using only available system tools and Python packages.",
             instruction=[
-                "Receive user requests and create a task execution plan.",
-                "Provide the task execution plan to TaskSplitterAI."
+                "Create executable task plans using only existing system tools and installed Python packages.",
+                "Break down complex tasks into smaller, executable steps.",
+                "Avoid generating tasks that require external software installation or system configuration.",
+                "Focus on data processing, analysis, and visualization tasks."
             ],
             table_name=table_name,
             debug_mode=debug_mode,
-            add_history_to_messages=True
+            add_history_to_messages=True,
+            stream=stream
         )
 
     def process_input(self, user_input: str):
@@ -48,11 +52,17 @@ class TalkAI(BaseAI):
         return task_plan
 
 class ToolsAI(BaseAI):
-    def __init__(self, tools: list, description: str, instruction: list, table_name: str, debug_mode=False, add_history_to_messages=False):
+    def __init__(self, table_name: str, debug_mode=False, add_history_to_messages=False, tools=[ShellTools(), PythonTools()]):
         super().__init__(
             model_id="yi-large-fc",
-            description=description,
-            instruction=instruction,
+            description="An AI that executes bioinformatics tasks using available Python packages and system tools.",
+            instruction=[
+                "Execute only tasks that use existing Python packages and system tools.",
+                "Do not attempt to install new software or modify system configurations.",
+                "Process biological data using available resources.",
+                "Report if a task cannot be executed with current tools.",
+                "Focus on data analysis, file operations, and calculations."
+            ],
             table_name=table_name,
             debug_mode=debug_mode,
             add_history_to_messages=add_history_to_messages
@@ -60,78 +70,48 @@ class ToolsAI(BaseAI):
         self.agent.tools = tools
         self.agent.show_tool_calls = True
 
-    def execute_task(self, task: str):
-        # Execute the task by running bioinformatics software
-        try:
-            # Ensure the task command is safe to execute
-            safe_command = self.sanitize_command(task)
-            result = subprocess.run(safe_command, shell=True, capture_output=True, text=True)
-            return result.stdout + result.stderr
-        except Exception as e:
-            return f"An error occurred while executing the task: {e}"
-
-    def sanitize_command(self, command: str) -> str:
-        # Implement command sanitization to prevent unsafe executions
-        # ...code to sanitize command...
-        return command  # Placeholder
-
     def is_harmful(self, code: str) -> bool:
         # Code to check if the task is harmful
         return False  # Placeholder implementation
 
+    def execute_task(self, task: str) -> str:
+        # Execute the given task
+        execution_result = self.agent.run(f"Execute the following task:\n{task}").content.strip()
+        return execution_result
+
 class TaskSplitterAI(BaseAI):
     def __init__(self, table_name="task_splitter", debug_mode=False):
         super().__init__(
-            model_id="yi-large-fc",
-            description="An AI that analyzes tasks and distributes them to the appropriate ToolsAI.",
+            model_id="yi-lightning",
+            description="An AI that validates and distributes executable tasks to ToolsAI.",
             instruction=[
-                "Analyze the task execution plan from TalkAI.",
-                "Determine the appropriate ToolsAI for each task.",
-                "Ensure the task is safe before execution."
+                "Verify that tasks only use available system tools and Python packages.",
+                "Reject tasks requiring external software installation or system changes.",
+                "Split complex tasks into executable subtasks.",
+                "Ensure each subtask can be handled by current ToolsAI capabilities.",
+                "Flag and filter out any non-executable tasks."
             ],
             table_name=table_name,
             debug_mode=debug_mode,
             add_history_to_messages=False
         )
-        self.tools_agents = {
-            "script": ToolsAI(
-                tools=[PythonTools()],
-                description="Specialized in executing data processing scripts.",
-                instruction=[
-                    "Execute data processing tasks using Python."
-                ],
-                table_name="script_agent"
-            ),
-            "system": ToolsAI(
-                tools=[ShellTools()],
-                description="Specialized in performing system operations and file management.",
-                instruction=[
-                    "Execute system operations and manage files."
-                ],
-                table_name="system_agent"
-            )
-        }
 
-    def process_task(self, task_plan: str) -> str:
-        # Analyze the task plan and select the appropriate agent
-        analysis = self.agent.run(f"""
-            Analyze the following task and determine the appropriate tool ('script' or 'system'):
-            Task: {task_plan}
-            """).content.strip()
-        if analysis in self.tools_agents:
-            execution_result = self.tools_agents[analysis].execute_task(task_plan)
-            return execution_result
-        else:
-            return "Could not determine appropriate agent for this task"
+    def split_tasks(self, task_plan: str) -> list:
+        # Split the task plan into a list of tasks
+        tasks = [task.strip() for task in task_plan.strip().split('\n') if task.strip()]
+        return tasks
 
 class OutputCheckerAI(BaseAI):
     def __init__(self, table_name="output_checker", debug_mode=False):
         super().__init__(
             model_id="yi-lightning",
-            description="An AI that checks the output of executed tasks.",
+            description="An AI that validates task outputs and execution status.",
             instruction=[
-                "Review the output of tasks from ToolsAI.",
-                "Ensure the output meets the required standards."
+                "Verify that task outputs are complete and valid.",
+                "Check for execution errors or tool limitations.",
+                "Ensure results meet bioinformatics quality standards.",
+                "Report any execution failures or incomplete tasks.",
+                "Validate data formats and analysis results."
             ],
             table_name=table_name,
             debug_mode=debug_mode,

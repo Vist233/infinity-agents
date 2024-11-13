@@ -59,7 +59,7 @@ agent = Agent(
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
-    tools=[GoogleSearch(), PythonTools()], 
+    tools=[ShellTools(), PythonTools()], 
     show_tool_calls=True, 
     markdown=True, 
     debug_mode=True, 

@@ -1,0 +1,3 @@
+import os
+current_dir = os.getcwd()
+current_dir
