@@ -12,7 +12,7 @@ class BaseAI:
     def __init__(self, model_id: str, description: str, instruction: list, table_name: str, debug_mode=False, add_history_to_messages=True, stream=False):
         self.storage = SqlAgentStorage(
             table_name=table_name,
-            db_file="db/data.db"
+            db_file="./../DataBase/data.db"
         )
         self.agent = Agent(
             model=OpenAILike(
