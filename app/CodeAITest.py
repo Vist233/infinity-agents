@@ -1,14 +1,16 @@
-    """_summary_
+import uuid
+from AIs import TalkAI, TaskSplitterAI, OutputCheckerAI, ToolsAI  # 导入AI类
+import os   
+ 
+"""
     你可以使用这个做测试，但是！不要在这里写这个流程，
     app\Test\WorkFlowTest.py里面有一个完全一样的文件，
     你应该在那里写测试，这里只是用来展示给你看，怕你找不到。
-    """
+"""
 
 
 
-import uuid
-from AIs import TalkAI, TaskSplitterAI, OutputCheckerAI, ToolsAI  # 导入AI类
-import os
+
 
 def main() -> None:
     session_id = str(uuid.uuid4())

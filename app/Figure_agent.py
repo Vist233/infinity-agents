@@ -1,9 +1,6 @@
-import os
-import openai
+from openai import OpenAI
 import base64
 import httpx
-import subprocess
-import tempfile
 
 # # Approach 1: use image URL
 # # image1 = "https://platform.lingyiwanwu.com/assets/LLMquality.jpg"
@@ -14,6 +11,14 @@ import tempfile
 # # image_media_type = "image/jpeg"
 # # image = "data:image/jpeg;base64," + base64.b64encode(httpx.get(image_url).content).decode("utf-8")
 # # Approach 3: use local image and encode it to base64
+
+API_BASE = "https://api.lingyiwanwu.com/v1"
+API_KEY = "1352a88fdd3844deaec9d7dbe4b467d5"
+client = OpenAI(
+  api_key=API_KEY,
+  base_url=API_BASE
+)
+
 image_path1 = "./Strandard.png"
 image_path2 = "./22A-T-34-5球形侧视图.JPG"
 image_path3 = "./22A-T-34-2球形侧视图.JPG"
