@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     python3.10 \
     python3.10-pip \
     python3.10-dev \
+    perl \
     && apt-get clean
 
 # 3. 安装 Miniconda
@@ -25,6 +26,10 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
 # 4. 设置环境变量：将 Conda 和 Python 路径添加到环境变量中
 ENV PATH="/opt/conda/bin:$PATH"
 ENV CONDA_DEFAULT_ENV=base
+COPY Bioinfomatics-Software/CPJSdraw-main/bin/CPJSdraw.pl /usr/local/bin/
+COPY Bioinfomatics-Software/Kaks_Calculator-main/kaks_slidingwindow.pl /usr/local/bin/
+COPY Bioinfomatics-Software/misa/misa.pl /usr/local/bin/
+COPY Bioinfomatics-Software\misa\misa.ini /usr/local/bin/
 
 # 5. 创建 Conda 环境并安装 Python 3.10
 RUN conda update -n base -c defaults conda && \
