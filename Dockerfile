@@ -37,7 +37,7 @@ RUN conda update -n base -c defaults conda && \
     conda config --add channels bioconda && \
     conda config --add channels conda-forge && \
     conda install python=3.10 -y && \
-    conda install -y raxml-ng modeltest mafft CPSTools vcftools gatk samtools bwa snpeff
+    conda install -y raxml-ng modeltest mafft CPSTools vcftools gatk samtools bwa snpeff pyinstaller
 
 # 6. 复制 requirements.txt 文件到容器中
 COPY requirements.txt /tmp/requirements.txt
