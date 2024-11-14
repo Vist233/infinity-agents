@@ -47,9 +47,11 @@ RUN conda config --set solver classic && \
 COPY requirements.txt /tmp/requirements.txt
 
 # 7. 安装 Python 依赖
-RUN conda activate base && \
+RUN conda init bash && \
+    /bin/bash -c "source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate base && \
     pip install --upgrade setuptools && \
-    pip install -r /tmp/requirements.txt
+    pip install --use-deprecated=legacy-resolver -r /tmp/requirements.txt"
     
 # 8. 设置工作目录
 WORKDIR /app
