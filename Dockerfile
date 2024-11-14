@@ -1,5 +1,5 @@
 # 1. 使用 Ubuntu 基础镜像
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Set the timezone non-interactively
 ENV DEBIAN_FRONTEND=noninteractive
@@ -49,7 +49,7 @@ COPY requirements.txt /tmp/requirements.txt
 # 7. 安装 Python 依赖
 RUN conda run -n base pip install --upgrade setuptools && \
     conda run -n base pip install -r /tmp/requirements.txt
-    
+
 # 8. 设置工作目录
 WORKDIR /app
 
