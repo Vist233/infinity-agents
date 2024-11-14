@@ -7,5 +7,4 @@ matplotlib
 seaborn
 scikit-learn
 HTSeq
-PyVCF
 pysam
