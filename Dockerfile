@@ -1,6 +1,11 @@
 # 1. 使用 Ubuntu 基础镜像
 FROM ubuntu:20.04
 
+# Set the timezone non-interactively
+ENV DEBIAN_FRONTEND=noninteractive
+RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
+    echo "Etc/UTC" > /etc/timezone
+
 # 2. 安装基本依赖
 RUN apt-get update && apt-get install -y \
     wget \
