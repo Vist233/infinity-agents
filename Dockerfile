@@ -12,9 +12,6 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libsm6 \
     libxi6 \
-    python3.10 \
-    python3.10-pip \
-    python3.10-dev \
     perl \
     && apt-get clean
 
@@ -29,7 +26,7 @@ ENV CONDA_DEFAULT_ENV=base
 COPY Bioinfomatics-Software/CPJSdraw-main/bin/CPJSdraw.pl /usr/local/bin/
 COPY Bioinfomatics-Software/Kaks_Calculator-main/kaks_slidingwindow.pl /usr/local/bin/
 COPY Bioinfomatics-Software/misa/misa.pl /usr/local/bin/
-COPY Bioinfomatics-Software\misa\misa.ini /usr/local/bin/
+COPY Bioinfomatics-Software/misa/misa.ini /usr/local/bin/
 
 # 5. 创建 Conda 环境并安装 Python 3.10
 RUN conda update -n base -c defaults conda && \
@@ -43,8 +40,7 @@ RUN conda update -n base -c defaults conda && \
 COPY requirements.txt /tmp/requirements.txt
 
 # 7. 安装 Python 依赖
-RUN conda activate base && \
-    pip install -r /tmp/requirements.txt
+RUN conda run -n base pip install -r /tmp/requirements.txt
 
 # 8. 设置工作目录
 WORKDIR /app
@@ -54,7 +50,7 @@ COPY . .
 
 # 10. 确保每次运行时都在 `base` 环境中
 #     启动时默认使用 /bin/bash，激活 `base` 环境。
-ENTRYPOINT ["bash", "-c", "source /opt/conda/bin/activate base && exec $0", "--"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "base", "bash"]
 
 # 11. 暴露应用所需的端口（根据实际情况设置）
 EXPOSE 8080
