@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxi6 \
     perl \
+    libarchive-dev \
     && apt-get clean
 
 # 3. 安装 Miniconda
@@ -46,8 +47,9 @@ RUN conda config --set solver classic && \
 COPY requirements.txt /tmp/requirements.txt
 
 # 7. 安装 Python 依赖
-RUN conda run -n base pip install -r /tmp/requirements.txt
-
+RUN conda run -n base pip install --upgrade setuptools && \
+    conda run -n base pip install -r /tmp/requirements.txt
+    
 # 8. 设置工作目录
 WORKDIR /app
 
