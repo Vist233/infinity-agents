@@ -34,7 +34,8 @@ COPY Bioinfomatics-Software/misa/misa.pl /usr/local/bin/
 COPY Bioinfomatics-Software/misa/misa.ini /usr/local/bin/
 
 # 5. 创建 Conda 环境并安装 Python 3.10
-RUN conda update -n base -c defaults conda && \
+RUN conda config --set solver classic && \
+    conda update -n base -c defaults conda && \
     conda config --add channels defaults && \
     conda config --add channels bioconda && \
     conda config --add channels conda-forge && \
