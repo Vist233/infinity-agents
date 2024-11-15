@@ -1,0 +1,79 @@
+Here’s a breakdown of how the interface could be structured based on your description, closely following the layout, features, and color scheme in the image:
+﻿
+### Web Interface Layout
+﻿
+#### **Overall Structure**
+- **Two-Column Layout**: The page is split into two main vertical sections:
+- **Left Side**: AI Dialog Module
+- **Right Side**: File Processing Module
+  
+---
+﻿
+### Left Part: **AI Dialog Module**
+﻿
+1. **Header (Upper Left)**:
+- **Model Selection Dropdown**: A dropdown menu or button (styled to match the image’s theme) allows users to choose AI models (e.g., GPT-3, GPT-4).
+- This header is fixed at the top of the AI module area for easy model switching.
+﻿
+2. **Main Dialog Area**:
+- **Chat Window Style**: Displays conversation history between the user and AI in a scrollable container.
+- **Message Bubbles**:
+- **User Input**: Styled as user speech bubbles on the right side.
+- **AI Response**: Styled as AI speech bubbles on the left side, with options for code snippets and text-based responses.
+- **Scroll Bar**: A styled scroll bar for scrolling through the dialog history.
+﻿
+3. **User Input Box**:
+- Positioned at the bottom of the dialog module.
+- Allows users to enter text or commands to interact with the AI model.
+   
+---
+﻿
+### Right Part: **File Processing Module**
+﻿
+1. **Header (Upper Right)**:
+- **Current Working Folder Display**: Shows the name of the current project folder.
+- **File List**: Displays files and folders in a collapsible format with icons indicating:
+- **File Type** (e.g., folder, Python file, text file).
+- **Status Icon** (e.g., synced, unsynced, cloud status).
+- **File Name and Type** (with matching text colors and icons from the image).
+- **Size** of each file.
+﻿
+2. **Main File Area**:
+- **Collapsible File Tree**: Allows users to expand/collapse folders for easy navigation.
+- **Selectable Files**: Users can click on files to view or manage them in real time.
+﻿
+3. **Lower Right Section: Command Processing Information Area**
+- **Command Input Box**: 
+- An input field at the bottom where users can enter commands for code execution.
+- **Execution Output Display**:
+- Shows a scrollable area above the input box to display command outputs, debug information, or code results.
+- **Code Block Display**:
+- An area formatted to display code blocks with sections such as:
+- **Explanation**: Summarizes code function.
+- **Functions**: Lists out functions or definitions.
+- **Test Steps**: Displays test cases and expected output.
+﻿
+---
+﻿
+### Styling Guidelines
+﻿
+- **Color Scheme**: 
+- Use the same colors as in the image, mainly dark and grayscale tones with highlights for icons, buttons, and interactive elements.
+  
+- **Text Styling**:
+- **File Names and Status**: Use different font weights or color shades to differentiate between folders and files.
+- **Code Blocks and Outputs**: Monospaced font for code, with light background for readability.
+  
+- **Scroll Bars**:
+- Style scroll bars to fit the dark theme, blending with the module background.
+﻿
+---
+﻿
+### Functionality Features
+﻿
+- **Dynamic Model Selection**: When a user selects a model from the dropdown, it updates the AI’s response style or behavior.
+- **Real-time Dialog Updates**: Conversations between user and AI should update dynamically.
+- **File Interactivity**: Users should be able to click files to view or run commands on them in the command input area.
+- **Command Execution Display**: Commands typed in the input box display execution results above it in real-time, making it easier for debugging or tracking progress.
+﻿
+Let me know if you would like a mockup image generated for this layout!

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI and File Processing Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Side: AI Dialog Module -->
+        <div class="left-side">
+            <div class="header">
+                <select id="model-selection">
+                    <option value="gpt3">GPT-3</option>
+                    <option value="gpt4">GPT-4</option>
+                </select>
+            </div>
+            <div class="dialog-area">
+                <!-- Chat messages will be displayed here -->
+            </div>
+            <div class="user-input">
+                <input type="text" id="user-input" placeholder="Type your message here...">
+            </div>
+        </div>
+        <!-- Right Side: File Processing Module -->
+        <div class="right-side">
+            <div class="header">
+                <span>Current Folder: /path/to/project</span>
+            </div>
+            <div class="file-area">
+                <!-- Collapsible file tree will be displayed here -->
+            </div>
+            <div class="command-area">
+                <div class="output-display">
+                    <!-- Command outputs will be displayed here -->
+                </div>
+                <div class="command-input">
+                    <input type="text" id="command-input" placeholder="Enter command here...">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
