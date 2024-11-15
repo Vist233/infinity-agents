@@ -7,7 +7,7 @@ from phi.storage.workflow.sqlite import SqlWorkflowStorage
 from phi.utils.log import logger
 from phi.model.openai.like import OpenAILike
 import AI_Classes
-from app.StructureOutput import TaskSpliterAIOutput,outputCheckerOutput
+from StructureOutput import TaskSpliterAIOutput,outputCheckerOutput
 
 
 # Define the Workflow

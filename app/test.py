@@ -3,7 +3,7 @@ from phi.playground import Playground, serve_playground_app
 from phi.tools.python import PythonTools
 from phi.tools.shell import ShellTools
 from phi.model.openai.like import OpenAILike
-from app.AI_Classes import toolsTeamStorage
+from AI_Classes import toolsTeamStorage
 
 shellExcutor = Agent(
     name="shell excutor",
