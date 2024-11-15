@@ -49,6 +49,7 @@ userInterfaceCommunicator = Agent(
     markdown=True
 )
 
+#should know what tools it could use and structure its output.AND CURRENT DIR LIST
 taskSpliter = Agent(
     storage = taskSpliterStorage,
     model=OpenAILike(
@@ -58,6 +59,7 @@ taskSpliter = Agent(
     ),
     description="An AI that validates and distributes executable tasks to ToolsAI.",
     instruction=[
+        "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10.",
         "Filter out any non-executable or invalid tasks.",
         "If the input contains the task that install new software or modify system configurations, ignore it",
         "If the input is not a task, return NOT A TASK.",
@@ -66,6 +68,7 @@ taskSpliter = Agent(
     markdown=True
 )
 
+#structure its output
 outputChecker = Agent(
     storage = outputCheckerStorage,
     model=OpenAILike(
@@ -143,7 +146,7 @@ toolsTeam = Agent(
     ),
     description="An AI that executes bioinformatics tasks using available Python packages and system tools.",
     instruction=[
-        "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10, python3.10-pip, python3.10-dev."
+        "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10."
         "Execute only tasks that use existing Python packages and system tools.",
         "Process biological data using available resources.",
         "If a command is not a task skip it and return NOT A TASK.",
