@@ -1,5 +1,6 @@
 from phi.agent import Agent
 from phi.model.openai.like import OpenAILike
+from phi.playground import Playground, serve_playground_app
 from phi.tools.googlesearch import GoogleSearch
 from phi.tools.shell import ShellTools
 from phi.tools.python import PythonTools
@@ -12,7 +13,7 @@ session_id = str(uuid.uuid4())
 userInterfaceCommunicatorStorage = SqlAgentStorage(
             table_name=session_id,
             db_file="./../DataBase/userInterfaceCommunicator.db"
-        ),
+        )
 
 outputCheckerStorage = SqlAgentStorage(
             table_name=session_id,
@@ -158,3 +159,7 @@ toolsTeam = Agent(
     markdown=True,
 )
 
+pp = Playground(agents=[webSeacher,outputChecker,toolsTeam]).get_app()
+
+if __name__ == "__main__":
+    serve_playground_app("playground:app", reload=True)
