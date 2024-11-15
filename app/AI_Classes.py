@@ -38,6 +38,13 @@ userInterfaceCommunicator = Agent(
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
+    description="An AI assistant that converts user requests into executable bioinformatics tasks.",
+    instruction=[
+    "Create executable task plans using only existing system tools and installed Python packages.",
+    "Break down complex tasks into smaller, executable steps.",
+    "Avoid generating tasks that require external software installation or system configuration.",
+    "Focus on data processing, analysis, and visualization tasks."
+    ],
     add_history_to_messages=True,
     markdown=True
 )
@@ -49,6 +56,12 @@ taskSpliter = Agent(
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
+    description="An AI that validates and distributes executable tasks to ToolsAI.",
+    instruction=[
+        "Filter out any non-executable or invalid tasks.",
+        "If the input contains the task that install new software or modify system configurations, ignore it",
+        "If the input is not a task, return NOT A TASK.",
+    ],
     add_history_to_messages=True,
     markdown=True
 )
@@ -60,6 +73,14 @@ outputChecker = Agent(
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
+    description="An AI that validates task outputs and execution status.",
+    instruction=[
+        "Verify that task outputs are complete and valid.",
+        "Check for execution errors or tool limitations.",
+        "Ensure results meet bioinformatics quality standards.",
+        "Report any execution failures or incomplete tasks.",
+        "Validate data formats and analysis results."
+    ],
     add_history_to_messages=False,
     markdown=True
 )
@@ -122,13 +143,12 @@ toolsTeam = Agent(
     ),
     description="An AI that executes bioinformatics tasks using available Python packages and system tools.",
     instruction=[
+        "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10, python3.10-pip, python3.10-dev."
         "Execute only tasks that use existing Python packages and system tools.",
-        "Do not attempt to install new software or modify system configurations.",
         "Process biological data using available resources.",
         "If a command is not a task skip it and return NOT A TASK.",
         "Focus on data analysis, file operations, and calculations.",
         "If a task cannot be executed, report the reason and suggest alternative approaches.",
-        "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10, python3.10-pip, python3.10-dev."
     ],
     add_history_to_messages=False,
     show_tool_calls=True,
