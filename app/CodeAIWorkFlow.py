@@ -136,8 +136,7 @@ class TaskExecutionWorkflow(Workflow):
 os.makedirs('./ProcessingSpace'+session_id, exist_ok=True)
 os.chdir('./ProcessingSpace'+session_id)
 
-filePath = input("Your input file direactoray here:")
-shutil.copy(filePath, 'destination_file.txt')
+filePath = input("Your input file path here:")
 destination_file_path = os.path.join(os.getcwd(), os.path.basename(filePath))
 shutil.copy(filePath, destination_file_path)
 print("")
