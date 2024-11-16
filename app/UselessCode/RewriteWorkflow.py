@@ -212,7 +212,7 @@ class TaskExecutionWorkflow(Workflow):
 task_execution_workflow = TaskExecutionWorkflow(
     session_id=session_id,
     storage=SqlWorkflowStorage(
-        table_name="task_execution_workflows",
+        table_name=session_id,
         db_file="tmp/workflows.db",
     ),
 )

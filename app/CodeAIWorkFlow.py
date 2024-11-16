@@ -31,7 +31,9 @@ class TaskExecutionWorkflow(Workflow):
         # Step 1: Process input with userInterfaceCommunicator
         logger.info("Processing input with userInterfaceCommunicator")
         try:
-            ui_response: RunResponse = self.user_interface.run("The following is the files under current dir\n" + listCurrentDir + "The following is the user's input\n" + user_input)
+            ui_response: RunResponse = self.user_interface.run(
+                "The following is the files under current dir\n" + str(listCurrentDir) + "\nThe following is the user's input\n" + user_input
+            )
             if ui_response and ui_response.content:
                 ui_content = ui_response.content
                 logger.info("Received response from userInterfaceCommunicator")
@@ -133,24 +135,26 @@ class TaskExecutionWorkflow(Workflow):
 
 
 # Create a new directory for the session
-os.makedirs('./ProcessingSpace'+session_id, exist_ok=True)
-os.chdir('./ProcessingSpace'+session_id)
+os.makedirs('./ProcessingSpace' + session_id, exist_ok=True)
+os.chdir('./ProcessingSpace' + session_id)
 
 filePath = input("Your input file path here:")
 destination_file_path = os.path.join(os.getcwd(), os.path.basename(filePath))
 shutil.copy(filePath, destination_file_path)
-print("")
+
+# Get the user input text
+user_input = input("Your input text here:")
 
 # Create the new workflow
 task_execution_workflow = TaskExecutionWorkflow(
     session_id=session_id,
     storage=SqlWorkflowStorage(
         table_name="task_execution_workflows",
-        db_file="./../Database/workflows.db",
+        db_file="./../Database/CodeWorkflows.db",
     ),
 )
 
-user_input = "Your input text here:"
+# Run the workflow
 task_execution_results: Iterator[RunResponse] = task_execution_workflow.run(user_input=user_input)
 
 
