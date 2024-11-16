@@ -136,16 +136,27 @@ pubmedSeacher = Agent(
     )
 )
 
+yiSeacher = Agent(
+    name="Yi Searcher",
+    role="Search from and summary web.",
+    tools=[],
+    model=OpenAILike(
+        id="yi-large-rag",
+        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+        base_url="https://api.lingyiwanwu.com/v1",
+    )
+)
+
 toolsTeam = Agent(
     name="Tools Team",
-    team=[pythonExcutor, shellExcutor],
+    team=[pythonExcutor, shellExcutor, yiSeacher],
     storage = toolsTeamStorage,
     model=OpenAILike(
         id="yi-large-fc",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
-    description="An AI that executes bioinformatics tasks using available Python packages and system tools.",
+    description="An AI that executes bioinformatics tasks using available Python packages and system tools. If the input don't need py or shell, you could search something from the web to get the better answer from web or just return your answer.",
     instruction=[
         "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10."
         "Execute only tasks that use existing Python packages and system tools.",
@@ -159,7 +170,22 @@ toolsTeam = Agent(
     markdown=True,
 )
 
-pp = Playground(agents=[webSeacher,outputChecker,toolsTeam]).get_app()
-
-if __name__ == "__main__":
-    serve_playground_app("playground:app", reload=True)
+#How to deal with the PICTURE? use vision model seperately?
+searchSummaryTeam = Agent(
+    name="Search and Summary Team",
+    team=[pubmedSeacher, yiSeacher],
+    storage = toolsTeamStorage,
+    model=OpenAILike(
+        id="yi-large-fc",
+        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+        base_url="https://api.lingyiwanwu.com/v1",
+    ),
+    description="comprehensive the knowledge from pubmed and website to replay the user.",
+    instruction=[
+        "Search the web and pubmed to get what the user want."
+    ],
+    add_history_to_messages=True,
+    show_tool_calls=True,
+    markdown=True,
+)
+    
