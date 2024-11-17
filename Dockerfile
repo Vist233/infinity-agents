@@ -1,12 +1,12 @@
-# 1. 使用 Ubuntu 基础镜像
+# 1. Use Ubuntu base image
 FROM ubuntu:22.04
 
-# Set the timezone non-interactively
+# 2. Set timezone non-interactively
 ENV DEBIAN_FRONTEND=noninteractive
 RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     echo "Etc/UTC" > /etc/timezone
 
-# 2. 安装基本依赖
+# 3. Install system dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -19,54 +19,57 @@ RUN apt-get update && apt-get install -y \
     libxi6 \
     perl \
     libarchive-dev \
-    && apt-get clean
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# 3. 安装 Miniconda
+# 4. Install Miniconda and set environment variables
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
     bash /tmp/miniconda.sh -b -p /opt/conda && \
     rm -rf /tmp/miniconda.sh
-
-# 4. 设置环境变量：将 Conda 和 Python 路径添加到环境变量中
 ENV PATH="/opt/conda/bin:$PATH"
 ENV CONDA_DEFAULT_ENV=base
-COPY Bioinfomatics-Software/CPJSdraw-main/bin/CPJSdraw.pl /usr/local/bin/
-COPY Bioinfomatics-Software/Kaks_Calculator-main/kaks_slidingwindow.pl /usr/local/bin/
-COPY Bioinfomatics-Software/misa/misa.pl /usr/local/bin/
-COPY Bioinfomatics-Software/misa/misa.ini /usr/local/bin/
 
-# 5. 创建 Conda 环境并安装 Python 3.10
+# 5. Copy bioinformatics tools
+COPY Bioinfomatics-Software/CPJSdraw-main/bin/CPJSdraw.pl \
+     Bioinfomatics-Software/Kaks_Calculator-main/kaks_slidingwindow.pl \
+     Bioinfomatics-Software/misa/misa.pl \
+     Bioinfomatics-Software/misa/misa.ini \
+     /usr/local/bin/
+
+# 6. Configure conda and install dependencies
 RUN conda config --set solver classic && \
     conda update -n base -c defaults conda && \
     conda config --add channels defaults && \
     conda config --add channels bioconda && \
     conda config --add channels conda-forge && \
-    conda install python=3.10 -y && \
-    conda install -y raxml-ng modeltest-ng mafft CPSTools vcftools gatk samtools bwa snpeff pyinstaller
+    conda install -y python=3.10 \
+    raxml-ng \
+    modeltest-ng \
+    mafft \
+    CPSTools \
+    vcftools \
+    gatk \
+    samtools \
+    bwa \
+    snpeff \
+    pyinstaller
 
-# 6. 复制 requirements.txt 文件到容器中
+# 7. Install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
-
-RUN apt-get update && apt-get install -y libarchive-dev
-RUN apt-get update && apt-get install -y libarchive-dev libarchive20
-# 7. 安装 Python 依赖
 RUN conda init bash && \
     /bin/bash -c "source /opt/conda/etc/profile.d/conda.sh && \
     conda activate base && \
     pip install --upgrade setuptools && \
-    pip install --use-deprecated=legacy-resolver -r /tmp/requirements.txt"
-    
-# 8. 设置工作目录
-WORKDIR /app
+    pip install -r /tmp/requirements.txt" && \
+    rm /tmp/requirements.txt
 
-# 9. 复制应用程序的代码
+# 8. Set up application
+WORKDIR /app
 COPY . .
 
-# 10. 确保每次运行时都在 `base` 环境中
-#     启动时默认使用 /bin/bash，激活 `base` 环境。
+# 9. Configure container runtime
+EXPOSE 8080
 ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "base", "bash"]
 
-# 11. 暴露应用所需的端口（根据实际情况设置）
-EXPOSE 8080
-
-# 12. 设置容器启动命令
-# CMD ["python", "main.py"]  # 替换为你实际的启动命令
+# Optional: Uncomment and modify the CMD based on your application
+# CMD ["python", "main.py"]
