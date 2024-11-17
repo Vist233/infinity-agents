@@ -1,12 +1,8 @@
-import json
-import os
-from typing import Optional, Iterator, Dict, List, Any
 from pydantic import BaseModel, Field
 from phi.agent import Agent
 from phi.workflow import Workflow, RunResponse, RunEvent
 from phi.storage.workflow.sqlite import SqlWorkflowStorage
 from phi.utils.log import logger
-from phi.model.openai.like import OpenAILike
 from StructureOutput import TaskSpliterAIOutput, outputCheckerOutput
 from AI_Classes import (
     userInterfaceCommunicator,
@@ -16,13 +12,16 @@ from AI_Classes import (
     session_id
 )
 import shutil
+from phi.utils.pprint import pprint_run_response
+import os
+from typing import Iterator
 
 
-class TaskExecutionWorkflow(Workflow):
-    user_interface: Agent = userInterfaceCommunicator
-    task_splitter: Agent = taskSpliter
-    tools_team: Agent = toolsTeam
-    output_checker: Agent = outputChecker
+class CodeAIWorkflow(Workflow):
+    user_interface: Agent = Field(default_factory=lambda: userInterfaceCommunicator)
+    task_splitter: Agent = Field(default_factory=lambda: taskSpliter)
+    tools_team: Agent = Field(default_factory=lambda: toolsTeam)
+    output_checker: Agent = Field(default_factory=lambda: outputChecker)
 
     def run(self, user_input: str) -> Iterator[RunResponse]:
         listCurrentDir = os.listdir('.')
@@ -135,8 +134,8 @@ class TaskExecutionWorkflow(Workflow):
 
 
 # Create a new directory for the session
-os.makedirs('./ProcessingSpace' + session_id, exist_ok=True)
-os.chdir('./ProcessingSpace' + session_id)
+os.makedirs('./app/ProcessingSpace/' + session_id, exist_ok=True)
+os.chdir('./app/ProcessingSpace/' + session_id)
 
 filePath = input("Your input file path here:")
 destination_file_path = os.path.join(os.getcwd(), os.path.basename(filePath))
@@ -146,7 +145,7 @@ shutil.copy(filePath, destination_file_path)
 user_input = input("Your input text here:")
 
 # Create the new workflow
-task_execution_workflow = TaskExecutionWorkflow(
+task_execution_workflow = CodeAIWorkflow(
     session_id=session_id,
     storage=SqlWorkflowStorage(
         table_name="task_execution_workflows",
@@ -158,4 +157,4 @@ task_execution_workflow = TaskExecutionWorkflow(
 task_execution_results: Iterator[RunResponse] = task_execution_workflow.run(user_input=user_input)
 
 
-# pprint_run_response(task_processing_results, markdown=True)
+pprint_run_response(task_execution_results, markdown=True)
