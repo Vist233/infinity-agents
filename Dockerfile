@@ -46,19 +46,27 @@ RUN conda config --set solver classic && \
 # 6. 复制 requirements.txt 文件到容器中
 COPY requirements.txt /tmp/requirements.txt
 
-# 7. 安装 Python 依赖
-RUN /opt/conda/bin/pip install --upgrade setuptools && \
-    /opt/conda/bin/pip install --use-deprecated=legacy-resolver -r /tmp/requirements.txt
+RUN apt-get update && apt-get install -y libarchive-dev
 
+# 7. 安装 Python 依赖
+RUN conda init bash && \
+    /bin/bash -c "source /opt/conda/etc/profile.d/conda.sh && \
+    conda activate base && \
+    pip install --upgrade setuptools && \
+    pip install --use-deprecated=legacy-resolver -r /tmp/requirements.txt"
+    
 # 8. 设置工作目录
 WORKDIR /app
 
 # 9. 复制应用程序的代码
 COPY . .
 
-# 10. 设置容器启动命令
-ENTRYPOINT ["/opt/conda/bin/python"]
-CMD ["main.py"]  # 替换为你实际的启动命令
+# 10. 确保每次运行时都在 `base` 环境中
+#     启动时默认使用 /bin/bash，激活 `base` 环境。
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "base", "bash"]
 
 # 11. 暴露应用所需的端口（根据实际情况设置）
 EXPOSE 8080
+
+# 12. 设置容器启动命令
+# CMD ["python", "main.py"]  # 替换为你实际的启动命令
