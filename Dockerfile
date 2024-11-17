@@ -47,7 +47,7 @@ RUN conda config --set solver classic && \
 COPY requirements.txt /tmp/requirements.txt
 
 RUN apt-get update && apt-get install -y libarchive-dev
-
+RUN apt-get update && apt-get install -y libarchive-dev libarchive20
 # 7. 安装 Python 依赖
 RUN conda init bash && \
     /bin/bash -c "source /opt/conda/etc/profile.d/conda.sh && \
