@@ -58,7 +58,12 @@ class CodeAIWorkflow(Workflow):
         # Step 2: Split the task using taskSpliter
         logger.info("Splitting the task with taskSpliter")
         try:
-            task_splitter_response: RunResponse = self.task_splitter.run("The following is the files under current dir\n" + listCurrentDir + "The following is the user input\n" +ui_content)
+            task_splitter_response: RunResponse = self.task_splitter.run(
+                "The following is the files under current dir:\n" + 
+                "\n".join(listCurrentDir) + 
+                "\nThe following is the user input:\n" + 
+                ui_content
+            )
             if task_splitter_response and task_splitter_response.content:
                 task_splitter_output = TaskSpliterAIOutput.parse_obj(task_splitter_response.content)
                 tasks = task_splitter_output.tasks
@@ -86,7 +91,12 @@ class CodeAIWorkflow(Workflow):
         logger.info("Executing tasks with toolsTeam")
         for task in tasks:
             try:
-                tools_team_response: RunResponse = self.tools_team.run("The following is the files under current dir\n" + listCurrentDir + "The following is the task\n" + json.dumps(task, indent=4))
+                tools_team_response: RunResponse = self.tools_team.run(
+                    "The following is the files under current dir:\n" + 
+                    "\n".join(listCurrentDir) + 
+                    "\nThe following is the task:\n" + 
+                    json.dumps(task, indent=4)
+                )
                 if tools_team_response and tools_team_response.content:
                     execution_results.append(tools_team_response.content)
                     logger.info("Task executed by toolsTeam")
@@ -101,7 +111,12 @@ class CodeAIWorkflow(Workflow):
         logger.info("Checking execution results with outputChecker")
         try:
             combined_results = "\n".join(execution_results)
-            output_checker_response: RunResponse = self.output_checker.run("The following is the files under current dir\n" + listCurrentDir + "The following is the output from the excution\n" + combined_results)
+            output_checker_response: RunResponse = self.output_checker.run(
+                "The following is the files under current dir:\n" + 
+                "\n".join(listCurrentDir) + 
+                "\nThe following is the output from the execution:\n" + 
+                combined_results
+            )
             if output_checker_response and output_checker_response.content:
                 output_checker_output = outputCheckerOutput.parse_obj(output_checker_response.content)
                 logger.info(f"Output check result: {output_checker_output.checkResult}")

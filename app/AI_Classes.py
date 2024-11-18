@@ -47,7 +47,8 @@ userInterfaceCommunicator = Agent(
     "Focus on data processing, analysis, and visualization tasks."
     ],
     add_history_to_messages=True,
-    markdown=True
+    markdown=True,
+    debug_mode=True
 )
 
 #should know what tools it could use and structure its output.AND CURRENT DIR LIST
@@ -66,7 +67,8 @@ taskSpliter = Agent(
         "If the input is not a task, return NOT A TASK.",
     ],
     add_history_to_messages=True,
-    markdown=True
+    markdown=True,
+    debug_mode=True
 )
 
 #structure its output
@@ -86,7 +88,8 @@ outputChecker = Agent(
         "Validate data formats and analysis results."
     ],
     add_history_to_messages=False,
-    markdown=True
+    markdown=True,
+    debug_mode=True
 )
 
 
