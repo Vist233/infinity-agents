@@ -8,3 +8,4 @@ seaborn
 scikit-learn
 HTSeq
 pysam
+baidusearch

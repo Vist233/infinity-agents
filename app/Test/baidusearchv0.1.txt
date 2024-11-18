@@ -1,0 +1,60 @@
+import json
+from typing import Optional, List, Dict
+
+from phi.tools import Toolkit
+from phi.utils.log import logger
+
+try:
+    from baidusearch.baidusearch import search as baidu_search_api
+except ImportError:
+    raise ImportError("`baidusearch` not installed. Please install using `pip install baidusearch`")
+
+class baidusearch(Toolkit):
+    """
+    BaiduSearch is a toolkit for searching Baidu easily.
+
+    Args:
+        fixed_max_results (Optional[int]): A fixed number of maximum results.
+        debug (Optional[bool]): Enable debug output.
+    """
+
+    def __init__(
+        self,
+        fixed_max_results: Optional[int] = None,
+        debug: Optional[bool] = False,
+    ):
+        super().__init__(name="baidusearch")
+        # ...existing code...
+        self.fixed_max_results: Optional[int] = fixed_max_results
+        self.debug: Optional[bool] = debug
+        self.register(self.baidu_search)
+
+    def baidu_search(self, query: str, max_results: int = 5) -> str:
+        """
+        Search Baidu for a specified query.
+
+        Args:
+            query (str): The query to search for.
+            max_results (int, optional): The maximum number of results to return.
+
+        Returns:
+            str: A JSON formatted string containing the search results.
+        """
+        max_results = self.fixed_max_results or max_results
+        logger.debug(f"Searching Baidu for: {query}")
+
+        # Perform Baidu search using the baidusearch API
+        results = baidu_search_api(query, num_results=max_results)
+
+        # Collect the search results
+        res: List[Dict[str, str]] = []
+        for idx, item in enumerate(results, 1):
+            res.append(
+                {
+                    "title": item.get('title', ''),
+                    "url": item.get('url', ''),
+                    "abstract": item.get('abstract', ''),
+                    "rank": idx,
+                }
+            )
+        return json.dumps(res, ensure_ascii=False, indent=2)
