@@ -12,4 +12,4 @@ agent = Agent(
     show_tool_calls=True
     )
 
-agent.print_response("What's happening in France?", markdown=True)
+agent.print_response("请你告诉我最近法国发生了什么事情", markdown=True)

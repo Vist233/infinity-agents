@@ -1,5 +1,15 @@
-from baidusearch.baidusearch import search
- 
-results = search('Full Stack Developer')  # 返回10个或更少的结果
-for result in results:
-    print(result['title'], result['url'])
+from phi.agent import Agent
+from phi.tools.googlesearch import GoogleSearch
+from phi.model.openai.like import OpenAILike
+
+agent = Agent(
+    model=OpenAILike(
+        id="yi-large-fc",
+        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+        base_url="https://api.lingyiwanwu.com/v1",
+    ),
+    tools=[GoogleSearch()],
+    show_tool_calls=True
+    )
+
+agent.print_response("请你告诉我最近法国发生了什么事情", markdown=True)
