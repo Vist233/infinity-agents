@@ -14,7 +14,7 @@ try:
 except ImportError:
     raise ImportError("`pycountry` not installed. Please install using `pip install pycountry`")
 
-class baidusearch(Toolkit):
+class BaiduSearch(Toolkit):
     """
     BaiduSearch is a toolkit for searching Baidu easily.
 
