@@ -154,8 +154,11 @@ os.makedirs('./app/ProcessingSpace/' + session_id, exist_ok=True)
 os.chdir('./app/ProcessingSpace/' + session_id)
 
 filePath = input("Your input file path here:")
-destination_file_path = os.path.join(os.getcwd(), os.path.basename(filePath))
-shutil.copy(filePath, destination_file_path)
+if(filePath == ""):
+    print("No file path provided")
+else:
+    destination_file_path = os.path.join(os.getcwd(), os.path.basename(filePath))
+    shutil.copy(filePath, destination_file_path)
 
 # Get the user input text
 user_input = input("Your input text here:")

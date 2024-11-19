@@ -7,6 +7,7 @@ from phi.tools.python import PythonTools
 from phi.tools.pubmed import PubmedTools
 from phi.storage.agent.sqlite import SqlAgentStorage
 import uuid
+import StructureOutput
 
 session_id = str(uuid.uuid4())
 
@@ -41,10 +42,11 @@ userInterfaceCommunicator = Agent(
     ),
     description="An AI assistant that converts user requests into executable bioinformatics tasks.",
     instruction=[
-    "Create executable task plans using only existing system tools and installed Python packages.",
+    "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10.",
     "Break down complex tasks into smaller, executable steps.",
     "Avoid generating tasks that require external software installation or system configuration.",
-    "Focus on data processing, analysis, and visualization tasks."
+    "Focus on data processing, analysis, and visualization tasks.",
+    "If the enviroment's tools could not solve the problem, you could search something from the web to get the better answer from web or just return your answer.",
     ],
     add_history_to_messages=True,
     markdown=True,
@@ -58,6 +60,7 @@ taskSpliter = Agent(
         id="yi-lightning",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
+        use_beta=True  # Add this parameter if supported
     ),
     description="An AI that validates and distributes executable tasks to ToolsAI.",
     instruction=[
@@ -66,9 +69,12 @@ taskSpliter = Agent(
         "If the input contains the task that install new software or modify system configurations, ignore it",
         "If the input is not a task, return NOT A TASK.",
     ],
+    response_model=StructureOutput.TaskSpliterAIOutput,
+    structured_outputs=True,
     add_history_to_messages=True,
     markdown=True,
-    debug_mode=True
+    debug_mode=True,
+    parse_method="beta.chat.completions.parse"  # Specify the parse method
 )
 
 #structure its output
@@ -78,6 +84,7 @@ outputChecker = Agent(
         id="yi-lightning",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
+        use_beta=True  # Add this parameter if supported
     ),
     description="An AI that validates task outputs and execution status.",
     instruction=[
@@ -87,9 +94,12 @@ outputChecker = Agent(
         "Report any execution failures or incomplete tasks.",
         "Validate data formats and analysis results."
     ],
+    response_model=StructureOutput.TaskSpliterAIOutput,
+    structured_outputs=True,
     add_history_to_messages=False,
     markdown=True,
-    debug_mode=True
+    debug_mode=True,
+    parse_method="beta.chat.completions.parse"  # Specify the parse method
 )
 
 

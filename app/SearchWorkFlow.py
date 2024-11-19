@@ -49,6 +49,8 @@ task_execution_workflow = TaskExecutionWorkflow(
     ),
 )
 
+user_input = input("Your input text here:")
+
 # Run the workflow
 task_execution_results: Iterator[RunResponse] = task_execution_workflow.run(user_input=user_input)
 
