@@ -35,12 +35,12 @@ COPY Bioinfomatics-Software/CPJSdraw-main/bin/CPJSdraw.pl \
      /usr/local/bin/
 
 # 5. 配置 Conda 并安装依赖
-RUN conda config --set solver classic && \
-    conda update -n base -c defaults conda && \
-    conda config --add channels defaults && \
-    conda config --add channels bioconda && \
-    conda config --add channels conda-forge && \
-    conda install -y python=3.10 \
+RUN conda install -y mamba -n base -c conda-forge && \
+    mamba config --set solver libmamba && \
+    mamba update -n base -c defaults conda && \
+    mamba config --add channels bioconda && \
+    mamba config --add channels conda-forge && \
+    mamba install -y python=3.10 \
         raxml-ng \
         modeltest-ng \
         mafft \
