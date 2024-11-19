@@ -15,7 +15,7 @@ from phi.model.openai import OpenAIChat
 
 class TaskSpliterAIOutput(BaseModel):
     thought: str = Field(..., description="Initial thought and analysis on the given task.")
-    tasks: List[Dict[str, Any]] = Field(..., description="A list of tasks with details for each Tool AI to execute. If not a task, return 'NOT A TASK'.")
+    tasks: List[str] = Field(..., description="A list of tasks with details for each Tool AI to execute. If not a task, return 'NOT A TASK'.")
 
 class outputCheckerOutput(BaseModel):
     thought: str = Field(..., description="Initial thought and analysis on the given task.")

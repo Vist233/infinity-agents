@@ -60,7 +60,6 @@ taskSpliter = Agent(
         id="yi-lightning",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
-        use_beta=True  # Add this parameter if supported
     ),
     description="An AI that validates and distributes executable tasks to ToolsAI.",
     instruction=[
@@ -70,7 +69,6 @@ taskSpliter = Agent(
         "If the input is not a task, return NOT A TASK.",
     ],
     response_model=StructureOutput.TaskSpliterAIOutput,
-    structured_outputs=True,
     add_history_to_messages=True,
     markdown=True,
     debug_mode=True,
@@ -95,7 +93,6 @@ outputChecker = Agent(
         "Validate data formats and analysis results."
     ],
     response_model=StructureOutput.TaskSpliterAIOutput,
-    structured_outputs=True,
     add_history_to_messages=False,
     markdown=True,
     debug_mode=True,
