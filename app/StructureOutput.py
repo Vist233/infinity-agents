@@ -20,3 +20,5 @@ class TaskSpliterAIOutput(BaseModel):
 class outputCheckerOutput(BaseModel):
     thought: str = Field(..., description="Initial thought and analysis on the given task.")
     checkResult: str = Field(..., description="The result of checking the output. If the output is correct, this should be 'pass'. Otherwise, it should be 'fail'.")
+    summary: str = Field(..., description="A summary of output.")
+    

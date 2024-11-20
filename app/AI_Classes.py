@@ -16,9 +16,9 @@ userInterfaceCommunicatorStorage = SqlAgentStorage(
             db_file="./../DataBase/userInterfaceCommunicator.db"
         )
 
-outputCheckerStorage = SqlAgentStorage(
+outputCheckerAndSummaryStorage = SqlAgentStorage(
             table_name=session_id,
-            db_file="./../DataBase/outputChecker.db"
+            db_file="./../DataBase/outputCheckerAndSummary.db"
         )
 
 toolsTeamStorage = SqlAgentStorage(
@@ -68,23 +68,20 @@ taskSpliter = Agent(
         "If the input contains the task that install new software or modify system configurations, ignore it",
         "If the input is not a task, return NOT A TASK.",
     ],
-    response_model=StructureOutput.TaskSpliterAIOutput,
     add_history_to_messages=True,
     markdown=True,
     debug_mode=True,
-    parse_method="beta.chat.completions.parse"  # Specify the parse method
 )
 
 #structure its output
-outputChecker = Agent(
-    storage = outputCheckerStorage,
+outputCheckerAndSummary = Agent(
+    storage = outputCheckerAndSummaryStorage,
     model=OpenAILike(
-        id="yi-lightning",
+        id="yi-medium-200k",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
-        use_beta=True  # Add this parameter if supported
     ),
-    description="An AI that validates task outputs and execution status.",
+    description="An AI that validates task outputs and execution status or summary the excution situation.",
     instruction=[
         "Verify that task outputs are complete and valid.",
         "Check for execution errors or tool limitations.",
@@ -92,11 +89,9 @@ outputChecker = Agent(
         "Report any execution failures or incomplete tasks.",
         "Validate data formats and analysis results."
     ],
-    response_model=StructureOutput.TaskSpliterAIOutput,
     add_history_to_messages=False,
     markdown=True,
     debug_mode=True,
-    parse_method="beta.chat.completions.parse"  # Specify the parse method
 )
 
 
@@ -159,7 +154,7 @@ yiSeacher = Agent(
 
 toolsTeam = Agent(
     name="Tools Team",
-    team=[pythonExcutor, shellExcutor, yiSeacher],
+    team=[pythonExcutor, shellExcutor, yiSeacher, pubmedSeacher],
     storage = toolsTeamStorage,
     model=OpenAILike(
         id="yi-large-fc",

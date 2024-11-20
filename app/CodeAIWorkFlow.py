@@ -18,6 +18,19 @@ from typing import Iterator
 import json
 import re
 
+
+"""
+    In TaskExecutionWorkflow, implement the following steps:
+    Accept user input.
+    Send the input to userInterfaceCommunicator and get the response.
+    Send the response to taskSpliter and obtain a structured task list (TaskSpliterAIOutput).
+    Iterate over the task list, sending each task to toolsTeam for execution, and collect the results.
+    After executing all tasks, send the combined results to outputChecker and obtain a structured output (outputCheckerOutput).
+    Based on the outputChecker's decision, output the summary or return the task to Taskspliter to excute the tesks.
+"""
+
+
+
 def process_string(input_string):
     # Step 1: Extract the content between the first [ and the first ]
     match = re.search(r'\[(.*?)\]', input_string, re.DOTALL)
