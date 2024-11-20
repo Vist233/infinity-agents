@@ -72,7 +72,7 @@ class CodeAIWorkflow(Workflow):
     user_interface: Agent = Field(default_factory=lambda: userInterfaceCommunicator)
     task_splitter: Agent = Field(default_factory=lambda: taskSpliter)
     tools_team: Agent = Field(default_factory=lambda: toolsTeam)
-    output_checker_and_summary: Agent = Field(default_factory=lambda: outputCheckerAndSummary)
+    output_checker: Agent = Field(default_factory=lambda: outputCheckerAndSummary)
 
     def run(self, user_input: str) -> Iterator[RunResponse]:
         listCurrentDir = os.listdir('.')
@@ -162,7 +162,7 @@ class CodeAIWorkflow(Workflow):
         logger.info("Checking execution results with outputChecker")
         try:
             combined_results = "\n".join(execution_results)
-            output_checker_response: RunResponse = self.output_checker_and_summary.run(
+            output_checker_response: RunResponse = self.output_checker.run(
                 "The following is the files under current dir:\n" + 
                 "\n".join(listCurrentDir) + 
                 "\nThe following is the output from the execution:\n" + 
