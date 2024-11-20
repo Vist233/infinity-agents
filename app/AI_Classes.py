@@ -196,38 +196,3 @@ searchSummaryTeam = Agent(
     markdown=True,
 )
 
-def TaskExecutionWorkflow():
-    # Accept user input
-    user_input = input("Please enter your request: ")
-
-    # Send the input to userInterfaceCommunicator and get the response
-    user_response = userInterfaceCommunicator.complete(user_input)
-
-    # Send the response to taskSpliter and obtain a structured task list
-    task_list_response = taskSpliter.complete(user_response)
-
-    # Assume task_list_response is a dictionary with a 'tasks' key
-    task_list = task_list_response.get('tasks', [])
-
-    # Initialize a list to collect results
-    combined_results = []
-
-    # Iterate over the task list, sending each task to toolsTeam for execution
-    for task in task_list:
-        task_result = toolsTeam.complete(task)
-        combined_results.append(task_result)
-
-    # After executing all tasks, send the combined results to outputCheckerAndSummary
-    output_checker_response = outputCheckerAndSummary.complete({'results': combined_results})
-
-    # Based on the outputChecker's decision, output the summary or re-execute tasks
-    decision = output_checker_response.get('decision', 'accept')
-    if decision == 'accept':
-        summary = output_checker_response.get('summary', '')
-        print("Summary of Results:")
-        print(summary)
-    else:
-        print("Tasks need to be re-executed.")
-        # Optionally, implement logic to re-execute tasks
-
-TaskExecutionWorkflow()
