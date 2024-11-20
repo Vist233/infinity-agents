@@ -61,7 +61,7 @@ taskSpliter = Agent(
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
-    description="An AI that validates and distributes executable tasks to ToolsAI.",
+    description="An AI that validates and distributes executable tasks to ToolsAI. The output should just a json format and not contain\"\`\`\`json \`\`\`\"",
     instruction=[
         "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10.",
         "Filter out any non-executable or invalid tasks.",
@@ -71,6 +71,7 @@ taskSpliter = Agent(
     add_history_to_messages=True,
     markdown=True,
     debug_mode=True,
+    response_model=StructureOutput.taskSpliterAIOutput,
 )
 
 #structure its output
@@ -81,7 +82,7 @@ outputCheckerAndSummary = Agent(
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
-    description="An AI that validates task outputs and execution status or summary the excution situation.",
+    description="An AI that validates task outputs and execution status or summary the excution situation. The output should just a json format and not contain\"\`\`\`json \`\`\`\"",
     instruction=[
         "Verify that task outputs are complete and valid.",
         "Check for execution errors or tool limitations.",
@@ -92,6 +93,7 @@ outputCheckerAndSummary = Agent(
     add_history_to_messages=False,
     markdown=True,
     debug_mode=True,
+    response_model=StructureOutput.outputCheckerOutput,
 )
 
 
@@ -193,4 +195,39 @@ searchSummaryTeam = Agent(
     show_tool_calls=True,
     markdown=True,
 )
-    
+
+def TaskExecutionWorkflow():
+    # Accept user input
+    user_input = input("Please enter your request: ")
+
+    # Send the input to userInterfaceCommunicator and get the response
+    user_response = userInterfaceCommunicator.complete(user_input)
+
+    # Send the response to taskSpliter and obtain a structured task list
+    task_list_response = taskSpliter.complete(user_response)
+
+    # Assume task_list_response is a dictionary with a 'tasks' key
+    task_list = task_list_response.get('tasks', [])
+
+    # Initialize a list to collect results
+    combined_results = []
+
+    # Iterate over the task list, sending each task to toolsTeam for execution
+    for task in task_list:
+        task_result = toolsTeam.complete(task)
+        combined_results.append(task_result)
+
+    # After executing all tasks, send the combined results to outputCheckerAndSummary
+    output_checker_response = outputCheckerAndSummary.complete({'results': combined_results})
+
+    # Based on the outputChecker's decision, output the summary or re-execute tasks
+    decision = output_checker_response.get('decision', 'accept')
+    if decision == 'accept':
+        summary = output_checker_response.get('summary', '')
+        print("Summary of Results:")
+        print(summary)
+    else:
+        print("Tasks need to be re-executed.")
+        # Optionally, implement logic to re-execute tasks
+
+TaskExecutionWorkflow()

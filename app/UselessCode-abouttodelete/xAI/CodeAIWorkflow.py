@@ -3,7 +3,7 @@ from phi.agent import Agent
 from phi.workflow import Workflow, RunResponse, RunEvent
 from phi.storage.workflow.sqlite import SqlWorkflowStorage
 from phi.utils.log import logger
-from StructureOutput import TaskSpliterAIOutput, outputCheckerOutput
+from StructureOutput import taskSpliterAIOutput, outputCheckerOutput
 from AI_Classes import (
     userInterfaceCommunicator,
     taskSpliter,
@@ -28,45 +28,6 @@ import re
     After executing all tasks, send the combined results to outputChecker and obtain a structured output (outputCheckerOutput).
     Based on the outputChecker's decision, output the summary or return the task to Taskspliter to excute the tesks.
 """
-
-
-
-def process_string(input_string):
-    # Step 1: Extract the content between the first [ and the first ]
-    match = re.search(r'\[(.*?)\]', input_string, re.DOTALL)
-    if not match:
-        return []
-
-    extracted_string = match.group(1)
-
-    # Step 2: Remove special characters
-    cleaned_string = re.sub(r'[\n\t\r]', '', extracted_string)
-
-    # Step 3: Convert the string to a list
-    result_list = cleaned_string.split(',')
-
-    # Remove any leading/trailing whitespace from each element
-    result_list = [item.strip() for item in result_list]
-
-    return result_list
-
-def extract_tasks(json_data):
-    try:
-        # 将 JSON 字符串解析为 Python 对象
-        data = json.loads(json_data)
-        
-        # 检查是否存在 'tasks' 字段
-        if 'tasks' in data:
-            tasks = data['tasks']
-            # 过滤掉无效任务
-            valid_tasks = [task for task in tasks if task != "NOT A TASK"]
-            return valid_tasks if valid_tasks else "No valid tasks found."
-        else:
-            return "No tasks field found in the data."
-    except json.JSONDecodeError:
-        return "Invalid JSON data."
-
-
 
 class CodeAIWorkflow(Workflow):
     user_interface: Agent = Field(default_factory=lambda: userInterfaceCommunicator)
@@ -115,7 +76,8 @@ class CodeAIWorkflow(Workflow):
                 ui_content
             )
             if task_splitter_response and task_splitter_response.content:
-                tasks = extract_tasks(task_splitter_response.content)
+                task_splitter_output = TaskSpliterAIOutput.parse_obj(json.loads(task_splitter_response.content))
+                tasks = task_splitter_output.tasks
                 logger.info(f"Task split into {len(tasks)} subtasks.")
             else:
                 logger.warning("taskSpliter response invalid")

@@ -70,8 +70,8 @@ taskSpliter = Agent(
     add_history_to_messages=True,
     markdown=True,
     debug_mode=True,
-    response_model=StructureOutput.TaskSpliterAIOutput,
-    structured_outputs=True,
+    response_model=StructureOutput.taskSpliterAIOutput,
+    structured_outputs=False,
 )
 
 #structure its output
@@ -93,7 +93,7 @@ outputCheckerAndSummary = Agent(
     markdown=True,
     debug_mode=True,
     response_model=StructureOutput.outputCheckerOutput,
-    structured_outputs=True,
+    structured_outputs=False,
 )
 
 

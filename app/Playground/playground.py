@@ -1,38 +1,37 @@
 from phi.agent import Agent
-from phi.model.openai import OpenAIChat
-from phi.storage.agent.sqlite import SqlAgentStorage
-from phi.tools.duckduckgo import DuckDuckGo
-from phi.playground import Playground, serve_playground_app
-import uuid
 from phi.model.openai.like import OpenAILike
-import StructureOutput
+from phi.playground import Playground, serve_playground_app
 from phi.tools.googlesearch import GoogleSearch
 from phi.tools.shell import ShellTools
 from phi.tools.python import PythonTools
 from phi.tools.pubmed import PubmedTools
 from phi.storage.agent.sqlite import SqlAgentStorage
+import uuid
+import StructureOutput
 
 session_id = str(uuid.uuid4())
 
 userInterfaceCommunicatorStorage = SqlAgentStorage(
-            table_name="userInterfaceCommunicator",
+            table_name=session_id,
             db_file="./../DataBase/userInterfaceCommunicator.db"
         )
 
-outputCheckerStorage = SqlAgentStorage(
-            table_name="outputChecker",
-            db_file="./../DataBase/outputChecker.db"
+outputCheckerAndSummaryStorage = SqlAgentStorage(
+            table_name=session_id,
+            db_file="./../DataBase/outputCheckerAndSummary.db"
         )
 
 toolsTeamStorage = SqlAgentStorage(
-            table_name="toolsTeam",
+            table_name=session_id,
             db_file="./../DataBase/toolsTeam.db"
         )
 
 taskSpliterStorage = SqlAgentStorage(
-            table_name="taskSpliter",
+            table_name=session_id,
             db_file="./../DataBase/taskSpliter.db"
         )
+
+
 
 userInterfaceCommunicator = Agent(
     storage = userInterfaceCommunicatorStorage,
@@ -62,30 +61,28 @@ taskSpliter = Agent(
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
-    description="An AI that validates and distributes executable tasks to ToolsAI.",
+    description="An AI that validates and distributes executable tasks to ToolsAI. The output should just a json format and not contain\"\`\`\`json \`\`\`\"",
     instruction=[
         "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10.",
         "Filter out any non-executable or invalid tasks.",
         "If the input contains the task that install new software or modify system configurations, ignore it",
         "If the input is not a task, return NOT A TASK.",
     ],
-    response_model=StructureOutput.TaskSpliterAIOutput,
     add_history_to_messages=True,
     markdown=True,
     debug_mode=True,
-    parse_method="beta.chat.completions.parse"  # Specify the parse method
+    response_model=StructureOutput.taskSpliterAIOutput,
 )
 
 #structure its output
-outputChecker = Agent(
-    storage = outputCheckerStorage,
+outputCheckerAndSummary = Agent(
+    storage = outputCheckerAndSummaryStorage,
     model=OpenAILike(
-        id="yi-lightning",
+        id="yi-medium-200k",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
-        use_beta=True  # Add this parameter if supported
     ),
-    description="An AI that validates task outputs and execution status.",
+    description="An AI that validates task outputs and execution status or summary the excution situation. The output should just a json format and not contain\"\`\`\`json \`\`\`\"",
     instruction=[
         "Verify that task outputs are complete and valid.",
         "Check for execution errors or tool limitations.",
@@ -93,11 +90,10 @@ outputChecker = Agent(
         "Report any execution failures or incomplete tasks.",
         "Validate data formats and analysis results."
     ],
-    response_model=StructureOutput.TaskSpliterAIOutput,
     add_history_to_messages=False,
     markdown=True,
     debug_mode=True,
-    parse_method="beta.chat.completions.parse"  # Specify the parse method
+    response_model=StructureOutput.outputCheckerOutput,
 )
 
 
@@ -160,7 +156,7 @@ yiSeacher = Agent(
 
 toolsTeam = Agent(
     name="Tools Team",
-    team=[pythonExcutor, shellExcutor, yiSeacher],
+    team=[pythonExcutor, shellExcutor, yiSeacher, pubmedSeacher],
     storage = toolsTeamStorage,
     model=OpenAILike(
         id="yi-large-fc",
@@ -199,8 +195,9 @@ searchSummaryTeam = Agent(
     show_tool_calls=True,
     markdown=True,
 )
+    
 
-app = Playground(agents=[userInterfaceCommunicator, taskSpliter, outputChecker, toolsTeam]).get_app()
+app = Playground(agents=[userInterfaceCommunicator, taskSpliter, outputCheckerAndSummary, toolsTeam]).get_app()
 
 if __name__ == "__main__":
     serve_playground_app("playground:app", reload=True)
