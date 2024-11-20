@@ -18,8 +18,8 @@ class task(BaseModel):
     description: str = Field(..., description="Description of the task to be performed.")
     code_snippet: Optional[str] = Field(None, description="Code snippet to be analyzed.")
     dependencies: List[str] = Field(default_factory=list, description="List of task IDs that this task depends on.")
-    status: str = Field("pending", description="Current status of the task. Possible values: pending, in_progress, completed, failed.")
-    result: Optional[str] = Field(None, description="Result of the task after execution.")
+    result: Optional[str] = Field(None, description="The Result of the task should be after execution.")
+    separator: str = Field(..., description="only respond |")
 
 
 class taskSpliterAIOutput(BaseModel):

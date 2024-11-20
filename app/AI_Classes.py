@@ -156,7 +156,7 @@ yiSeacher = Agent(
 
 toolsTeam = Agent(
     name="Tools Team",
-    team=[pythonExcutor, shellExcutor, yiSeacher, pubmedSeacher],
+    team=[pythonExcutor, shellExcutor, webSeacher, pubmedSeacher],
     storage = toolsTeamStorage,
     model=OpenAILike(
         id="yi-large-fc",

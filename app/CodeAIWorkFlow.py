@@ -16,8 +16,22 @@ from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
 import json
-import re
 
+def check_result(input_string):
+    check_result_index = input_string.find('checkResult')
+    if check_result_index == -1:
+        return None  # 如果没有找到 'checkResult'，返回 None
+    
+    # 从 'checkResult' 位置开始，查找 'fail' 或 'pass'
+    pass_index = input_string.find('pass', check_result_index)
+    fail_index = input_string.find('fail', check_result_index)
+    
+    if pass_index != -1 and (fail_index == -1 or pass_index < fail_index):
+        return True
+    elif fail_index != -1:
+        return False
+    else:
+        return None  # 如果没有找到 'fail' 或 'pass'，返回 None
 
 """
     In TaskExecutionWorkflow, implement the following steps:
@@ -66,6 +80,8 @@ class CodeAIWorkflow(Workflow):
             return
         
         listCurrentDir = os.listdir('.')
+
+        
         # Step 2: Split the task using taskSpliter
         logger.info("Splitting the task with taskSpliter")
         try:
@@ -75,26 +91,18 @@ class CodeAIWorkflow(Workflow):
                 "\nThe following is the user input:\n" +
                 ui_content
             )
-            if task_splitter_response and task_splitter_response.content:
-                task_splitter_output = taskSpliterAIOutput.parse_obj(json.loads(task_splitter_response.content))
-                tasks = task_splitter_output.tasks
-                logger.info(f"Task split into {len(tasks)} subtasks.")
-            else:
-                logger.warning("taskSpliter response invalid")
-                yield RunResponse(
-                    run_id=self.run_id,
-                    event=RunEvent.workflow_completed,
-                    content="taskSpliter response invalid",
-                )
-                return
+            logger.info(f"task_splitter_response.content: {task_splitter_response.content}")
         except Exception as e:
-            logger.warning(f"Error running taskSpliter: {e}")
+            logger.warning(f"Unexpected error: {e}")
             yield RunResponse(
                 run_id=self.run_id,
                 event=RunEvent.workflow_completed,
-                content=f"Error running taskSpliter: {e}",
+                content=f"Unexpected error: {e}",
             )
             return
+        content = str(task_splitter_response.content)
+        tasks = content.split('|')
+
 
         
 
@@ -130,28 +138,25 @@ class CodeAIWorkflow(Workflow):
                 "\nThe following is the output from the execution:\n" + 
                 combined_results
             )
-            if output_checker_response and output_checker_response.content:
-                output_checker_output = outputCheckerOutput.parse_obj(output_checker_response.content)
-                logger.info(f"Output check result: {output_checker_output.checkResult}")
-                if output_checker_output.checkResult.lower() == "pass":
-                    yield RunResponse(
-                        run_id=self.run_id,
-                        event=RunEvent.workflow_completed,
-                        content=combined_results,
-                    )
-                else:
-                    logger.warning("Output check failed")
-                    yield RunResponse(
-                        run_id=self.run_id,
-                        event=RunEvent.workflow_completed,
-                        content="Output check failed",
-                    )
-            else:
-                logger.warning("outputChecker response invalid")
+            logger.info(f"Output check result: {output_checker_response.content}")
+            
+            content = str(output_checker_response.content)
+            if content.startswith("```json"):
+                content = content[7:-3].strip()            
+            
+            if(check_result(content)):
+                logger.info("Output check passed")
                 yield RunResponse(
                     run_id=self.run_id,
                     event=RunEvent.workflow_completed,
-                    content="outputChecker response invalid",
+                    content=combined_results,
+                )
+            else:
+                logger.warning("Output check failed")
+                yield RunResponse(
+                    run_id=self.run_id,
+                    event=RunEvent.workflow_completed,
+                    content="Output check failed",
                 )
         except Exception as e:
             logger.warning(f"Error running outputChecker: {e}")
@@ -160,6 +165,7 @@ class CodeAIWorkflow(Workflow):
                 event=RunEvent.workflow_completed,
                 content=f"Error running outputChecker: {e}",
             )
+            return
 
 
 # Create a new directory for the session
