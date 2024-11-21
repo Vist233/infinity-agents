@@ -17,13 +17,13 @@ class task(BaseModel):
     id: str = Field(..., description="Unique identifier for the task.")
     description: str = Field(..., description="Description of the task to be performed.")
     code_snippet: Optional[str] = Field(None, description="Code snippet to be analyzed.")
-    dependencies: List[str] = Field(default_factory=list, description="List of task IDs that this task depends on.")
+    dependencies: List[str] = Field(default_factory=list, description="List of softwares that this task depends on.")
     result: Optional[str] = Field(None, description="The Result of the task should be after execution.")
     separator: str = Field(..., description="only respond |")
 
 
 class taskSpliterAIOutput(BaseModel):
-    tasks: List[task] = Field(..., description="A list of tasks with details for each Tool AI to execute. If not a task, return 'NOT A TASK'.")
+    tasks: List[task] = Field(..., description="A list of tasks with details for each Tool AI to execute. If not a task, return 'NOT A TASK'. Up to three tasks in the list")
 
 class outputCheckerOutput(BaseModel):
     thought: str = Field(..., description="Initial thought and analysis on the given task.")

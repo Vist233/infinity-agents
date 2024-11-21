@@ -79,9 +79,10 @@ class CodeAIWorkflow(Workflow):
             )
             return
         
-        listCurrentDir = os.listdir('.')
-
         
+        
+        
+        listCurrentDir = os.listdir('.')
         # Step 2: Split the task using taskSpliter
         logger.info("Splitting the task with taskSpliter")
         try:
@@ -105,6 +106,7 @@ class CodeAIWorkflow(Workflow):
 
 
         
+        
 
         listCurrentDir = os.listdir('.')
         # Step 3: Execute tasks with toolsTeam
@@ -126,6 +128,9 @@ class CodeAIWorkflow(Workflow):
             except Exception as e:
                 logger.warning(f"Error running toolsTeam: {e}")
                 execution_results.append(f"Error executing task: {e}")
+
+
+
 
         listCurrentDir = os.listdir('.')
         # Step 4: Check outputs with outputChecker

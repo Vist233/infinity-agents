@@ -156,7 +156,7 @@ yiSeacher = Agent(
 
 toolsTeam = Agent(
     name="Tools Team",
-    team=[pythonExcutor, shellExcutor, webSeacher, pubmedSeacher],
+    team=[pythonExcutor, shellExcutor, pubmedSeacher],
     storage = toolsTeamStorage,
     model=OpenAILike(
         id="yi-large-fc",
@@ -173,25 +173,6 @@ toolsTeam = Agent(
         "If a task cannot be executed, report the reason and suggest alternative approaches.",
     ],
     add_history_to_messages=False,
-    show_tool_calls=True,
-    markdown=True,
-)
-
-#How to deal with the PICTURE? use vision model seperately?
-searchSummaryTeam = Agent(
-    name="Search and Summary Team",
-    team=[pubmedSeacher, yiSeacher],
-    storage = toolsTeamStorage,
-    model=OpenAILike(
-        id="yi-large-fc",
-        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
-        base_url="https://api.lingyiwanwu.com/v1",
-    ),
-    description="comprehensive the knowledge from pubmed and website to replay the user.",
-    instruction=[
-        "Search the web and pubmed to get what the user want."
-    ],
-    add_history_to_messages=True,
     show_tool_calls=True,
     markdown=True,
 )
