@@ -1,40 +1,28 @@
 from phi.agent import Agent
 from phi.model.openai.like import OpenAILike
-from phi.playground import Playground, serve_playground_app
-from phi.tools.googlesearch import GoogleSearch
+from phi.tools.arxiv_toolkit import ArxivToolkit
+from phi.tools.baidusearch import BaiduSearch
 from phi.tools.shell import ShellTools
 from phi.tools.python import PythonTools
 from phi.tools.pubmed import PubmedTools
+from phi.tools.calculator import Calculator
 from phi.storage.agent.sqlite import SqlAgentStorage
-import uuid
+from phi.tools.file import FileTools
 import StructureOutput
-
-session_id = str(uuid.uuid4())
-
-userInterfaceCommunicatorStorage = SqlAgentStorage(
-            table_name=session_id,
-            db_file="./../DataBase/userInterfaceCommunicator.db"
-        )
-
-outputCheckerAndSummaryStorage = SqlAgentStorage(
-            table_name=session_id,
-            db_file="./../DataBase/outputCheckerAndSummary.db"
-        )
-
-toolsTeamStorage = SqlAgentStorage(
-            table_name=session_id,
-            db_file="./../DataBase/toolsTeam.db"
-        )
-
-taskSpliterStorage = SqlAgentStorage(
-            table_name=session_id,
-            db_file="./../DataBase/taskSpliter.db"
-        )
+import CodeAIWorkflow
 
 
+def create_storage(session_id: str, name: str) -> SqlAgentStorage:
+    return SqlAgentStorage(
+        table_name=session_id,
+        db_file=f"./../DataBase/{name}.db"  # Changed to use workflow database
+    )
+
+# Add toolsTeamStorage definition at the top after create_storage
+toolsTeamStorage = create_storage(CodeAIWorkflow.user_session_id, "toolsTeam")
 
 userInterfaceCommunicator = Agent(
-    storage = userInterfaceCommunicatorStorage,
+    storage=create_storage(CodeAIWorkflow.user_session_id, "userInterfaceCommunicator"),
     model=OpenAILike(
         id="yi-lightning",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
@@ -55,7 +43,7 @@ userInterfaceCommunicator = Agent(
 
 #should know what tools it could use and structure its output.AND CURRENT DIR LIST
 taskSpliter = Agent(
-    storage = taskSpliterStorage,
+    storage=create_storage(CodeAIWorkflow.user_session_id, "taskSpliter"),
     model=OpenAILike(
         id="yi-lightning",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
@@ -76,7 +64,7 @@ taskSpliter = Agent(
 
 #structure its output
 outputCheckerAndSummary = Agent(
-    storage = outputCheckerAndSummaryStorage,
+    storage=create_storage(CodeAIWorkflow.user_session_id, "outputCheckerAndSummary"),
     model=OpenAILike(
         id="yi-medium-200k",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
@@ -96,12 +84,11 @@ outputCheckerAndSummary = Agent(
     response_model=StructureOutput.outputCheckerOutput,
 )
 
-
-
 pythonExcutor = Agent(
-    name="python excutor",
+    storage=toolsTeamStorage,
+    name="Python Excutor",
     role="Use python to solve the problem.",
-    tools=[PythonTools()],
+    tools=[PythonTools(), FileTools()],
     model=OpenAILike(
         id="yi-large-fc",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
@@ -110,7 +97,8 @@ pythonExcutor = Agent(
 )
 
 shellExcutor = Agent(
-    name="shell excutor",
+    storage=toolsTeamStorage,
+    name="Shell Excutor",
     role="Use shell to solve the problem.",
     tools=[ShellTools()],
     add_datetime_to_instructions=True,
@@ -121,18 +109,8 @@ shellExcutor = Agent(
     )
 )
 
-webSeacher = Agent(
-    name="Google Searcher",
-    role="Reads articles from URLs.",
-    tools=[GoogleSearch()],
-    model=OpenAILike(
-        id="yi-large-fc",
-        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
-        base_url="https://api.lingyiwanwu.com/v1",
-    )
-)
-
 pubmedSeacher = Agent(
+    storage=toolsTeamStorage,
     name="Pubmed Searcher",
     role="Searches PubMed for articles and summary the article.",
     tools=[PubmedTools()],
@@ -143,37 +121,84 @@ pubmedSeacher = Agent(
     )
 )
 
-yiSeacher = Agent(
-    name="Yi Searcher",
-    role="Search from and summary web.",
-    tools=[],
+arxivSearcher = Agent(
+    storage=toolsTeamStorage,
+    name="Arxiv Searcher",
+    role="Searches Arxiv for articles and summary the article.",
+    tools=[ArxivToolkit()],
     model=OpenAILike(
-        id="yi-large-rag",
+        id="yi-large-fc",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     )
 )
 
-toolsTeam = Agent(
-    name="Tools Team",
-    team=[pythonExcutor, shellExcutor, pubmedSeacher],
-    storage = toolsTeamStorage,
+paperSearcher = Agent(
+    storage=toolsTeamStorage,
+    name="paper Searcher",
+    role="Searches Arxiv and Pubmed for articles and summary the article.",
+    tools=[ArxivToolkit(), PubmedTools()],
     model=OpenAILike(
         id="yi-large-fc",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
-    ),
-    description="An AI that executes bioinformatics tasks using available Python packages and system tools. If the input don't need py or shell, you could search something from the web to get the better answer from web or just return your answer.",
-    instruction=[
-        "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10."
-        "Execute only tasks that use existing Python packages and system tools.",
-        "Process biological data using available resources.",
-        "If a command is not a task skip it and return NOT A TASK.",
-        "Focus on data analysis, file operations, and calculations.",
-        "If a task cannot be executed, report the reason and suggest alternative approaches.",
-    ],
-    add_history_to_messages=False,
-    show_tool_calls=True,
-    markdown=True,
+    )
 )
+
+webSeacher = Agent(
+    storage=toolsTeamStorage,
+    name="Web Searcher",
+    role="Search from and summary web.",
+    tools=[BaiduSearch()],
+    model=OpenAILike(
+        id="yi-large-fc",
+        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+        base_url="https://api.lingyiwanwu.com/v1",
+    )
+)
+
+calculatorai = Agent(
+    storage=toolsTeamStorage,
+    name="Calculator",
+    role="Calculate the expression.",
+    tools=[        
+           Calculator(
+            add=True,
+            subtract=True,
+            multiply=True,
+            divide=True,
+            exponentiate=True,
+            factorial=True,
+            is_prime=True,
+            square_root=True,
+        )],
+    model=OpenAILike(
+        id="yi-large-fc",
+        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+        base_url="https://api.lingyiwanwu.com/v1",
+    )
+)
+
+# toolsTeam = Agent(
+#     name="Tools Team",
+#     team=[pythonExcutor, shellExcutor, pubmedSeacher],
+#     storage = toolsTeamStorage,
+#     model=OpenAILike(
+#         id="yi-large-fc",
+#         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+#         base_url="https://api.lingyiwanwu.com/v1",
+#     ),
+#     description="An AI that executes bioinformatics tasks using available Python packages and system tools. If the input don't need py or shell, you could search something from the web to get the better answer from web or just return your answer.",
+#     instruction=[
+#         "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10."
+#         "Execute only tasks that use existing Python packages and system tools.",
+#         "Process biological data using available resources.",
+#         "If a command is not a task skip it and return NOT A TASK.",
+#         "Focus on data analysis, file operations, and calculations.",
+#         "If a task cannot be executed, report the reason and suggest alternative approaches.",
+#     ],
+#     add_history_to_messages=False,
+#     show_tool_calls=True,
+#     markdown=True,
+# )
 
