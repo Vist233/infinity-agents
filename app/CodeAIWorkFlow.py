@@ -18,6 +18,8 @@ from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
 import uuid
+from StructureOutput import parse_tasks_to_list, parse_output_checker_to_dict
+import ast
 
 
 """
@@ -25,9 +27,12 @@ import uuid
     Accept user input.
     Send the input to userInterfaceCommunicator and get the response.
     Send the response to taskSpliter and obtain a structured task list (TaskSpliterAIOutput).
-    Iterate over the task list, sending each task to toolsTeam for execution, and collect the results.
+    use function parse_tasks_to_list to get the tasks list
+    Iterate over the task list, sending each task to corresponding ai for execution, and collect the results.
+    if ERROR happend when function excuted, give the result which was been collected above to outputchecker and then outputchecker summary the result to taskspliterai to excute the same workflow
+    if ERROR happend 2 times, report ERROR to the user
     After executing all tasks, send the combined results to outputChecker and obtain a structured output (outputCheckerOutput).
-    Based on the outputChecker's decision, output the summary or return the task to Taskspliter to excute the tesks.
+    Based on the parse_output_checker_to_dict worked outputChecker's decision, output the summary or return the task to Taskspliter to excute the tesks.
 """
 
 class CodeAIWorkflow(Workflow):
@@ -43,6 +48,19 @@ class CodeAIWorkflow(Workflow):
     shellExcutor: Agent = Field(default_factory=lambda: shellExcutor)
     
 
+    def get_agent_for_task(self, task_dependency):
+        if task_dependency == 'paperSearcher':
+            return self.paperSearcher
+        elif task_dependency == 'webSearcher':
+            return self.webSeacher
+        elif task_dependency == 'calculatorAI':
+            return self.calculatorai
+        elif task_dependency == 'pythonExecutor':
+            return self.pythonExcutor
+        elif task_dependency == 'shellExecutor':
+            return self.shellExcutor
+        else:
+            return None  # Handle tasks with no dependencies or unknown dependencies
 
     def run(self, user_input: str) -> Iterator[RunResponse]:
         listCurrentDir = os.listdir('.')
@@ -96,76 +114,96 @@ class CodeAIWorkflow(Workflow):
                 content=f"Unexpected error: {e}",
             )
             return
-        content = str(task_splitter_response.content)
-        tasks = content.split('|')
+        # Use parse_tasks_to_list to get tasks list
+        tasks_list = parse_tasks_to_list(task_splitter_response.content)
+        error_count = 0
 
+        while True:
+            execution_results = []
+            task_errors = False
+            logger.info("Executing tasks with corresponding AIs")
+            for task_str in tasks_list:
+                task_data = ast.literal_eval(task_str)
+                task_dependencies = task_data.get('dependencies', [])
+                if not task_dependencies or task_dependencies == ['NO DEPENDENCY']:
+                    logger.warning("No dependencies specified for task")
+                    continue
+                agent = self.get_agent_for_task(task_dependencies[0])
+                if agent is None:
+                    logger.warning(f"No agent found for dependency: {task_dependencies[0]}")
+                    continue
+                try:
+                    agent_response: RunResponse = agent.run(task_data.get('description', ''))
+                    if agent_response and agent_response.content:
+                        execution_results.append(agent_response.content)
+                        logger.info("Task executed by agent")
+                    else:
+                        logger.warning("Agent response invalid")
+                        task_errors = True
+                except Exception as e:
+                    logger.warning(f"Error running agent: {e}")
+                    execution_results.append(f"Error executing task: {e}")
+                    task_errors = True
 
-        
-        
-
-        listCurrentDir = os.listdir('.')
-        # Step 3: Execute tasks with toolsTeam
-        execution_results = []
-        logger.info("Executing tasks with toolsTeam")
-        for task in tasks:
-            try:
-                tools_team_response: RunResponse = self.tools_team.run(
-                    "The following is the files under current dir:\n" + 
-                    "\n".join(listCurrentDir) + 
-                    "\nThe following is the task:\n" + 
-                    task
+            if task_errors:
+                error_count += 1
+                if error_count >= 2:
+                    logger.warning("Error occurred twice during task execution")
+                    yield RunResponse(
+                        run_id=self.run_id,
+                        event=RunEvent.workflow_completed,
+                        content="Error occurred twice during task execution",
+                    )
+                    return
+                # Send collected results to outputChecker
+                combined_results = "\n".join(execution_results)
+                output_checker_response: RunResponse = self.output_checker.run(
+                    "The following is the output from the execution:\n" + combined_results
                 )
-                if tools_team_response and tools_team_response.content:
-                    execution_results.append(tools_team_response.content)
-                    logger.info("Task executed by toolsTeam")
+                # Parse outputChecker response
+                output_dict = parse_output_checker_to_dict(output_checker_response.content)
+                # Decide whether to re-execute the tasks based on outputChecker's decision
+                if output_dict.get('checkResult', '').lower() == 'pass':
+                    logger.info("Output check passed")
+                    yield RunResponse(
+                        run_id=self.run_id,
+                        event=RunEvent.workflow_completed,
+                        content=output_dict.get('summary', ''),
+                    )
+                    return
                 else:
-                    logger.warning("toolsTeam response invalid")
-            except Exception as e:
-                logger.warning(f"Error running toolsTeam: {e}")
-                execution_results.append(f"Error executing task: {e}")
-
-
-
-
-        listCurrentDir = os.listdir('.')
-        # Step 4: Check outputs with outputChecker
-        logger.info("Checking execution results with outputChecker")
-        try:
-            combined_results = "\n".join(execution_results)
-            output_checker_response: RunResponse = self.output_checker.run(
-                "The following is the files under current dir:\n" + 
-                "\n".join(listCurrentDir) + 
-                "\nThe following is the output from the execution:\n" + 
-                combined_results
-            )
-            logger.info(f"Output check result: {output_checker_response.content}")
-            
-            content = str(output_checker_response.content)
-            if content.startswith("```json"):
-                content = content[7:-3].strip()            
-            
-            if(check_result(content)):
-                logger.info("Output check passed")
-                yield RunResponse(
-                    run_id=self.run_id,
-                    event=RunEvent.workflow_completed,
-                    content=combined_results,
-                )
+                    # Return tasks to taskSpliter to execute the same workflow
+                    logger.info("Re-executing tasks based on outputChecker's suggestion")
+                    continue
             else:
-                logger.warning("Output check failed")
-                yield RunResponse(
-                    run_id=self.run_id,
-                    event=RunEvent.workflow_completed,
-                    content="Output check failed",
+                # After executing all tasks successfully, send combined results to outputChecker
+                combined_results = "\n".join(execution_results)
+                output_checker_response: RunResponse = self.output_checker.run(
+                    "The following is the output from the execution:\n" + combined_results
                 )
-        except Exception as e:
-            logger.warning(f"Error running outputChecker: {e}")
-            yield RunResponse(
-                run_id=self.run_id,
-                event=RunEvent.workflow_completed,
-                content=f"Error running outputChecker: {e}",
-            )
-            return
+                # Parse outputChecker response
+                output_dict = parse_output_checker_to_dict(output_checker_response.content)
+                if output_dict.get('checkResult', '').lower() == 'pass':
+                    logger.info("Output check passed")
+                    yield RunResponse(
+                        run_id=self.run_id,
+                        event=RunEvent.workflow_completed,
+                        content=output_dict.get('summary', ''),
+                    )
+                    return
+                else:
+                    # Return tasks to taskSpliter to execute the same workflow
+                    logger.info("Re-executing tasks based on outputChecker's suggestion")
+                    error_count += 1
+                    if error_count >= 2:
+                        logger.warning("Error occurred twice during task execution")
+                        yield RunResponse(
+                            run_id=self.run_id,
+                            event=RunEvent.workflow_completed,
+                            content="Error occurred twice during task execution",
+                        )
+                        return
+                    continue
 
 
 # Move this block to after user input but before workflow creation

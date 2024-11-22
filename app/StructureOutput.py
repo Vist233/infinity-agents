@@ -55,3 +55,6 @@ def parse_output_checker_to_dict(output_str):
         return output_dict
     else:
         return {}
+    
+if __name__ == "__main__":
+    print(parse_tasks_to_list("task(id='1', description='Task 1', code_snippet=None, dependencies=[], result=None, separator='|')\ntask(id='2', description='Task 2', code_snippet=None, dependencies=['paperSearcher'], result=None, separator='|')")[1])
