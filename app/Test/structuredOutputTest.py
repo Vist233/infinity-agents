@@ -27,13 +27,14 @@ class MovieScript(BaseModel):
 # Agent that uses JSON mode
 json_mode_agent = Agent(
     model=OpenAILike(
-        id="yi-lightning",
+        id="yi-medium",
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
     description="You write movie scripts.",
     response_model=MovieScript,
-    debug_mode=True
+    debug_mode=True,
+    arbitrary_types_allowed=True,
 )
 
 # Agent that uses structured outputs
