@@ -118,23 +118,26 @@ class AssistantT:
 
 app = Flask(__name__)
 #assistant = AssistantT()
-UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
+UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     messages = []
     logs = ["系统初始化完成\n"]
+    uploaded_files = []  # 用于存储成功上传的文件名
 
     if request.method == "POST":
-
         if "file" in request.files:
-            uploaded_files = request.files.getlist("file")
-            for file in uploaded_files:
-                if file.filename:
-                    file_save_path = os.path.join(UPLOAD_FOLDER, file.filename)
+            uploaded_files_list = request.files.getlist("file")
+            for file in uploaded_files_list:
+                if file :
+                    filename = file.filename
+                    file_save_path = os.path.join(UPLOAD_FOLDER, filename)
                     file.save(file_save_path)
-                    logs.append(f"文件 {file.filename} 已成功上传至 {file_save_path}\n")
+                    uploaded_files.append(filename)
+                    logs.append(f"文件 '{filename}' 已成功上传至 {file_save_path}")
 
         user_input = request.form.get("userInput")
         if user_input:
@@ -163,7 +166,29 @@ def index():
                 logs.append(f"{error_message}\n")
                 messages.append({"type": "ai", "text": error_message})
 
-    return render_template("main.html", messages=messages, logs=logs)
+    return render_template("main.html",
+                           messages=messages,
+                           logs=logs,
+                           uploaded_files=uploaded_files)
+
+
+@app.route("/upload", methods=["POST"])
+def upload():
+    logs = []
+    uploaded_files = []
+
+    if "files" in request.files:
+        uploaded_files_list = request.files.getlist("files")
+        for file in uploaded_files_list:
+            if file and file.filename:
+                filename = file.filename
+                file_save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                file.save(file_save_path)
+                uploaded_files.append(filename)
+                logs.append(f"文件 '{filename}' 已成功上传至 {file_save_path}")
+
+    return {"logs": logs, "uploaded_files": uploaded_files}, 200
+
 
 if __name__ == "__main__":
     #user_input = input("Please enter your query: ")
