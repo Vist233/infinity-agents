@@ -92,22 +92,3 @@ class PaperSummaryGenerator(Workflow):
         if "summaries" not in self.session_state:
             self.session_state["summaries"] = []
         self.session_state["summaries"].append({"topic": topic, "summary": self.summarizer.run_response.content})
-
-
-# The topic to generate a summary on
-topic = "Quantum Computing Advances"
-
-# Create the workflow
-generate_summary = PaperSummaryGenerator(
-    session_id=f"generate-summary-on-{topic}",
-    storage=SqlWorkflowStorage(
-        table_name="generate_summary_workflows",
-        db_file="tmp/workflows.db",
-    ),
-)
-
-# Run workflow
-summary: Iterator[RunResponse] = generate_summary.run(topic=topic, use_cache=True)
-
-# Print the response
-pprint_run_response(summary, markdown=True)
