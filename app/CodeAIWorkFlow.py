@@ -142,52 +142,103 @@ shellExcutor = Agent(
 """
 
 class CodeAIWorkflow(Workflow):
-    session_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_interface: Agent = Field(default_factory=lambda: userInterfaceCommunicator)
-    task_splitter: Agent = Field(default_factory=lambda: taskSpliter)
-    pythonExcutor: Agent = Field(default_factory=lambda: pythonExcutor)
-    shellExcutor: Agent = Field(default_factory=lambda: shellExcutor)
-    
-    def get_agent_for_task(self, task_dependency):
-        if task_dependency == 'pythonExecutor':
-            return self.pythonExcutor
-        elif task_dependency == 'shellExecutor':
-            return self.shellExcutor
-        else:
-            return None
+    def __init__(self, session_id: str, storage: SqlWorkflowStorage):
+        super().__init__(session_id=session_id, storage=storage)
+        self.user_interface = Agent(
+            model=OpenAILike(
+                id="yi-medium",
+                api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+                base_url="https://api.lingyiwanwu.com/v1",
+            ),
+            instructions=[
+                "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libsm6, libxi6, python3.10.",
+                "You just need to provide the task Task execution sequence and the corresponding command, you could use python or shell command.",
+                "Avoid generating tasks that require external software installation or system configuration.",
+                "Don't check the tools and libraries, all the tools and libraries are available in the environment.",
+            ],
+        )
+
+        self.task_splitter = Agent(
+            model=OpenAILike(
+                id="yi-medium",
+                api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+                base_url="https://api.lingyiwanwu.com/v1",
+            ),
+            instructions=[
+                "You are a specialized task analyzer for bioinformatics workflows, python, shell.",
+                "For each task analyze and decide whether it needs Python or Shell execution.",
+                "Provide clean, executable code snippets without installation or config steps.",
+            ],
+            response_model=StructureOutput.taskSpliterAIOutput
+        )
+
+        tools_storage = SqlAgentStorage(
+            table_name=session_id,
+            db_file=f"./Database/toolsTeam.db"
+        )
+
+        self.python_executor = Agent(
+            storage=tools_storage,
+            tools=[PythonTools(), FileTools()],
+            model=OpenAILike(
+                id="yi-large-fc",
+                api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+                base_url="https://api.lingyiwanwu.com/v1",
+            ),
+            instructions=[
+                "Focus on generating clean, efficient Python code.",
+                "Always include proper error handling and input validation.",
+                "Return detailed execution results and any generated file paths."
+            ],
+        )
+
+        self.shell_executor = Agent(
+            storage=tools_storage,
+            tools=[ShellTools()],
+            model=OpenAILike(
+                id="yi-large-fc",
+                api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+                base_url="https://api.lingyiwanwu.com/v1"
+            ),
+            instructions=[
+                "Generate proper command lines for bioinformatics tools.",
+                "Include error handling and status checks.",
+                "Return command output and generated file paths."
+            ],
+        )
 
     def run(self, user_input: str) -> Iterator[RunResponse]:
-        listCurrentDir = os.listdir('.')
-        logger.info(f"User input received: {user_input}")
+        logger.info(f"Processing request: {user_input}")
+        
+        # Get current directory contents
+        list_current_dir = os.listdir('.')
 
-        # Step 1: Process with userInterfaceCommunicator
-        try:
-            ui_response: RunResponse = self.user_interface.run(
-                f"Current directory files:\n{str(listCurrentDir)}\nUser input:\n{user_input}"
-            )
-            if not ui_response or not ui_response.content:
-                yield RunResponse(
-                    run_id=self.run_id,
-                    event=RunEvent.workflow_completed,
-                    content="Invalid userInterfaceCommunicator response"
+        # Step 1: UI Communication with retries
+        ui_response = None
+        num_tries = 0
+        while ui_response is None and num_tries < 3:
+            try:
+                num_tries += 1
+                ui_response = self.user_interface.run(
+                    f"Current directory files:\n{str(list_current_dir)}\nUser input:\n{user_input}"
                 )
-                return
-            logger.info("Received response from userInterfaceCommunicator")
-        except Exception as e:
-            logger.error(f"userInterfaceCommunicator error: {e}")
+                if not ui_response or not ui_response.content:
+                    logger.warning("Invalid UI response, retrying...")
+                    ui_response = None
+            except Exception as e:
+                logger.warning(f"UI communication error: {e}")
+
+        if not ui_response:
             yield RunResponse(
                 run_id=self.run_id,
                 event=RunEvent.workflow_completed,
-                content=f"Error: {str(e)}"
+                content="Failed to process request through UI communicator"
             )
             return
 
-        logger.info(f"{ui_response.content}")
-
-        # Step 2: Process with taskSpliter
+        # Step 2: Task Splitting
         try:
-            task_splitter_response: RunResponse = self.task_splitter.run(ui_response.content)
-            logger.info(f"{task_splitter_response.content}")
+            task_splitter_response = self.task_splitter.run(ui_response.content)
             tasks_list = StructureOutput.create_task_splitter_output(str(task_splitter_response.content))
             if not tasks_list:
                 yield RunResponse(
@@ -205,39 +256,46 @@ class CodeAIWorkflow(Workflow):
             )
             return
 
-        logger.info(f"Tasks list: {tasks_list}")
+        # Step 3: Execute tasks with detailed output
+        python_results = []
+        shell_results = []
+        execution_summary = []
 
-        # Step 3: Execute tasks
-        execution_results = []
-        for task in tasks_list:
+        for idx, task in enumerate(tasks_list, 1):
+            task_type = "Python" if 'pythonExecutor' in task else "Shell"
+            executor = self.python_executor if 'pythonExecutor' in task else self.shell_executor
+            
+            execution_summary.append(f"\n--- Task {idx} ({task_type}) ---")
+            execution_summary.append(f"Command: {task}")
+            
             try:
-                # Determine dependencies by searching the string
-                if 'pythonExecutor' in task:
-                    agent = self.pythonExcutor
-                elif 'shellExecutor' in task:
-                    agent = self.shellExcutor
-                else:
-                    logger.info(f"Skipping task due to no valid dependencies: {task}")
-                    continue
-
-                agent_response = agent.run(task)
-                if agent_response and agent_response.content:
-                    execution_results.append(agent_response.content)
-
+                response = executor.run(task)
+                if response and response.content:
+                    result = f"Output: {response.content}"
+                    if task_type == "Python":
+                        python_results.append(result)
+                    else:
+                        shell_results.append(result)
+                    execution_summary.append(result)
+                    execution_summary.append("Status: Success")
             except Exception as e:
-                logger.error(f"Task execution error: {e}")
-                yield RunResponse(
-                    run_id=self.run_id,
-                    event=RunEvent.workflow_completed,
-                    content=f"Task execution error: {str(e)}"
-                )
-                return
+                error_msg = f"Error: {str(e)}"
+                execution_summary.append(error_msg)
+                execution_summary.append("Status: Failed")
 
-        # Return final results
+        # Prepare final output
+        final_output = [
+            "=== Task Execution Summary ===",
+            f"Total tasks: {len(tasks_list)}",
+            f"Python tasks: {len(python_results)}",
+            f"Shell tasks: {len(shell_results)}",
+            "\n=== Detailed Execution Log ===",
+        ] + execution_summary
+
         yield RunResponse(
             run_id=self.run_id,
             event=RunEvent.workflow_completed,
-            content="\n".join(execution_results)
+            content="\n".join(final_output)
         )
 
 # Get the user inputs
