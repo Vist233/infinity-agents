@@ -1,2 +1,3 @@
 .obsidian/
 compose-dev.yaml
+*.db

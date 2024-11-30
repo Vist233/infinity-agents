@@ -8,51 +8,32 @@ from phi.model.openai.like import OpenAILike
 from phi.tools.shell import ShellTools
 from phi.tools.python import PythonTools
 from phi.storage.agent.sqlite import SqlAgentStorage
-from phi.tools.file import FileTools
-import shutil
+# from phi.tools.file import FileTools
+from fileChanged import FileTools
 from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
 import uuid
 import StructureOutput
 
-
-
-
-
-
 # Initialize processing workspace
 if not os.path.exists('./ProcessingSpace'):
     os.makedirs('./ProcessingSpace')
 os.chdir('./ProcessingSpace/')
 
-# Get the user inputs
-# session_input = input("Session ID (press Enter to generate new): ").strip()
-
-# while(1):
-#     if os.path.isdir(session_input):
-#         user_session_id = session_input
-#         break
-#     elif session_input == "":
-#         user_session_id = str(uuid.uuid4())
-#         break
-#     else:
-#         user_session_id = input("session ID invalied, Please reenter the session ID (press Enter to generate new): ")
-
-
+# Generate a new session ID
 user_session_id = str(uuid.uuid4())
 os.makedirs(user_session_id, exist_ok=True)
 os.chdir(user_session_id)
 
-
-
-
+# Create database directory before initializing storage
+os.makedirs('./Database', exist_ok=True)
 
 def create_storage(session_id: str, name: str) -> SqlAgentStorage:
     """Create SQLite storage for agents with proper session isolation"""
     return SqlAgentStorage(
         table_name=session_id,
-        db_file=f"./../DataBase/{name}.db"  # Changed to use workflow database
+        db_file=f"./Database/{name}.db"
     )
 
 # Initialize shared storage for tool executors
@@ -66,11 +47,11 @@ userInterfaceCommunicator = Agent(
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
-    description="An AI assistant that converts user requests into the excute task list.",
+    description="An AI assistant that converts user requests into the execute task list.",
     instruction=[
         "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libsm6, libxi6, python3.10.",
-        "You just need to provide the task Task execution sequence and the corresponding command, you could use python or shell command.",
-        "Avoid generating tasks that require external software installation or system configuration.",
+        "You just need to provide the task execution sequence and the corresponding command, you could use python or shell command.",
+        "Break down complex tasks into smaller, executable steps and avoid generating tasks that require external software installation or system configuration.",
         "Don't check the tools and libraries, all the tools and libraries are available in the environment.",
     ],
     add_history_to_messages=True,
@@ -86,18 +67,20 @@ taskSpliter = Agent(
         api_key="1352a88fdd3844deaec9d7dbe4b467d5",
         base_url="https://api.lingyiwanwu.com/v1",
     ),
-    description="split the task into python and shell tasks",
+    description="An AI assistant that converts user requests into executable bioinformatics tasks.",
     instruction=[
-        "You are a specialized task analyzer for bioinformatics workflows, python, shell.",
-        # "Available tools include: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, and basic Unix tools.",
-        "For each task analyze and decide whether it needs Python (data processing, analysis, visualization) or Shell (command line tools, file operations) execution.",
+        "For each task analyze and decide whether it needs Python (data processing, analysis, visualization, save the python file to local) or Shell (command line tools, file operations) execution.",
         "Provide clean, executable code snippets without installation or config steps.",
+        "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, phidata, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libxext6, libsm6, libxi6, python3.10.",
+        "Don't check the tools and libraries, all the tools and libraries are available in the environment.",
+        "if the task is no task, return 'NO TASK' in your reply.",
     ],
     add_history_to_messages=True,
     arbitrary_types_allowed=True,
     response_model=StructureOutput.taskSpliterAIOutput
 )
 
+# Python Executor Agent
 pythonExcutor = Agent(
     storage=toolsTeamStorage,
     tools=[PythonTools(), FileTools()],
@@ -117,6 +100,7 @@ pythonExcutor = Agent(
     add_history_to_messages=False,
 )
 
+# Shell Executor Agent
 shellExcutor = Agent(
     storage=toolsTeamStorage,
     tools=[ShellTools()],
@@ -137,75 +121,11 @@ shellExcutor = Agent(
     add_history_to_messages=False
 )
 
-"""
-    This should be workflow description
-"""
-
 class CodeAIWorkflow(Workflow):
-    def __init__(self, session_id: str, storage: SqlWorkflowStorage):
-        super().__init__(session_id=session_id, storage=storage)
-        self.user_interface = Agent(
-            model=OpenAILike(
-                id="yi-medium",
-                api_key="1352a88fdd3844deaec9d7dbe4b467d5",
-                base_url="https://api.lingyiwanwu.com/v1",
-            ),
-            instructions=[
-                "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libsm6, libxi6, python3.10.",
-                "You just need to provide the task Task execution sequence and the corresponding command, you could use python or shell command.",
-                "Avoid generating tasks that require external software installation or system configuration.",
-                "Don't check the tools and libraries, all the tools and libraries are available in the environment.",
-            ],
-        )
-
-        self.task_splitter = Agent(
-            model=OpenAILike(
-                id="yi-medium",
-                api_key="1352a88fdd3844deaec9d7dbe4b467d5",
-                base_url="https://api.lingyiwanwu.com/v1",
-            ),
-            instructions=[
-                "You are a specialized task analyzer for bioinformatics workflows, python, shell.",
-                "For each task analyze and decide whether it needs Python or Shell execution.",
-                "Provide clean, executable code snippets without installation or config steps.",
-            ],
-            response_model=StructureOutput.taskSpliterAIOutput
-        )
-
-        tools_storage = SqlAgentStorage(
-            table_name=session_id,
-            db_file=f"./Database/toolsTeam.db"
-        )
-
-        self.python_executor = Agent(
-            storage=tools_storage,
-            tools=[PythonTools(), FileTools()],
-            model=OpenAILike(
-                id="yi-large-fc",
-                api_key="1352a88fdd3844deaec9d7dbe4b467d5",
-                base_url="https://api.lingyiwanwu.com/v1",
-            ),
-            instructions=[
-                "Focus on generating clean, efficient Python code.",
-                "Always include proper error handling and input validation.",
-                "Return detailed execution results and any generated file paths."
-            ],
-        )
-
-        self.shell_executor = Agent(
-            storage=tools_storage,
-            tools=[ShellTools()],
-            model=OpenAILike(
-                id="yi-large-fc",
-                api_key="1352a88fdd3844deaec9d7dbe4b467d5",
-                base_url="https://api.lingyiwanwu.com/v1"
-            ),
-            instructions=[
-                "Generate proper command lines for bioinformatics tools.",
-                "Include error handling and status checks.",
-                "Return command output and generated file paths."
-            ],
-        )
+    user_interface: Agent = Field(default_factory=lambda: userInterfaceCommunicator)
+    task_splitter: Agent = Field(default_factory=lambda: taskSpliter)
+    pythonExcutor: Agent = Field(default_factory=lambda: pythonExcutor)
+    shellExcutor: Agent = Field(default_factory=lambda: shellExcutor)
 
     def run(self, user_input: str) -> Iterator[RunResponse]:
         logger.info(f"Processing request: {user_input}")
@@ -239,6 +159,14 @@ class CodeAIWorkflow(Workflow):
         # Step 2: Task Splitting
         try:
             task_splitter_response = self.task_splitter.run(ui_response.content)
+            if "NO TASK" in task_splitter_response.content:
+                logger.info("No tasks to execute as per task splitter response.")
+                yield RunResponse(
+                    run_id=self.run_id,
+                    event=RunEvent.workflow_completed,
+                    content="No tasks to execute"
+                )
+                return
             tasks_list = StructureOutput.create_task_splitter_output(str(task_splitter_response.content))
             if not tasks_list:
                 yield RunResponse(
@@ -261,9 +189,13 @@ class CodeAIWorkflow(Workflow):
         shell_results = []
         execution_summary = []
 
+        # Remove the last task if it is a separator
+        if tasks_list and '=\'|\'' in tasks_list[-1]:
+            tasks_list.pop()
+
         for idx, task in enumerate(tasks_list, 1):
             task_type = "Python" if 'pythonExecutor' in task else "Shell"
-            executor = self.python_executor if 'pythonExecutor' in task else self.shell_executor
+            executor = self.pythonExcutor if 'pythonExecutor' in task else self.shellExcutor
             
             execution_summary.append(f"\n--- Task {idx} ({task_type}) ---")
             execution_summary.append(f"Command: {task}")
@@ -298,31 +230,32 @@ class CodeAIWorkflow(Workflow):
             content="\n".join(final_output)
         )
 
-# Get the user inputs
-# filePath = input("Your input file path here:")
-filePath = ""
+def execute_workflow(session_id: str, input_text: str):
+    """Execute the workflow with the given session ID and input text."""
+    # Create the workflow with the session_id
+    task_execution_workflow = CodeAIWorkflow(
+        session_id=session_id,
+        storage=SqlWorkflowStorage(
+            table_name=session_id,
+            db_file="./Database/CodeWorkflows.db",
+        ),
+    )
 
-if(filePath == ""):
-    print("No file path provided")
-else:
-    destination_file_path = os.path.join(os.getcwd(), os.path.basename(filePath))
-    shutil.copy(filePath, destination_file_path)
+    # Run the workflow
+    task_execution_results = task_execution_workflow.run(user_input=input_text)
 
-# user_input = input("Your input text here:")
-user_input = "告诉我当前文件夹中有什么文件并创建test.txt文件。我正在windows下使用cmd"
+    # Print the results
+    pprint_run_response(task_execution_results, markdown=True)
 
-# Create the workflow with the session_id
-task_execution_workflow = CodeAIWorkflow(
-    session_id=user_session_id,  # Use the user provided or generated session_id
-    storage=SqlWorkflowStorage(
-        table_name=user_session_id,
-        db_file="./../Database/CodeWorkflows.db",
-    ),
-)
-
-# Run the workflow
-task_execution_results = task_execution_workflow.run(user_input=user_input)
+# Example usage
+if __name__ == "__main__":
+    session_id = str(uuid.uuid4())
+    input_text = "随便生成一段用于分析DNA序列的Python代码放在当前文件夹中。"
+    execute_workflow(session_id, input_text)
 
 
-pprint_run_response(task_execution_results, markdown=True)
+
+
+
+
 
