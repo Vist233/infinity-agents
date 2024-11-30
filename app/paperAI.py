@@ -34,15 +34,18 @@ class PaperSummaryGenerator(Workflow):
         ),
     )
 
-    def run(self, topic: str, use_cache: bool = True) -> Iterator[RunResponse]:
+    def run(self, logs: list, topic: str, use_cache: bool = True) -> Iterator[RunResponse]:
         logger.info(f"Generating a summary on: {topic}")
+        logs.append(f"Generating a summary on: {topic}")
 
         # Use the cached summary if use_cache is True
         if use_cache and "summaries" in self.session_state:
             logger.info("Checking if cached summary exists")
+            logs.append(f"Checking if cached summary exists")
             for cached_summary in self.session_state["summaries"]:
                 if cached_summary["topic"] == topic:
                     logger.info("Found cached summary")
+                    logs.append(f"Found cached summary")
                     yield RunResponse(
                         run_id=self.run_id,
                         event=RunEvent.workflow_completed,
@@ -63,11 +66,14 @@ class PaperSummaryGenerator(Workflow):
                     and searcher_response.content
                 ):
                     logger.info("Successfully retrieved papers.")
+                    logs.append(f"Successfully retrieved papers.")
                     search_results = searcher_response.content
                 else:
                     logger.warning("Searcher response invalid, trying again...")
+                    logs.append(f"Searcher response invalid, trying again...")
             except Exception as e:
                 logger.warning(f"Error running searcher: {e}")
+                logs.append(f"Error running searcher: {e}")
 
         # If no search_results are found for the topic, end the workflow
         if not search_results:
@@ -80,6 +86,7 @@ class PaperSummaryGenerator(Workflow):
 
         # Step 2: Summarize the research papers
         logger.info("Summarizing research papers")
+        logs.append(f"Summarizing research papers")
         # Prepare the input for the summarizer
         summarizer_input = {
             "topic": topic,
