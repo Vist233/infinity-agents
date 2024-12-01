@@ -28,13 +28,13 @@ os.makedirs(user_session_id, exist_ok=True)
 os.chdir(user_session_id)
 
 # Create database directory before initializing storage
-os.makedirs('./Database', exist_ok=True)
+os.makedirs('./../Database', exist_ok=True)
 
 def create_storage(session_id: str, name: str) -> SqlAgentStorage:
     """Create SQLite storage for agents with proper session isolation"""
     return SqlAgentStorage(
         table_name=session_id,
-        db_file=f"./Database/{name}.db"
+        db_file=f"./../Database/{name}.db"
     )
 
 # Initialize shared storage for tool executors
@@ -238,7 +238,7 @@ def execute_workflow(session_id: str, input_text: str):
         session_id=session_id,
         storage=SqlWorkflowStorage(
             table_name=session_id,
-            db_file="./Database/CodeWorkflows.db",
+            db_file="./../Database/CodeWorkflows.db",
         ),
     )
 
