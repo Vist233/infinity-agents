@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 from phi.tools import Toolkit
 from phi.utils.log import logger
@@ -61,14 +61,16 @@ class FileTools(Toolkit):
             logger.error(f"Error reading file: {e}")
             return f"Error reading file: {e}"
 
-    def list_files(self) -> str:
-        """Returns a list of files in the base directory
+    def list_files(self, file_extension: Optional[str] = None) -> str:
+        """Returns a list of files in the base directory, optionally filtered by file extension.
 
-        :return: The contents of the file if successful, otherwise returns an error message.
+        :param file_extension: The file extension to filter by (e.g., '.txt'). If None, lists all files.
+        :return: A JSON string of the list of files if successful, otherwise returns an error message.
         """
         try:
-            logger.info(f"Reading files in : {self.base_dir}")
-            return json.dumps([str(file_path) for file_path in self.base_dir.iterdir()], indent=4)
+            logger.info(f"Reading files in: {self.base_dir}")
+            files = [str(file_path) for file_path in self.base_dir.iterdir() if file_extension is None or file_path.suffix == file_extension]
+            return json.dumps(files, indent=4)
         except Exception as e:
             logger.error(f"Error reading files: {e}")
             return f"Error reading files: {e}"

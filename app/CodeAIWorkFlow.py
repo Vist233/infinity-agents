@@ -9,7 +9,8 @@ from phi.tools.shell import ShellTools
 from phi.tools.python import PythonTools
 from phi.storage.agent.sqlite import SqlAgentStorage
 # from phi.tools.file import FileTools
-from fileChanged import FileTools
+from tools.fileChanged import FileTools
+from tools.shellChanged import ShellTools
 from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
