@@ -4,8 +4,8 @@ from phi.workflow import RunEvent
 from phi.storage.workflow.sqlite import SqlWorkflowStorage
 import os
 
-from app.CodeAIWorkFlow import CodeAIWorkflow, user_session_id
-from app.paperAI import PaperSummaryGenerator
+from CodeAIWorkFlow import CodeAIWorkflow
+from paperAI import PaperSummaryGenerator
 
 
 class DialogueManager:
@@ -13,29 +13,34 @@ class DialogueManager:
         self.assistant = assistant
 
     def process_user_input(self, user_input, conversation_history, logs):
-        self.assistant.session_id = f"generate-summary-on-{user_input}"
         logs.append(f"用户发送: {user_input}\n")
         response = ""
 
         try:
-            full_input = f"{conversation_history}\n用户: {user_input}"  # 包含上下文的输入
-            for res in self.assistant.run(logs, user_input):
-                if res.event == RunEvent.workflow_completed:
-                    logs.append("Workflow completed.\n")
-                    response = res.content
+            if self.assistant == paperai:
+                self.assistant.session_id = f"generate-summary-on-{user_input}"
+
+                for res in self.assistant.run(logs, user_input):
+                    if res.event == RunEvent.workflow_completed:
+                        logs.append("Workflow completed.\n")
+                        response = res.content
+            elif self.assistant == codeai:
+                full_input = f"{conversation_history}\n用户: {user_input}"  # 包含上下文的输入
+                for res in self.assistant.run(logs, full_input):
+                    if res.event == RunEvent.workflow_completed:
+                        logs.append("Workflow completed.\n")
+                        response = res.content
         except Exception as e:
             response = f"处理过程中出错: {e}"
             logs.append(f"{response}\n")
 
         return response
 
-
 app = Flask(__name__)
 app.secret_key = str(uuid.uuid4())
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = f"ProcessingSpace\\{app.secret_key}"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
 
 paperai = PaperSummaryGenerator(
     storage=SqlWorkflowStorage(
@@ -44,27 +49,25 @@ paperai = PaperSummaryGenerator(
     ),
 )
 codeai = CodeAIWorkflow(
-    session_id=user_session_id,
+    session_id=app.secret_key,
     storage=SqlWorkflowStorage(
-        table_name=user_session_id,
+        table_name=app.secret_key,
         db_file="./../Database/CodeWorkflows.db",
     ),
 )
 paperai_manager = DialogueManager(paperai)
 codeai_manager = DialogueManager(codeai)
 
-
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # 初始化会话中的对话历史
     if "messages" not in session:
         session["messages"] = []
     messages = session["messages"]
-    logs = ["系统初始化完成\n"]
+    logs = ["系统初始化完成\n"]   #右下角
 
-    # 处理用户输入
     if request.method == "POST":
         user_input = request.form.get("userInput")
+        agent = request.form.get("agent")  # 判断是调用 paperai 还是 codeai
         if user_input:
             # 获取对话上下文
             conversation_history = "\n".join(
@@ -72,15 +75,18 @@ def index():
                 for msg in messages
             )
 
-            # 使用 DialogueManager.py 生成回复
-            response = dialogue_manager.process_user_input(user_input, conversation_history, logs)
+            if agent == "paperai":
+                response = paperai_manager.process_user_input(user_input, conversation_history, logs)
+            elif agent == "codeai":
+                response = codeai_manager.process_user_input(user_input, conversation_history, logs)
+            else:
+                response = "未指定有效的 Agent。"
 
             messages.append({"type": "user", "text": user_input})
             messages.append({"type": "ai", "text": response})
             session["messages"] = messages
 
     return render_template("main.html", messages=messages, logs=logs)
-
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -98,7 +104,6 @@ def upload():
                 logs.append(f"文件 '{filename}' 已成功上传至 {file_save_path}")
 
     return {"logs": logs, "uploaded_files": uploaded_files}, 200
-
 
 if __name__ == "__main__":
     app.run(debug=True)
