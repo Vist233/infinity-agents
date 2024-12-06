@@ -276,8 +276,8 @@
 <body>
 
   <div class="header">
-  <img src="../static/logo.png" alt="Logo" class="logo" />
-  <h1 class="header-title">BIOINFO-AGENT</h1>
+  <img src="./../static/logo.png" alt="Logo" class="logo" />
+  <h1 class="header-title">Infinite Bio-Agents</h1>
   </div>
 
   <div class="container-fluid vh-100 d-flex">
@@ -298,18 +298,18 @@
       <!-- 输入框 -->
       <form action="/" method="POST" class="input-area">
         <select name="agent" class="agent-select">
-          <option value="paperai" selected>PAPER AI</option>
-          <option value="codeai">CODE AI</option>
+          <option value="paperai" selected>Paper Chat</option>
+          <option value="codeai">Code Helper</option>
         </select>
         <input
           type="text"
           class="input-box"
           id="userInput"
           name="userInput"
-          placeholder="输入内容..."
+          placeholder="Input something here..."
           required
         />
-        <button type="submit" class="send-button">SEND</button>
+        <button type="submit" class="send-button">Send Message</button>
       </form>
     </div>
 
@@ -317,10 +317,10 @@
     <div class="function-area">
       <!-- 文件上传区 -->
       <div class="file-area">
-        <h5 class="section-title">FILES</h5>
+        <h5 class="section-title">WorkingSpace</h5>
         <!-- 文件上传表单 -->
         <form id="uploadForm" action="/" method="POST" enctype="multipart/form-data">
-          <label for="fileInput" class="file-label">UPLOAD</label>
+          <label for="fileInput" class="file-label">Upload File</label>
           <input type="file" class="file-input" id="fileInput" name="file" multiple />
         </form>
         <ul class="file-list" id="fileList">
@@ -335,7 +335,7 @@
 
       <!-- 调试信息区 -->
       <div class="log-area">
-        <h5 class="section-title">LOGS</h5>
+        <h5 class="section-title">Logs</h5>
         <ul class="log-list">
           <!-- 动态显示日志 -->
           {% if logs %}

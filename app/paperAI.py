@@ -7,6 +7,7 @@ from phi.utils.pprint import pprint_run_response
 from phi.utils.log import logger
 from phi.tools.arxiv_toolkit import ArxivToolkit
 from phi.model.openai.like import OpenAILike
+from phi.tools.pubmed import PubmedTools
 
 class PaperSummaryGenerator(Workflow):
     searcher: Agent = Agent(
@@ -15,7 +16,7 @@ class PaperSummaryGenerator(Workflow):
             api_key="1352a88fdd3844deaec9d7dbe4b467d5",
             base_url="https://api.lingyiwanwu.com/v1",
         ),
-        tools=[ArxivToolkit()],
+        tools=[PubmedTools()],
         instructions=["Given a topic, search for 10 research papers and return the 5 most relevant papers in a simple format including title, URL, and abstract for each paper."],
     )
 
