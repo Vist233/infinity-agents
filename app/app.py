@@ -4,7 +4,7 @@ from phi.workflow import RunEvent
 from phi.storage.workflow.sqlite import SqlWorkflowStorage
 import os
 
-from CodeAIWorkFlow import CodeAIWorkflow
+from codeAI import CodeAIWorkflow
 from paperAI import PaperSummaryGenerator
 
 
