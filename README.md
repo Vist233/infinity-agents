@@ -1,1 +1,54 @@
-该基因序列处理AI系统旨在帮助用户高效地进行基因组数据分析和交流。系统基于AI技术，集成了基因序列处理工具，用户可通过直观的界面上传基因序列文件，描述具体的基因组分析需求（如基因注释或遗传多样性指标的计算），并与AI进行交流。本系统在Docker容器中运行，确保系统的隔离性和稳定性，便于部署在不同的服务器环境中。
+# Infinity Bio-Agents
+
+An AI agent for bioinformatics to deal with various bio-problems.
+
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [License](#license)
+
+## Introduction
+
+Infinity Bio-Agents is an AI-based tool designed to address various bioinformatics problems. This repository contains multiple scripts and notebooks to assist in bioinformatics research and analysis.
+
+## Features
+
+- **Python**: Core functionalities and algorithms.
+- **Jupyter Notebook**: Interactive data analysis and visualization.
+- **Perl**: Additional bioinformatics utilities.
+- **Java**: Supplementary tools.
+- **HTML**: Visualization and reporting.
+
+## Run it locally
+
+To install the required dependencies, run:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+To use the AI agent in web, follow these steps:
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/Vist233/Infinity_Bio-Agents.git
+    cd Infinity_Bio-Agents
+    ```
+
+2. To use the app, run:
+    ```bash
+    docker build -t iba .
+    docker exc iba
+    ```
+
+look at your http://127.0.0.1:5000
+
+## License
+
+This project is licensed under the MIT License.
+
