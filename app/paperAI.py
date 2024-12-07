@@ -19,6 +19,7 @@ class PaperSummaryGenerator(Workflow):
         ),
         tools=[PubmedTools()],
         instructions=["Given a topic, search for 10 research papers and return the 5 most relevant papers in a simple format including title, URL, and abstract for each paper."],
+        add_history_to_messages=True,
     )
 
     summarizer: Agent = Agent(
@@ -34,6 +35,7 @@ class PaperSummaryGenerator(Workflow):
             api_key=API_KEY,
             base_url="https://api.lingyiwanwu.com/v1",
         ),
+        add_history_to_messages=True,
     )
 
     def run(self, logs: list, topic: str, use_cache: bool = True) -> Iterator[RunResponse]:
