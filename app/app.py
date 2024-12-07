@@ -1,8 +1,10 @@
 import uuid
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, send_file
 from phi.workflow import RunEvent
 from phi.storage.workflow.sqlite import SqlWorkflowStorage
 import os
+import io
+import zipfile
 
 from app.codeAI import CodeAIWorkflow
 from app.paperAI import PaperSummaryGenerator
@@ -104,6 +106,25 @@ def upload():
                 logs.append(f"文件 '{filename}' 已成功上传至 {file_save_path}")
 
     return {"logs": logs, "uploaded_files": uploaded_files}, 200
+
+@app.route("/download", methods=["GET"])
+def download():
+    """将 UPLOAD_FOLDER 中的所有文件打包为 ZIP 并提供下载"""
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for root, _, files in os.walk(app.config["UPLOAD_FOLDER"]):
+            for file in files:
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, start=app.config["UPLOAD_FOLDER"])
+                zip_file.write(file_path, arcname)
+    zip_buffer.seek(0)
+
+    return send_file(
+        zip_buffer,
+        as_attachment=True,
+        download_name="uploaded_files.zip",
+        mimetype="application/zip",
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

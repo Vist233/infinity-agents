@@ -1,80 +1,61 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const messageArea = document.getElementById("messageArea");
-  const userInput = document.getElementById("userInput");
-  const sendButton = document.getElementById("sendButton");
-  const fileInput = document.getElementById("fileInput");
-  const fileList = document.getElementById("fileList");
-  const logArea = document.getElementById("logArea");
+     //上传文件
+    document.getElementById("fileInput").addEventListener("change", async function (event) {
+      const fileList = document.getElementById("fileList");
+      const files = event.target.files;
 
-  const logger = ["系统初始化完成"];
-  const messages = [];
+      const formData = new FormData();
+      for (const file of files) {
+        formData.append("files", file);
 
-  // 更新日志
-  function log(message) {
-    logger.push(message);
-    const logItem = document.createElement("div");
-    logItem.textContent = message;
-    logItem.classList.add("text-white-50");
-    logArea.appendChild(logItem);
-    logArea.scrollTop = logArea.scrollHeight;
-  }
+        const listItem = document.createElement("li");
+        listItem.textContent = file.name;
+        fileList.appendChild(listItem);
+      }
 
-  // 添加消息
-  function addMessage(type, text) {
-    messages.push({ type, text });
+      try {
+        const response = await fetch("/upload", {
+          method: "POST",
+          body: formData,
+        });
 
-    const messageDiv = document.createElement("div");
-    messageDiv.classList.add("message", type);
+        if (response.ok) {
+          const result = await response.json();
+          console.log("文件上传成功:", result);
 
-    const bubble = document.createElement("div");
-    bubble.classList.add("bubble");
-    bubble.textContent = text;
+          if (result.logs) {
+            result.logs.forEach((log) => {
+              const logItem = document.createElement("li");
+              logItem.textContent = log;
+              document.querySelector(".log-list").appendChild(logItem);
+            });
+          }
+        } else {
+          console.error("文件上传失败", response.statusText);
+        }
+      } catch (error) {
+        console.error("文件上传发生错误", error);
+      }
+    });
 
-    messageDiv.appendChild(bubble);
-    messageArea.appendChild(messageDiv);
-    messageArea.scrollTop = messageArea.scrollHeight;
-  }
-
-  // 发送消息
-  function sendMessage() {
-    const text = userInput.value.trim();
-    if (!text) return;
-
-    addMessage("user", text);
-    log(`用户发送: ${text}`);
-    userInput.value = "";
-
-    // 模拟 AI 回复
-    setTimeout(() => {
-      const aiResponse = "这是 AI 的回复。";
-      addMessage("ai", aiResponse);
-      log(`AI 回复: ${aiResponse}`);
-    }, 1000);
-  }
-
-  // 处理文件上传
-  function handleFileUpload(event) {
-    const files = event.target.files;
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-
-      // 添加到文件列表
-      const fileItem = document.createElement("li");
-      fileItem.textContent = file.name;
-      fileItem.classList.add("list-group-item");
-      fileList.appendChild(fileItem);
-
-      log(`上传文件: ${file.name}`);
-    }
-  }
-
-  // 绑定事件
-  sendButton.addEventListener("click", sendMessage);
-  userInput.addEventListener("keyup", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
-  fileInput.addEventListener("change", handleFileUpload);
-
-  // 初始化日志
-  logArea.textContent = logger.join("\n");
-});
+        // 下载所有文件
+    document.getElementById("downloadAllButton").addEventListener("click", async function () {
+      try {
+        const response = await fetch("/download", { method: "GET" });
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.style.display = "none";
+          a.href = url;
+          a.download = "files.zip"; // 打包为 ZIP 文件
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          console.log("文件下载成功");
+        } else {
+          console.error("文件下载失败", response.statusText);
+        }
+      } catch (error) {
+        console.error("文件下载发生错误", error);
+      }
+    });

@@ -1,6 +1,9 @@
 import json
 from typing import Iterator
+
+from flask import session
 from phi.agent import Agent
+from phi.utils.pprint import pprint_run_response
 from phi.workflow import Workflow, RunResponse, RunEvent
 from phi.utils.log import logger
 from phi.model.openai.like import OpenAILike
@@ -8,7 +11,7 @@ from phi.tools.pubmed import PubmedTools
 import os
 
 # Get the API key from environment variables OR set your API key here
-API_KEY = os.environ.get("YI_API_KEY", "1352a88fdd3844deaec9d7dbe4b467d5")
+API_KEY = os.environ.get("YI_API_KEY", "b9804fbc97884e278f7b8cc1c5bf8136")
 
 class PaperSummaryGenerator(Workflow):
     searcher: Agent = Agent(
@@ -103,3 +106,10 @@ class PaperSummaryGenerator(Workflow):
         if "summaries" not in self.session_state:
             self.session_state["summaries"] = []
         self.session_state["summaries"].append({"topic": topic, "summary": self.summarizer.run_response.content})
+
+'''
+paperai = PaperSummaryGenerator()
+logs=[]
+result=paperai.run(logs,"AGI")
+pprint_run_response(result, markdown=True)
+'''

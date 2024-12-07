@@ -1,121 +1,340 @@
-/* 页面布局和样式 */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #1e1e1e;
+      color: white;
+    }
 
-.container-fluid {
-  display: flex;
-  height: 100vh;
-  background-color: #1e1e1e;
-  color: white;
-}
+    .container-fluid {
+      display: flex;
+      height: 100vh;
+    }
 
-/* 左侧聊天区域 */
-.col-md-8 {
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid #333;
-}
+    .chat-area {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #333;
+    }
 
-.flex-grow-1 {
-  flex: 1;
-}
+    .message-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      background-color: #1e1e1e;
+    }
 
-.overflow-auto {
-  overflow-y: auto;
-}
+    .message {
+      display: flex;
+      margin-bottom: 15px;
+    }
 
-.message {
-  display: flex;
-  margin-bottom: 15px;
-}
+    .message.user {
+      justify-content: flex-end;
+    }
 
-.message.user {
-  justify-content: flex-end;
-}
+    .message.ai {
+      justify-content: flex-start;
+    }
 
-.message.ai {
-  justify-content: flex-start;
-}
+    .bubble {
+      max-width: 60%;
+      padding: 10px 15px;
+      border-radius: 20px;
+      word-wrap: break-word;
+    }
 
-.bubble {
-  max-width: 60%;
-  padding: 10px 15px;
-  border-radius: 20px;
-  word-wrap: break-word;
-}
+    .message.user .bubble {
+      background-color: #434343;
+      color: white;
+    }
 
-.message.user .bubble {
-  background-color: #007bff;
-  color: white;
-}
+    .message.ai .bubble {
+      background-color: #444;
+      color: white;
+    }
 
-.message.ai .bubble {
-  background-color: #6c757d;
-  color: white;
-}
+    .input-area {
+      display: flex;
+      padding: 10px;
+      background-color: #333;
+    }
 
-.input-group {
-  display: flex;
-  padding: 10px;
-}
+    .input-box {
+      flex: 1;
+      padding: 10px;
+      background-color: #444;
+      border: none;
+      color: white;
+      border-radius: 5px 0 0 5px;
+    }
 
-.input-group input {
-  flex: 1;
-  padding: 10px;
-  background-color: #444;
-  border: none;
-  color: white;
-  border-radius: 5px 0 0 5px;
-}
+    .send-button {
+      padding: 10px;
+      background-color: #000000;
+      border: none;
+      color: white;
+      border-radius: 0 5px 5px 0;
+      cursor: pointer;
+    }
 
-.input-group button {
-  padding: 10px;
-  background-color: #007bff;
-  border: none;
-  color: white;
-  border-radius: 0 5px 5px 0;
-  cursor: pointer;
-}
+    .send-button:hover {
+      background-color: #000000;
+    }
 
-.input-group button:hover {
-  background-color: #0056b3;
-}
+    .function-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
 
-/* 右侧功能区 */
-.col-md-4 {
-  display: flex;
-  flex-direction: column;
+    .file-header {
+      display: flex; /* 添加 flex 布局 */
+      justify-content: space-between; /* 左右两端对齐 */
+      align-items: center; /* 垂直方向居中 */
+      margin-bottom: 10px; /* 标题和文件列表之间的间距 */
 }
+    .file-area {
+      flex: 1;
+      background-color: #222;
+      margin-bottom: 10px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .file-area .section-title {
+    font-family: 'Microsoft YaHei UI', monospace;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    }
 
-.bg-secondary {
-  background-color: #333 !important;
-  color: white;
-}
+    .log-area .section-title {
+    font-family: 'Microsoft YaHei UI', monospace;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    }
 
-.list-group-item {
-  background-color: #222;
-  color: white;
-  margin: 5px 0;
-  border: none;
-  padding: 10px;
-}
+    .file-area .section-title {
+    background-color: #222;
+    padding: 5px 10px;
+    border-radius: 5px;
+    }
 
-.border-light {
-  border-color: #ccc !important;
-}
+    .log-area .section-title {
+      background-color: #222;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
 
-/* 自定义滚动条 */
-.overflow-auto::-webkit-scrollbar {
-  width: 8px;
-}
+    .file-input {
+      width: 100%;
+      margin-bottom: 10px;
+    }
 
-.overflow-auto::-webkit-scrollbar-thumb {
-  background: #444;
-  border-radius: 4px;
-}
+    .file-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
 
-.overflow-auto::-webkit-scrollbar-track {
-  background: #222;
-}
+    .file-list li {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      margin-bottom: 5px;
+      background-color: #333;
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .file-list li:hover {
+      background-color: #444;
+    }
+
+    .file-list li::before {
+      content: "📄";
+      margin-right: 10px;
+    }
+
+    .log-area {
+      flex: 1;
+      background-color: #222;
+      border: 1px solid #444;
+      border-radius: 5px;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 13px;
+      color: #56955b;
+    }
+
+    .section-title {
+      border-bottom: 1px solid #555;
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+    }
+
+    .overflow-y::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .overflow-y::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+
+    .overflow-y::-webkit-scrollbar-track {
+      background: #222;
+    }
+
+        /* 页眉样式 */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 0;
+      height: 38px;
+      background-color: #222;
+      border-bottom: 1px solid #333;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .container-fluid {
+      margin-top: 60px; /* 页眉的高度 */
+      height: calc(100vh - 60px); /* 总高度减去页眉高度 */
+    }
+
+    .header .logo {
+      height: 30px;
+      width: auto;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      margin: 0;
+    }
+
+    /* 美化文件选择按钮 */
+    .file-input {
+      display: none;
+    }
+
+    #uploadForm {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 0;
+    }
+
+    .file-label {
+      display: inline-flex;  /* 使用flexbox布局，使图标居中 */
+      align-items: center;   /* 垂直居中对齐 */
+      justify-content: center; /* 水平居中对齐 */
+      padding: 8px 15px;
+      background-color: #444;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+
+    .file-label:hover {
+      background-color: #555;
+    }
+
+    .file-label img.icon {
+      height: 20px; /* 统一图标大小 */
+      width: 20px;
+      margin: 0;
+    }
+
+        /* 文件下载按钮 */
+    .download-button {
+      padding: 8px 15px;
+      background-color: #444;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .download-button:hover {
+      background-color: #555;
+    }
+
+    .download-button img.icon {
+      height: 20px; /* 统一图标大小 */
+      width: 20px;
+      margin: 0;
+    }
+
+    /* 让文件选择按钮与 label 绑定 */
+    .file-input:focus + .file-label {
+      outline: 2px solid #545454;
+      outline-offset: 2px;
+    }
+
+    /* 滚动条美化 */
+    .overflow-y::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .overflow-y::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+
+    .overflow-y::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+
+    .overflow-y::-webkit-scrollbar-track {
+      background: #222;
+    }
+
+    .agent-select {
+      padding: 10px;
+      margin-right: 10px;
+      background-color: #444;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      outline: none;
+      font-size: 13px;
+    }
+
+    .agent-select:hover {
+      background-color: #505050;
+    }
+
+    .agent-select option {
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    .agent-select option:hover {
+      background-color: #444;
+    }
