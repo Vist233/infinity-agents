@@ -5,12 +5,16 @@ from phi.workflow import Workflow, RunResponse, RunEvent
 from phi.utils.log import logger
 from phi.model.openai.like import OpenAILike
 from phi.tools.pubmed import PubmedTools
+import os
+
+# Get the API key from environment variables OR set your API key here
+API_KEY = os.environ.get("YI_API_KEY", "1352a88fdd3844deaec9d7dbe4b467d5")
 
 class PaperSummaryGenerator(Workflow):
     searcher: Agent = Agent(
         model=OpenAILike(
             id="yi-large-fc",
-            api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+            api_key=API_KEY,
             base_url="https://api.lingyiwanwu.com/v1",
         ),
         tools=[PubmedTools()],
@@ -27,7 +31,7 @@ class PaperSummaryGenerator(Workflow):
         ],
         model=OpenAILike(
             id="yi-medium-200k",
-            api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+            api_key=API_KEY,
             base_url="https://api.lingyiwanwu.com/v1",
         ),
     )

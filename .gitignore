@@ -4,3 +4,4 @@ compose-dev.yaml
 .pyc
 __pycache__/
 ProcessingSpace/
+Database/

@@ -24,22 +24,22 @@ class FileTools(Toolkit):
         if list_files:
             self.register(self.list_files)
 
-    def save_file(self, contents: str, file_name: str, overwrite: bool = True) -> str:
-        """Saves the contents to a file called `file_name` and returns the file name if successful.
-
-        :param contents: The contents to save.
+    def save_file(self, code: str, file_name: str, overwrite: bool = True) -> str:
+        """Saves the code to a file called `file_name` and returns the file name if successful.
+    
+        :param code: The contents to save.
         :param file_name: The name of the file to save to.
         :param overwrite: Overwrite the file if it already exists.
         :return: The file name if successful, otherwise returns an error message.
         """
         try:
             file_path = self.base_dir.joinpath(file_name)
-            logger.debug(f"Saving contents to {file_path}")
+            logger.debug(f"Saving code to {file_path}")
             if not file_path.parent.exists():
                 file_path.parent.mkdir(parents=True, exist_ok=True)
             if file_path.exists() and not overwrite:
                 return f"File {file_name} already exists"
-            file_path.write_text(contents, encoding='utf-8')
+            file_path.write_text(code, encoding='utf-8')
             logger.info(f"Saved: {file_path}")
             return str(file_name)
         except Exception as e:

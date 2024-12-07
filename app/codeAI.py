@@ -21,6 +21,9 @@ import structureOutput
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 
+# Get the API key from environment variables OR set your API key here
+API_KEY = os.environ.get("YI_API_KEY", "1352a88fdd3844deaec9d7dbe4b467d5")
+
 # 构建目标目录路径
 processing_space_dir = os.path.join(parent_dir, 'ProcessingSpace')
 database_dir = os.path.join(parent_dir, 'Database')
@@ -54,7 +57,7 @@ userInterfaceCommunicator = Agent(
     storage=create_storage(user_session_id, "userInterfaceCommunicator"),
     model=OpenAILike(
         id="yi-medium",
-        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+        api_key=API_KEY,
         base_url="https://api.lingyiwanwu.com/v1",
     ),
     description="An AI assistant that converts user requests into the execute task list.",
@@ -74,7 +77,7 @@ taskSpliter = Agent(
     storage=create_storage(user_session_id, "taskSpliter"),
     model=OpenAILike(
         id="yi-medium",
-        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+        api_key=API_KEY,
         base_url="https://api.lingyiwanwu.com/v1",
     ),
     description="An AI assistant that converts user requests into executable bioinformatics tasks.",
@@ -96,7 +99,7 @@ pythonExcutor = Agent(
     tools=[PythonTools(), FileTools()],
     model=OpenAILike(
         id="yi-large-fc",
-        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+        api_key=API_KEY,
         base_url="https://api.lingyiwanwu.com/v1",
     ),
     description="Executes Python-based bioinformatics tasks with focus on data processing, analysis and visualization",
@@ -116,7 +119,7 @@ shellExcutor = Agent(
     tools=[ShellTools()],
     model=OpenAILike(
         id="yi-large-fc",
-        api_key="1352a88fdd3844deaec9d7dbe4b467d5",
+        api_key=API_KEY,
         base_url="https://api.lingyiwanwu.com/v1"
     ),
     description="Executes shell commands for bioinformatics tools with proper error handling",
@@ -126,7 +129,8 @@ shellExcutor = Agent(
         "Always validate input files existence before execution.",
         "Include error handling and status checks.",
         "Use appropriate flags and parameters for each tool.",
-        "Return command output and generated file paths."
+        "Return command output and generated file paths.",
+        "Commands should be provided as single, complete strings within a list, e.g., [\"command\"], rather than split into separate elements like [\"software\", \"parameters1\"].",
     ],
     add_history_to_messages=False
 )
@@ -260,7 +264,7 @@ def execute_workflow(session_id: str, input_text: str):
 # Example usage
 if __name__ == "__main__":
     session_id = str(uuid.uuid4())
-    input_text = "随便生成一段用于分析DNA序列的Python代码放在当前文件夹中。"
+    input_text = "使用命令 cat \"Hello World\" > hello.txt"
     execute_workflow(session_id, input_text)
 
 

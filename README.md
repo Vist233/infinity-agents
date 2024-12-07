@@ -24,10 +24,17 @@ Infinity Bio-Agents is an AI-based tool designed to address various bioinformati
 
 ## Run it locally
 
-To install the required dependencies, run:
+1. To install the required dependencies, run:
 
 ```bash
 pip install -r requirements.txt
+```
+
+2. set the enviroment YI_API_KEY as your YI api key or change the API_KEY varible in app/codeAI.py and app/paperAI.py
+
+```
+# Get the API key from environment variables OR set your API key here
+API_KEY = os.environ.get("YI_API_KEY", "XXXXXXXXXXXXXXX Your Yi api goes here")
 ```
 
 ## Usage
