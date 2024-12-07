@@ -67,7 +67,7 @@ userInterfaceCommunicator = Agent(
         "Break down complex tasks into smaller, executable steps and avoid generating tasks that require external software installation or system configuration.",
         "Don't check the tools and libraries, all the tools and libraries are available in the environment.",
     ],
-    add_history_to_messages=False,
+    add_history_to_messages=True,
     markdown=True,
     arbitrary_types_allowed=True
 )
