@@ -67,7 +67,7 @@ userInterfaceCommunicator = Agent(
         "Break down complex tasks into smaller, executable steps and avoid generating tasks that require external software installation or system configuration.",
         "Don't check the tools and libraries, all the tools and libraries are available in the environment.",
     ],
-    add_history_to_messages=False,
+    add_history_to_messages=True,
     markdown=True,
     arbitrary_types_allowed=True
 )
@@ -80,7 +80,7 @@ taskSpliter = Agent(
         api_key=API_KEY,
         base_url="https://api.lingyiwanwu.com/v1",
     ),
-    description="An AI assistant that converts user requests into executable bioinformatics tasks.",
+    description="An AI assistant that converts user requests into executable tasks.",
     instruction=[
         "For each task analyze and decide whether it needs Python (data processing, analysis, visualization, save the python file to local) or Shell (command line tools, file operations) execution.",
         "Provide clean, executable code snippets without installation or config steps.",
@@ -102,7 +102,7 @@ pythonExcutor = Agent(
         api_key=API_KEY,
         base_url="https://api.lingyiwanwu.com/v1",
     ),
-    description="Executes Python-based bioinformatics tasks with focus on data processing, analysis and visualization",
+    description="Executes Python-based tasks with focus on data processing, analysis and visualization",
     instruction=[
         "Focus on generating clean, efficient Python code.",
         "Always include proper error handling and input validation.",
@@ -122,10 +122,10 @@ shellExcutor = Agent(
         api_key=API_KEY,
         base_url="https://api.lingyiwanwu.com/v1"
     ),
-    description="Executes shell commands for bioinformatics tools with proper error handling",
+    description="Executes shell commands for tools with proper error handling",
     instruction=[
         "You are a shell command execution specialist.",
-        "Generate proper command lines for bioinformatics tools.",
+        "Generate proper command lines for the tools you have.",
         "Always validate input files existence before execution.",
         "Include error handling and status checks.",
         "Use appropriate flags and parameters for each tool.",

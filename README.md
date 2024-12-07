@@ -1,6 +1,6 @@
-# Infinity Bio-Agents
+# Infinity Agents
 
-An AI agent for bioinformatics to deal with various bio-problems.
+An AI agent for excuting code and paper summary.
 
 ## Table of Contents
 
@@ -12,15 +12,15 @@ An AI agent for bioinformatics to deal with various bio-problems.
 
 ## Introduction
 
-Infinity Bio-Agents is an AI-based tool designed to address various bioinformatics problems. This repository contains multiple scripts and notebooks to assist in bioinformatics research and analysis.
+Infinity Agents is an AI-based tool designed to excute the code in your local computer and search the paper. This repository contains multiple scripts and notebooks to assist in coding and analysis.
+
+Actually this AI Agent is design for those don't how to coding and need to search a lot of paper.
 
 ## Features
 
-- **Python**: Core functionalities and algorithms.
-- **Jupyter Notebook**: Interactive data analysis and visualization.
-- **Perl**: Additional bioinformatics utilities.
-- **Java**: Supplementary tools.
-- **HTML**: Visualization and reporting.
+- **Code Helper**:It will create a workspace in your computer. you could upload and download the files in your workspace. If you want to do something just tell it to the Code Helper, it will excute it in workspace automatically.
+- **Paper AI**:Give it a topic, it will search 15 paper in pubmed and summary the most relative 5 paper for you.
+
 
 ## Run it locally
 
@@ -37,7 +37,7 @@ pip install -r requirements.txt
 API_KEY = os.environ.get("YI_API_KEY", "XXXXXXXXXXXXXXX Your Yi api goes here")
 ```
 
-## Usage
+## Run it in Docker(Safer compared to locally)
 
 To use the AI agent in web, follow these steps:
 
