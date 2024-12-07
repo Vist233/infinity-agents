@@ -4,8 +4,8 @@ from phi.workflow import RunEvent
 from phi.storage.workflow.sqlite import SqlWorkflowStorage
 import os
 
-from codeAI import CodeAIWorkflow
-from paperAI import PaperSummaryGenerator
+from app.codeAI import CodeAIWorkflow
+from app.paperAI import PaperSummaryGenerator
 
 
 class DialogueManager:
@@ -41,6 +41,7 @@ app.secret_key = str(uuid.uuid4())
 UPLOAD_FOLDER = f"ProcessingSpace\\{app.secret_key}"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+logs = ["系统初始化完成\n"]  # 右下角
 
 paperai = PaperSummaryGenerator(
     storage=SqlWorkflowStorage(
@@ -63,7 +64,6 @@ def index():
     if "messages" not in session:
         session["messages"] = []
     messages = session["messages"]
-    logs = ["系统初始化完成\n"]   #右下角
 
     if request.method == "POST":
         user_input = request.form.get("userInput")

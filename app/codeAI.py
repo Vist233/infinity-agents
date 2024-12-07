@@ -9,13 +9,13 @@ from phi.tools.shell import ShellTools
 from phi.tools.python import PythonTools
 from phi.storage.agent.sqlite import SqlAgentStorage
 # from phi.tools.file import FileTools
-from tools.fileChanged import FileTools
-from tools.shellChanged import ShellTools
+from app.tools.fileChanged import FileTools
+from app.tools.shellChanged import ShellTools
 from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
 import uuid
-import structureOutput
+from app.StructureOutput import *
 
 # Initialize processing workspace
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -90,7 +90,7 @@ taskSpliter = Agent(
     ],
     add_history_to_messages=False,
     arbitrary_types_allowed=True,
-    response_model=structureOutput.taskSpliterAIOutput
+    response_model=taskSpliterAIOutput
 )
 
 # Python Executor Agent
@@ -141,8 +141,9 @@ class CodeAIWorkflow(Workflow):
     pythonExcutor: Agent = Field(default_factory=lambda: pythonExcutor)
     shellExcutor: Agent = Field(default_factory=lambda: shellExcutor)
 
-    def run(self, user_input: str) -> Iterator[RunResponse]:
+    def run(self, logs: list, user_input: str) -> Iterator[RunResponse]:
         logger.info(f"Processing request: {user_input}")
+        logs.append(f"Processing request: {user_input}")
         
         # Get current directory contents
         list_current_dir = os.listdir('.')
@@ -158,9 +159,11 @@ class CodeAIWorkflow(Workflow):
                 )
                 if not ui_response or not ui_response.content:
                     logger.warning("Invalid UI response, retrying...")
+                    logs.append(f"Invalid UI response, retrying...")
                     ui_response = None
             except Exception as e:
                 logger.warning(f"UI communication error: {e}")
+                logs.append(f"UI communication error: {e}")
 
         if not ui_response:
             yield RunResponse(
@@ -175,13 +178,14 @@ class CodeAIWorkflow(Workflow):
             task_splitter_response = self.task_splitter.run(ui_response.content)
             if "NO TASK" in task_splitter_response.content:
                 logger.info("No tasks to execute as per task splitter response.")
+                logs.append(f"No tasks to execute as per task splitter response.")
                 yield RunResponse(
                     run_id=self.run_id,
                     event=RunEvent.workflow_completed,
                     content="No tasks to execute"
                 )
                 return
-            tasks_list = structureOutput.create_task_splitter_output(str(task_splitter_response.content))
+            tasks_list = create_task_splitter_output(str(task_splitter_response.content))
             if not tasks_list:
                 yield RunResponse(
                     run_id=self.run_id,
@@ -191,6 +195,7 @@ class CodeAIWorkflow(Workflow):
                 return
         except Exception as e:
             logger.error(f"Task splitting error: {e}")
+            logs.append(f"Task splitting error: {e}")
             yield RunResponse(
                 run_id=self.run_id,
                 event=RunEvent.workflow_completed,
