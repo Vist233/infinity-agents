@@ -1,4 +1,4 @@
-# Infinity Bio-Agents
+# Infinity Agents
 
 An AI agent for excuting code and paper summary.
 
