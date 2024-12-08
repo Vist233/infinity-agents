@@ -8,6 +8,7 @@ from phi.workflow import Workflow, RunResponse, RunEvent
 from phi.utils.log import logger
 from phi.model.openai.like import OpenAILike
 from phi.tools.pubmed import PubmedTools
+from phi.tools.arxiv_toolkit import ArxivToolkit
 import os
 
 # Get the API key from environment variables OR set your API key here
@@ -20,8 +21,8 @@ class PaperSummaryGenerator(Workflow):
             api_key=API_KEY,
             base_url="https://api.lingyiwanwu.com/v1",
         ),
-        tools=[PubmedTools()],
-        instructions=["Given a topic, search for 10 research papers and return the 5 most relevant papers in a simple format including title, URL, and abstract for each paper."],
+        tools=[ArxivToolkit()],
+        instructions=["Given a topic, search for 5 research papers and return the 3 most relevant papers in a simple format including title, URL, and abstract for each paper."],
         add_history_to_messages=True,
     )
 
@@ -107,9 +108,10 @@ class PaperSummaryGenerator(Workflow):
             self.session_state["summaries"] = []
         self.session_state["summaries"].append({"topic": topic, "summary": self.summarizer.run_response.content})
 
-'''
-paperai = PaperSummaryGenerator()
-logs=[]
-result=paperai.run(logs,"AGI")
-pprint_run_response(result, markdown=True)
-'''
+
+if __name__ == "__main__":
+    paperai = PaperSummaryGenerator()
+    logs=[]
+    result=paperai.run(logs,"language models")
+    pprint_run_response(result, markdown=True)
+
