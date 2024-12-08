@@ -59,3 +59,15 @@
         console.error("文件下载发生错误", error);
       }
     });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const bubbles = document.querySelectorAll(".bubble");
+
+    bubbles.forEach((bubble) => {
+      const markdownText = bubble.getAttribute("data-markdown");
+      if (markdownText) {
+        // 使用 marked.js 解析 Markdown
+        bubble.innerHTML = marked(markdownText);
+      }
+    });
+  });
