@@ -15,7 +15,7 @@ from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
 import uuid
-from .StructureOutput import *
+from .structureOutput import *
 
 # Initialize processing workspace
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -41,6 +41,9 @@ os.chdir(user_session_id)
 
 # Create database directory before initializing storage
 os.makedirs(database_dir, exist_ok=True)
+
+
+
 
 def create_storage(session_id: str, name: str) -> SqlAgentStorage:
     """Create SQLite storage for agents with proper session isolation"""
@@ -135,7 +138,12 @@ shellExcutor = Agent(
     add_history_to_messages=False
 )
 
+
+
+
+
 class CodeAIWorkflow(Workflow):
+    
     user_interface: Agent = Field(default_factory=lambda: userInterfaceCommunicator)
     task_splitter: Agent = Field(default_factory=lambda: taskSpliter)
     pythonExcutor: Agent = Field(default_factory=lambda: pythonExcutor)

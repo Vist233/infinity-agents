@@ -3,5 +3,3 @@ compose-dev.yaml
 *.db
 .pyc
 __pycache__/
-ProcessingSpace/
-Database/
