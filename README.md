@@ -49,8 +49,8 @@ To use the AI agent in web, follow these steps:
 
 2. To use the app, run:
     ```bash
-    docker build -t iba .
-    docker exc iba
+    docker build -t infinite-agents .
+    docker run -p 8080:8080 infinite-agents
     ```
 
 look at your http://127.0.0.1:5000

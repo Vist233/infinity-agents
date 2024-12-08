@@ -56,10 +56,11 @@ COPY . .
 
 # 10. 确保每次运行时都在 `base` 环境中
 #     启动时默认使用 /bin/bash，激活 `base` 环境。
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "base", "bash"]
-
-# 11. 暴露应用所需的端口（根据实际情况设置）
+# Remove the bash ENTRYPOINT and modify the CMD
 EXPOSE 8080
 
-# 12. 设置容器启动命令
-# CMD ["python", "main.py"]  # 替换为你实际的启动命令
+# Use ENTRYPOINT to ensure conda environment is activated
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "base"]
+
+# Set the command to run Flask app
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8080"]
