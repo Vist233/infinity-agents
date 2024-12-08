@@ -9,13 +9,13 @@ from phi.tools.shell import ShellTools
 from phi.tools.python import PythonTools
 from phi.storage.agent.sqlite import SqlAgentStorage
 # from phi.tools.file import FileTools
-from app.tools.fileChanged import FileTools
-from app.tools.shellChanged import ShellTools
+from .tools.fileChanged import FileTools
+from .tools.shellChanged import ShellTools
 from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
 import uuid
-from app.StructureOutput import *
+from .StructureOutput import *
 
 # Initialize processing workspace
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -259,9 +259,9 @@ def execute_workflow(session_id: str, input_text: str):
             db_file = os.path.join(database_dir, "workflow.db")
         ),
     )
-
+    logs=[]
     # Run the workflow
-    task_execution_results = task_execution_workflow.run(user_input=input_text)
+    task_execution_results = task_execution_workflow.run(logs, user_input=input_text)
 
     # Print the results
     pprint_run_response(task_execution_results, markdown=True)

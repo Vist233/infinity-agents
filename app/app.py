@@ -6,8 +6,8 @@ import os
 import io
 import zipfile
 
-from app.codeAI import CodeAIWorkflow
-from app.paperAI import PaperSummaryGenerator
+from .codeAI import CodeAIWorkflow
+from .paperAI import PaperSummaryGenerator
 
 
 class DialogueManager:
@@ -27,8 +27,8 @@ class DialogueManager:
                         logs.append("Workflow completed.\n")
                         response = res.content
             elif self.assistant == codeai:
-                full_input = f"{conversation_history}\n用户: {user_input}"  # 包含上下文的输入
-                for res in self.assistant.run(logs, full_input):
+                #full_input = f"{conversation_history}\n用户: {user_input}"  # 包含上下文的输入
+                for res in self.assistant.run(logs, user_input):
                     if res.event == RunEvent.workflow_completed:
                         logs.append("Workflow completed.\n")
                         response = res.content
@@ -40,9 +40,9 @@ class DialogueManager:
 
 app = Flask(__name__)
 app.secret_key = str(uuid.uuid4())
-UPLOAD_FOLDER = f"ProcessingSpace\\{app.secret_key}"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+WORKING_SPACE = f"ProcessingSpace\\{app.secret_key}"
+os.makedirs(WORKING_SPACE, exist_ok=True)
+app.config["WORKING_SPACE"] = WORKING_SPACE
 logs = ["系统初始化完成\n"]  # 右下角
 
 paperai = PaperSummaryGenerator(
@@ -100,7 +100,7 @@ def upload():
         for file in uploaded_files_list:
             if file and file.filename:
                 filename = file.filename
-                file_save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                file_save_path = os.path.join(app.config["WORKING_SPACE"], filename)
                 file.save(file_save_path)
                 uploaded_files.append(filename)
                 logs.append(f"文件 '{filename}' 已成功上传至 {file_save_path}")
@@ -109,13 +109,13 @@ def upload():
 
 @app.route("/download", methods=["GET"])
 def download():
-    """将 UPLOAD_FOLDER 中的所有文件打包为 ZIP 并提供下载"""
+    """将 WORKING_SPACE 中的所有文件打包为 ZIP 并提供下载"""
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        for root, _, files in os.walk(app.config["UPLOAD_FOLDER"]):
+        for root, _, files in os.walk(app.config["WORKING_SPACE"]):
             for file in files:
                 file_path = os.path.join(root, file)
-                arcname = os.path.relpath(file_path, start=app.config["UPLOAD_FOLDER"])
+                arcname = os.path.relpath(file_path, start=app.config["WORKING_SPACE"])
                 zip_file.write(file_path, arcname)
     zip_buffer.seek(0)
 
