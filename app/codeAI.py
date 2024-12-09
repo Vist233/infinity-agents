@@ -8,6 +8,8 @@ from phi.model.openai.like import OpenAILike
 from phi.tools.shell import ShellTools
 from phi.tools.python import PythonTools
 from phi.storage.agent.sqlite import SqlAgentStorage
+
+from app.config import SECRET_KEY, API_KEY, DATABASE_DIR
 # from phi.tools.file import FileTools
 from .tools.fileChanged import FileTools
 from .tools.shellChanged import ShellTools
@@ -15,36 +17,13 @@ from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
 import uuid
-from .structureOutput import *
-
-# Initialize processing workspace
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
+from .StructureOutput import *
 
 # Get the API key from environment variables OR set your API key here
-API_KEY = os.environ.get("YI_API_KEY", "1352a88fdd3844deaec9d7dbe4b467d5")
+API_KEY = API_KEY
+database_dir = DATABASE_DIR
 
-# 构建目标目录路径
-processing_space_dir = os.path.join(parent_dir, 'ProcessingSpace')
-database_dir = os.path.join(parent_dir, 'Database')
-print(f"Parent directory: {parent_dir}")
-
-# 创建目录并切换到该目录
-if not os.path.exists(processing_space_dir):
-    os.makedirs(processing_space_dir)
-os.chdir(processing_space_dir)
-
-# Generate a new session ID
-user_session_id = str(uuid.uuid4())
-os.makedirs(user_session_id, exist_ok=True)
-os.chdir(user_session_id)
-
-# Create database directory before initializing storage
-os.makedirs(database_dir, exist_ok=True)
-
-
-
-
+user_session_id = SECRET_KEY
 def create_storage(session_id: str, name: str) -> SqlAgentStorage:
     """Create SQLite storage for agents with proper session isolation"""
     return SqlAgentStorage(
@@ -143,7 +122,7 @@ shellExcutor = Agent(
 
 
 class CodeAIWorkflow(Workflow):
-    
+
     user_interface: Agent = Field(default_factory=lambda: userInterfaceCommunicator)
     task_splitter: Agent = Field(default_factory=lambda: taskSpliter)
     pythonExcutor: Agent = Field(default_factory=lambda: pythonExcutor)

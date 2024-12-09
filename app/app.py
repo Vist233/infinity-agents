@@ -6,6 +6,7 @@ import os
 import io
 import zipfile
 
+from app.config import SECRET_KEY, DATABASE_DIR
 from .codeAI import CodeAIWorkflow
 from .paperAI import PaperSummaryGenerator
 
@@ -39,11 +40,34 @@ class DialogueManager:
         return response
 
 app = Flask(__name__)
-app.secret_key = str(uuid.uuid4())
-WORKING_SPACE = f"ProcessingSpace\\{app.secret_key}"
-os.makedirs(WORKING_SPACE, exist_ok=True)
-app.config["WORKING_SPACE"] = WORKING_SPACE
+app.secret_key = SECRET_KEY
 logs = ["系统初始化完成\n"]  # 右下角
+
+# Initialize processing workspace
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+
+# Get the API key from environment variables OR set your API key here
+API_KEY = os.environ.get("YI_API_KEY", "1352a88fdd3844deaec9d7dbe4b467d5")
+
+# 构建目标目录路径
+processing_space_dir = os.path.join(parent_dir, 'ProcessingSpace')
+database_dir = DATABASE_DIR
+print(f"Parent directory: {parent_dir}")
+
+# 创建目录并切换到该目录
+if not os.path.exists(processing_space_dir):
+    os.makedirs(processing_space_dir)
+os.chdir(processing_space_dir)
+
+# Generate a new session ID
+WORKING_SPACE = f"{app.secret_key}"
+os.makedirs(WORKING_SPACE, exist_ok=True)
+os.chdir(WORKING_SPACE)
+app.config["WORKING_SPACE"] = WORKING_SPACE
+
+# Create database directory before initializing storage
+os.makedirs(database_dir, exist_ok=True)
 
 paperai = PaperSummaryGenerator(
     storage=SqlWorkflowStorage(

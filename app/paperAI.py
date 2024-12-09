@@ -11,8 +11,10 @@ from phi.tools.pubmed import PubmedTools
 from phi.tools.arxiv_toolkit import ArxivToolkit
 import os
 
+from app.config import API_KEY
+
 # Get the API key from environment variables OR set your API key here
-API_KEY = os.environ.get("YI_API_KEY", "b9804fbc97884e278f7b8cc1c5bf8136")
+API_KEY = API_KEY
 
 class PaperSummaryGenerator(Workflow):
     searcher: Agent = Agent(
