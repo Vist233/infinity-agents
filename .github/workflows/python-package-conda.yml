@@ -1,4 +1,4 @@
-name: Python Package using pip
+name: Python Package using Conda
 
 on: [push]
 
@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.10, 3.9]
+        python-version: ['3.10', '3.9']
       max-parallel: 5
 
     steps:
