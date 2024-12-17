@@ -9,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # 当前文件所在目�
 DATABASE_DIR = os.path.join(BASE_DIR, "Database")
 
 # API Key 配置
-API_KEY = os.environ.get("YI_API_KEY", "1352a88fdd3844deaec9d7dbe4b467d5")
+API_KEY = os.environ.get("YI_API_KEY", "your API key here")
 
 # 确保目录存在
 os.makedirs(DATABASE_DIR, exist_ok=True)
