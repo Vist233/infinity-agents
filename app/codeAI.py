@@ -255,8 +255,16 @@ def execute_workflow(session_id: str, input_text: str):
 
 # Example usage
 if __name__ == "__main__":
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    processing_space_dir = os.path.join(parent_dir, 'ProcessingSpace')
+    if not os.path.exists(processing_space_dir):
+        os.makedirs(processing_space_dir)
+    os.chdir(processing_space_dir)
     session_id = str(uuid.uuid4())
-    input_text = "使用命令 cat \"Hello World\" > hello.txt"
+    os.makedirs(session_id, exist_ok=True)
+    os.chdir(session_id)
+    input_text = input("Please input your command: ")
     execute_workflow(session_id, input_text)
 
 
