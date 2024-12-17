@@ -9,15 +9,15 @@ from phi.tools.shell import ShellTools
 from phi.tools.python import PythonTools
 from phi.storage.agent.sqlite import SqlAgentStorage
 
-from app.config import SECRET_KEY, API_KEY, DATABASE_DIR
+from config import SECRET_KEY, API_KEY, DATABASE_DIR
 # from phi.tools.file import FileTools
-from .tools.fileChanged import FileTools
-from .tools.shellChanged import ShellTools
+from tools.fileChanged import FileTools
+from tools.shellChanged import ShellTools
 from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
 import uuid
-from .StructureOutput import *
+from StructureOutput import *
 
 # Get the API key from environment variables OR set your API key here
 API_KEY = API_KEY

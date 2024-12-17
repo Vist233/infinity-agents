@@ -3,3 +3,5 @@ compose-dev.yaml
 *.db
 .pyc
 __pycache__/
+./app/config.py
+Database/

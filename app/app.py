@@ -6,9 +6,9 @@ import os
 import io
 import zipfile
 
-from app.config import SECRET_KEY, DATABASE_DIR
-from .codeAI import CodeAIWorkflow
-from .paperAI import PaperSummaryGenerator
+from config import SECRET_KEY, DATABASE_DIR
+from codeAI import CodeAIWorkflow
+from paperAI import PaperSummaryGenerator
 
 
 class DialogueManager:
@@ -46,9 +46,6 @@ logs = ["系统初始化完成\n"]  # 右下角
 # Initialize processing workspace
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
-
-# Get the API key from environment variables OR set your API key here
-API_KEY = os.environ.get("YI_API_KEY", "1352a88fdd3844deaec9d7dbe4b467d5")
 
 # 构建目标目录路径
 processing_space_dir = os.path.join(parent_dir, 'ProcessingSpace')
