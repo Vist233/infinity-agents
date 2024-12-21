@@ -23,7 +23,8 @@
         {% if messages %}
           {% for message in messages %}
             <div class="message {{ message.type }}">
-              <div class="bubble" data-markdown="{{ message.text|escape }}"></div>
+              <!-- <div class="bubble" data-markdown="{{ message.text|escape }}"></div> -->
+              <div class="bubble">{{ message.text|safe }}</div>
             </div>
           {% endfor %}
         {% endif %}
