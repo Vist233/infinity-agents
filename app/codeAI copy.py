@@ -17,15 +17,24 @@ from typing import Iterator
 import uuid
 from StructureOutput import *
 
+def create_storage(session_id: str, name: str) -> SqlAgentStorage:
+    """Create SQLite storage for agents with proper session isolation"""
+    return SqlAgentStorage(
+        table_name=session_id,
+        db_file = os.path.join(database_dir, f"{name}.db")
+    )
+
 
 
 # Get the API key from environment variables OR set your API key here
 API_KEY = API_KEY
 database_dir = "./../Database"
 user_session_id = str(uuid.uuid4())
+toolsTeamStorage = create_storage(user_session_id, "toolsTeam")
 
 # User Interface Communicator Agent
 userInterfaceCommunicator = Agent(
+    storage=create_storage(user_session_id, "userInterfaceCommunicator"),
     model=OpenAILike(
         id="yi-medium",
         api_key=API_KEY,
@@ -45,6 +54,7 @@ userInterfaceCommunicator = Agent(
 
 # Task Splitter Agent
 taskSpliter = Agent(
+    storage=create_storage(user_session_id, "taskSpliter"),
     model=OpenAILike(
         id="yi-medium",
         api_key=API_KEY,
@@ -65,6 +75,7 @@ taskSpliter = Agent(
 
 # Python Executor Agent
 pythonExcutor = Agent(
+    storage=toolsTeamStorage,
     tools=[PythonTools(), FileTools()],
     model=OpenAILike(
         id="yi-large-fc",
@@ -84,6 +95,7 @@ pythonExcutor = Agent(
 
 # Shell Executor Agent
 shellExcutor = Agent(
+    storage=toolsTeamStorage,
     tools=[ShellTools()],
     model=OpenAILike(
         id="yi-large-fc",
@@ -222,5 +234,41 @@ class CodeAIWorkflow(Workflow):
             content="\n".join(final_output)
         )
 
+def execute_workflow(session_id: str, input_text: str):
+    """Execute the workflow with the given session ID and input text."""
+    # Create the workflow with the session_id
+    from phi.storage.workflow.sqlite import SqlWorkflowStorage
+    task_execution_workflow = CodeAIWorkflow(
+        session_id=session_id,
+        storage=SqlWorkflowStorage(
+            table_name=session_id,
+            db_file = os.path.join(database_dir, "workflow.db")
+        ),
+    )
+    logs=[]
+    # Run the workflow
+    return task_execution_workflow.run(logs, user_input=input_text)
+    # Print the results
+    # pprint_run_response(task_execution_results, markdown=True)
+
+# Example usage
+if __name__ == "__main__":
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    processing_space_dir = os.path.join(parent_dir, 'ProcessingSpace')
+    if not os.path.exists(processing_space_dir):
+        os.makedirs(processing_space_dir)
+    os.chdir(processing_space_dir)
+    session_id = str(uuid.uuid4())
+    os.makedirs(session_id, exist_ok=True)
+    os.chdir(session_id)
+    # input_text = input("Please input your command: ")
+    input_text = "请你随机生成一段用于DNA序列分析的py代码并保存在当前目录下"
+    result = execute_workflow(session_id, input_text)
+    
+    for res in result:
+        print(res.content)
+
+    
 
 

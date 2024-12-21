@@ -1,12 +1,9 @@
 import uuid
 from flask import Flask, render_template, request, session, send_file
-from phi.workflow import RunEvent
-from phi.storage.workflow.sqlite import SqlWorkflowStorage
 import os
 import io
 import zipfile
 
-from config import SECRET_KEY, DATABASE_DIR
 from codeAI import CodeAIWorkflow
 from paperAI import PaperSummaryGenerator
 
@@ -15,72 +12,56 @@ class DialogueManager:
     def __init__(self, assistant):
         self.assistant = assistant
 
-    def process_user_input(self, user_input, conversation_history, logs):
-        logs.append(f"用户发送: {user_input}\n")
-        response = ""
-
+    def process_user_input(self, user_input, conversation_history=""):
+        response = None
         try:
-            if self.assistant == paperai:
-                self.assistant.session_id = f"generate-summary-on-{user_input}"
-
-                for res in self.assistant.run(logs, user_input):
-                    if res.event == RunEvent.workflow_completed:
-                        logs.append("Workflow completed.\n")
-                        response = res.content
-            elif self.assistant == codeai:
-                #full_input = f"{conversation_history}\n用户: {user_input}"  # 包含上下文的输入
-                for res in self.assistant.run(logs, user_input):
-                    if res.event == RunEvent.workflow_completed:
-                        logs.append("Workflow completed.\n")
-                        response = res.content
+            # Create a new logs list for each request
+            request_logs = []
+            request_logs.append(f"User input {user_input} TO {self.assistant}\n")
+            response = self.assistant.run(request_logs, user_input)  # Changed from input to user_input
+            # Add any new logs to the global logs list
+            global logs
+            logs.extend(request_logs)
         except Exception as e:
-            response = f"处理过程中出错: {e}"
-            logs.append(f"{response}\n")
+            error_msg = f"处理过程中出错: {e}"
+            logs.append(error_msg)
+            return error_msg
 
         return response
 
 app = Flask(__name__)
-app.secret_key = SECRET_KEY
-logs = ["系统初始化完成\n"]  # 右下角
+convId = str(uuid.uuid4())  # Convert UUID to string here
+app.secret_key = convId  # Add this line after Flask initialization
+logs = ["系统初始化完成\n"]
 
-# Initialize processing workspace
+# 构建文件路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
+main_dir = os.path.dirname(current_dir)
+Codedb_file = os.path.join(main_dir, "Database", "CodeWorkflows.db")
+Paperdb_file = os.path.join(main_dir, "Database", "PaperWorkflows.db")
+processing_space_dir = os.path.join(main_dir, 'ProcessingSpace')
+WORKING_SPACE = os.path.join(main_dir, convId)  
+app.config["WORKING_SPACE"] = WORKING_SPACE
 
-# 构建目标目录路径
-processing_space_dir = os.path.join(parent_dir, 'ProcessingSpace')
-database_dir = DATABASE_DIR
-print(f"Parent directory: {parent_dir}")
 
-# 创建目录并切换到该目录
+os.makedirs(WORKING_SPACE, exist_ok=True)
+os.chdir(WORKING_SPACE)
 if not os.path.exists(processing_space_dir):
     os.makedirs(processing_space_dir)
 os.chdir(processing_space_dir)
 
-# Generate a new session ID
-WORKING_SPACE = f"{app.secret_key}"
-os.makedirs(WORKING_SPACE, exist_ok=True)
-os.chdir(WORKING_SPACE)
-app.config["WORKING_SPACE"] = WORKING_SPACE
-
-# Create database directory before initializing storage
-os.makedirs(database_dir, exist_ok=True)
 
 paperai = PaperSummaryGenerator(
-    storage=SqlWorkflowStorage(
-        table_name="generate_summary_workflows",
-        db_file="tmp/workflows.db",
-    ),
+    session_id=str(convId)
 )
 codeai = CodeAIWorkflow(
-    session_id=app.secret_key,
-    storage=SqlWorkflowStorage(
-        table_name=app.secret_key,
-        db_file="./../Database/CodeWorkflows.db",
-    ),
+    session_id=str(convId)
 )
 paperai_manager = DialogueManager(paperai)
 codeai_manager = DialogueManager(codeai)
+
+
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -90,26 +71,32 @@ def index():
 
     if request.method == "POST":
         user_input = request.form.get("userInput")
-        agent = request.form.get("agent")  # 判断是调用 paperai 还是 codeai
+        agent = request.form.get("agent")
         if user_input:
-            # 获取对话上下文
-            conversation_history = "\n".join(
-                f"用户: {msg['text']}" if msg["type"] == "user" else f"AI: {msg['text']}"
-                for msg in messages
-            )
-
             if agent == "paperai":
-                response = paperai_manager.process_user_input(user_input, conversation_history, logs)
+                response = paperai_manager.process_user_input(user_input)
             elif agent == "codeai":
-                response = codeai_manager.process_user_input(user_input, conversation_history, logs)
+                response = codeai_manager.process_user_input(user_input)
             else:
                 response = "未指定有效的 Agent。"
-
-            messages.append({"type": "user", "text": user_input})
-            messages.append({"type": "ai", "text": response})
-            session["messages"] = messages
+            
+            if response:
+                reply = ''
+                if hasattr(response, '__iter__'):
+                    for res in response:
+                        reply += res.content if hasattr(res, 'content') else str(res)
+                else:
+                    reply = response.content if hasattr(response, 'content') else str(response)
+                
+                messages.append({"type": "user", "text": user_input})
+                messages.append({"type": "ai", "text": reply})
+                session["messages"] = messages
 
     return render_template("main.html", messages=messages, logs=logs)
+
+
+
+
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -121,7 +108,7 @@ def upload():
         for file in uploaded_files_list:
             if file and file.filename:
                 filename = file.filename
-                file_save_path = os.path.join(app.config["WORKING_SPACE"], filename)
+                file_save_path = os.path.join(str(app.config["WORKING_SPACE"]), filename)
                 file.save(file_save_path)
                 uploaded_files.append(filename)
                 logs.append(f"文件 '{filename}' 已成功上传至 {file_save_path}")

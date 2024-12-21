@@ -1,5 +1,6 @@
 from typing import Iterator
 from phi.agent import Agent
+from phi.utils.pprint import pprint_run_response
 from phi.workflow import Workflow, RunResponse
 from phi.utils.log import logger
 from phi.model.openai.like import OpenAILike
@@ -11,6 +12,7 @@ from config import API_KEY
 API_KEY = API_KEY
 
 class PaperSummaryGenerator(Workflow):
+    
     searcher: Agent = Agent(
         model=OpenAILike(
             id="yi-large-fc",
@@ -102,3 +104,9 @@ class PaperSummaryGenerator(Workflow):
             logger.error(f"Error generating summary: {str(e)}")
             yield RunResponse(content=f"Error: {str(e)}")
 
+if __name__ == "__main__":
+    paperai = PaperSummaryGenerator()
+    logs = []
+    result = paperai.run(logs, "language models")
+    for res in result:
+        print(res.content)
