@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, session, send_file
 import os
 import io
 import zipfile
-
 from codeAI import CodeAIWorkflow
 from paperAI import PaperSummaryGenerator
 
@@ -40,7 +39,7 @@ main_dir = os.path.dirname(current_dir)
 Codedb_file = os.path.join(main_dir, "Database", "CodeWorkflows.db")
 Paperdb_file = os.path.join(main_dir, "Database", "PaperWorkflows.db")
 processing_space_dir = os.path.join(main_dir, 'ProcessingSpace')
-WORKING_SPACE = os.path.join(main_dir, convId)  
+WORKING_SPACE = os.path.join(processing_space_dir, convId)  
 app.config["WORKING_SPACE"] = WORKING_SPACE
 
 
@@ -50,12 +49,20 @@ if not os.path.exists(processing_space_dir):
     os.makedirs(processing_space_dir)
 os.chdir(processing_space_dir)
 
-
+from phi.storage.workflow.sqlite import SqlWorkflowStorage
 paperai = PaperSummaryGenerator(
-    session_id=str(convId)
+    session_id=str(convId),
+    storage=SqlWorkflowStorage(
+        table_name=str(convId),
+        db_file=Paperdb_file,
+    ),
 )
 codeai = CodeAIWorkflow(
-    session_id=str(convId)
+    session_id=str(convId),
+    storage=SqlWorkflowStorage(
+        table_name=str(convId),
+        db_file=Codedb_file,
+    ),
 )
 paperai_manager = DialogueManager(paperai)
 codeai_manager = DialogueManager(codeai)
@@ -65,10 +72,12 @@ codeai_manager = DialogueManager(codeai)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    #lock here
     if "messages" not in session:
         session["messages"] = []
     messages = session["messages"]
-
+    os.chdir(app.config["WORKING_SPACE"])
+    
     if request.method == "POST":
         user_input = request.form.get("userInput")
         agent = request.form.get("agent")
@@ -91,8 +100,8 @@ def index():
                 messages.append({"type": "user", "text": user_input})
                 messages.append({"type": "ai", "text": reply})
                 session["messages"] = messages
-
-    return render_template("main.html", messages=messages, logs=logs)
+    
+    return render_template("main.html", messages=messages, logs=logs) #unlock here
 
 
 

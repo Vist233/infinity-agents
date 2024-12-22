@@ -17,24 +17,20 @@ from typing import Iterator
 import uuid
 from StructureOutput import *
 
-def create_storage(session_id: str, name: str) -> SqlAgentStorage:
-    """Create SQLite storage for agents with proper session isolation"""
-    return SqlAgentStorage(
-        table_name=session_id,
-        db_file = os.path.join(database_dir, f"{name}.db")
-    )
-
-
+# def create_storage(session_id: str, name: str) -> SqlAgentStorage:
+#     """Create SQLite storage for agents with proper session isolation"""
+#     return SqlAgentStorage(
+#         table_name=session_id,
+#         db_file = os.path.join(database_dir, f"{name}.db")
+#     )
 
 # Get the API key from environment variables OR set your API key here
 API_KEY = API_KEY
 database_dir = "./../Database"
 user_session_id = str(uuid.uuid4())
-toolsTeamStorage = create_storage(user_session_id, "toolsTeam")
 
 # User Interface Communicator Agent
 userInterfaceCommunicator = Agent(
-    storage=create_storage(user_session_id, "userInterfaceCommunicator"),
     model=OpenAILike(
         id="yi-medium",
         api_key=API_KEY,
@@ -54,7 +50,6 @@ userInterfaceCommunicator = Agent(
 
 # Task Splitter Agent
 taskSpliter = Agent(
-    storage=create_storage(user_session_id, "taskSpliter"),
     model=OpenAILike(
         id="yi-medium",
         api_key=API_KEY,
@@ -75,7 +70,6 @@ taskSpliter = Agent(
 
 # Python Executor Agent
 pythonExcutor = Agent(
-    storage=toolsTeamStorage,
     tools=[PythonTools(), FileTools()],
     model=OpenAILike(
         id="yi-large-fc",
@@ -95,7 +89,6 @@ pythonExcutor = Agent(
 
 # Shell Executor Agent
 shellExcutor = Agent(
-    storage=toolsTeamStorage,
     tools=[ShellTools()],
     model=OpenAILike(
         id="yi-large-fc",
@@ -253,6 +246,7 @@ def execute_workflow(session_id: str, input_text: str):
 
 # Example usage
 if __name__ == "__main__":
+    
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(current_dir)
     processing_space_dir = os.path.join(parent_dir, 'ProcessingSpace')
