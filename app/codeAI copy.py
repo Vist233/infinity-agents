@@ -16,6 +16,7 @@ import os
 from typing import Iterator
 import uuid
 from StructureOutput import *
+from phi.model.deepseek import DeepSeekChat
 
 # def create_storage(session_id: str, name: str) -> SqlAgentStorage:
 #     """Create SQLite storage for agents with proper session isolation"""
@@ -25,17 +26,13 @@ from StructureOutput import *
 #     )
 
 # Get the API key from environment variables OR set your API key here
-API_KEY = API_KEY
+API = os.environ.get('DEEPSEEK_API_KEY') or API_KEY
 database_dir = "./../Database"
 user_session_id = str(uuid.uuid4())
 
 # User Interface Communicator Agent
 userInterfaceCommunicator = Agent(
-    model=OpenAILike(
-        id="yi-medium",
-        api_key=API_KEY,
-        base_url="https://api.lingyiwanwu.com/v1",
-    ),
+    model=DeepSeekChat(api_key=API),
     description="An AI assistant that converts user requests into the execute task list.",
     instruction=[
         "The following tools and libraries are available in the environment: raxml-ng, modeltest, mafft, CPSTools, vcftools, gatk, biopython, pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, HTSeq, PyVCF, pysam, samtools, bwa, snpeff, wget, curl, bzip2, ca-certificates, libglib2.0-0, libx11-6, libsm6, libxi6, python3.10.",
@@ -50,11 +47,7 @@ userInterfaceCommunicator = Agent(
 
 # Task Splitter Agent
 taskSpliter = Agent(
-    model=OpenAILike(
-        id="yi-medium",
-        api_key=API_KEY,
-        base_url="https://api.lingyiwanwu.com/v1",
-    ),
+    model=DeepSeekChat(api_key=API),
     description="An AI assistant that converts user requests into executable tasks.",
     instruction=[
         "For each task analyze and decide whether it needs Python (data processing, analysis, visualization, save the python file to local) or Shell (command line tools, file operations) execution.",
@@ -71,11 +64,7 @@ taskSpliter = Agent(
 # Python Executor Agent
 pythonExcutor = Agent(
     tools=[PythonTools(), FileTools()],
-    model=OpenAILike(
-        id="yi-large-fc",
-        api_key=API_KEY,
-        base_url="https://api.lingyiwanwu.com/v1",
-    ),
+    model=DeepSeekChat(api_key=API),
     description="Executes Python-based tasks with focus on data processing, analysis and visualization",
     instruction=[
         "Focus on generating clean, efficient Python code.",
@@ -90,11 +79,7 @@ pythonExcutor = Agent(
 # Shell Executor Agent
 shellExcutor = Agent(
     tools=[ShellTools()],
-    model=OpenAILike(
-        id="yi-large-fc",
-        api_key=API_KEY,
-        base_url="https://api.lingyiwanwu.com/v1"
-    ),
+    model=DeepSeekChat(api_key=API),
     description="Executes shell commands for tools with proper error handling",
     instruction=[
         "You are a shell command execution specialist.",

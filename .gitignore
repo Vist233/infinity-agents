@@ -5,3 +5,4 @@ compose-dev.yaml
 __pycache__/
 ./app/config.py
 Database/
+ProcessingSpace

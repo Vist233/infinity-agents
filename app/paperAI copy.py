@@ -7,41 +7,60 @@ from phi.model.openai.like import OpenAILike
 from phi.tools.pubmed import PubmedTools
 from phi.tools.arxiv_toolkit import ArxivToolkit
 from config import API_KEY
+from phi.model.deepseek import DeepSeekChat
+import json
+from textwrap import dedent
+from typing import Optional, Dict, Iterator
+
+from pydantic import BaseModel, Field
+import os
+from phi.agent import Agent
+from phi.workflow import Workflow, RunResponse, RunEvent
+from phi.storage.workflow.sqlite import SqlWorkflowStorage
+from phi.tools.duckduckgo import DuckDuckGo
+from phi.tools.newspaper4k import Newspaper4k
+from phi.utils.pprint import pprint_run_response
+from phi.utils.log import logger
+from phi.model.deepseek import DeepSeekChat
 
 # Get the API key from environment variables OR set your API key here
-API_KEY = API_KEY
+API = os.environ.get('DEEPSEEK_API_KEY') or API_KEY
+
+class NewsArticle(BaseModel):
+    title: str = Field(..., description="Title of the article.")
+    url: str = Field(..., description="Link to the article.")
+    summary: Optional[str] = Field(..., description="Summary of the article if available.")
+    
+class SearchResults(BaseModel):
+    articles: list[NewsArticle]
+
+class ScrapedArticle(BaseModel):
+    title: str = Field(..., description="Title of the article.")
+    url: str = Field(..., description="Link to the article.")
+    summary: Optional[str] = Field(..., description="Summary of the article if available.")
+    content: Optional[str] = Field(
+        ...,
+        description="Content of the in markdown format if available. Return None if the content is not available or does not make sense.",
+    )
 
 class PaperSummaryGenerator(Workflow):
-    
     searcher: Agent = Agent(
-        model=OpenAILike(
-            id="yi-large-fc",
-            api_key=API_KEY,
-            base_url="https://api.lingyiwanwu.com/v1",
-        ),
-        tools=[PubmedTools()],
+        model=DeepSeekChat(api_key=API),
+        tools=[ArxivToolkit()],
         instructions=[
-            "Given a topic, search for relevant research papers.",
-            "For each paper, provide the title, URL, and abstract in plain text format.",
-            "Separate papers with '---' and use consistent formatting:",
+            "Given a topic, search for 10 articles and return the 5 most relevant articles.",
         ],
         add_history_to_messages=True,
+        response_model=SearchResults,
     )
 
     summarizer: Agent = Agent(
+        model=DeepSeekChat(api_key=API),
         instructions=[
-            "You will be provided with a topic and a list of top research papers on that topic.",
-            "Carefully read each paper and generate a concise summary of the research findings.",
-            "Break the summary into sections and provide key takeaways at the end.",
-            "Make sure the title is informative and clear.",
-            "Always provide sources, do not make up information or sources.",
+            "Given a url, scrape the article and return the title, url, and markdown formatted content.",
+            "If the content is not available or does not make sense, return None as the content.",
         ],
-        model=OpenAILike(
-            id="yi-medium-200k",
-            api_key=API_KEY,
-            base_url="https://api.lingyiwanwu.com/v1",
-        ),
-        add_history_to_messages=True,
+        # response_model=ScrapedArticle,
     )
 
     def run(self, logs: list, topic: str, use_cache: bool = True) -> Iterator[RunResponse]:
@@ -62,10 +81,15 @@ class PaperSummaryGenerator(Workflow):
 
             # Step 1: Search and validate results
             all_papers = []
-            for i in range(3):
+            for i in range(1):
                 response = self.searcher.run(topic)
                 if response and response.content:
-                    all_papers.append(response.content)
+                    # Format the articles data
+                    articles_text = []
+                    for article in response.content.articles:
+                        article_info = f"Title: {article.title}\nURL: {article.url}\nSummary: {article.summary}\n"
+                        articles_text.append(article_info)
+                    all_papers.extend(articles_text)
                     logger.info(f"Search {i+1} completed successfully")
                 else:
                     logger.warning(f"Search {i+1} returned no results")
@@ -107,6 +131,7 @@ class PaperSummaryGenerator(Workflow):
 if __name__ == "__main__":
     paperai = PaperSummaryGenerator()
     logs = []
-    result = paperai.run(logs, "language models")
+    result = paperai.run(logs, "quantum computing")
     for res in result:
         print(res.content)
+
