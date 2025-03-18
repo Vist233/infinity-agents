@@ -1,4 +1,4 @@
-     //上传文件
+//上传文件
     document.getElementById("fileInput").addEventListener("change", async function (event) {
       const fileList = document.getElementById("fileList");
       const files = event.target.files;
@@ -71,3 +71,35 @@
       }
     });
   });
+
+// Render markdown when DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  // Configure marked to enable breaks
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+  });
+
+  // Render all markdown content
+  renderMarkdown();
+  
+  // Re-render markdown when messages are updated
+  const observer = new MutationObserver(function(mutations) {
+    renderMarkdown();
+  });
+  
+  const messageArea = document.getElementById('messageArea');
+  if (messageArea) {
+    observer.observe(messageArea, { childList: true, subtree: true });
+  }
+});
+
+// Function to render markdown in all .markdown-content elements
+function renderMarkdown() {
+  const markdownElements = document.querySelectorAll('.markdown-content');
+  markdownElements.forEach(element => {
+    const originalText = element.textContent || element.innerText;
+    const renderedHTML = marked(originalText);
+    element.innerHTML = renderedHTML;
+  });
+}
