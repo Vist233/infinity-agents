@@ -72,7 +72,6 @@ codeai_manager = DialogueManager(codeai)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    #lock here
     if "messages" not in session:
         session["messages"] = []
     messages = session["messages"]

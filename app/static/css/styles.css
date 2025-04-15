@@ -194,28 +194,6 @@ body {
       background: #222;
     }
 
-        /* 页眉样式 */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 10px 0;
-      height: 38px;
-      background-color: #222;
-      border-bottom: 1px solid #333;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-    }
-
-    .container-fluid {
-      margin-top: 60px; /* 页眉的高度 */
-      height: calc(100vh - 60px); /* 总高度减去页眉高度 */
-    }
-
     .header .logo {
       height: 30px;
       width: auto;
