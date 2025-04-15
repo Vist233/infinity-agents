@@ -120,21 +120,10 @@ body {
     font-weight: bold;
     }
 
-    .file-area .section-title {
-    background-color: #222;
-    padding: 5px 10px;
-    border-radius: 5px;
-    }
-
     .log-area .section-title {
       background-color: #222;
       padding: 5px 10px;
       border-radius: 5px;
-    }
-
-    .file-input {
-      width: 100%;
-      margin-bottom: 10px;
     }
 
     .file-list {
@@ -179,31 +168,6 @@ body {
       border-bottom: 1px solid #555;
       margin-bottom: 10px;
       padding-bottom: 5px;
-    }
-
-    .overflow-y::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .overflow-y::-webkit-scrollbar-thumb {
-      background: #444;
-      border-radius: 4px;
-    }
-
-    .overflow-y::-webkit-scrollbar-track {
-      background: #222;
-    }
-
-    .header .logo {
-      height: 30px;
-      width: auto;
-    }
-
-    .header-title {
-      font-size: 18px;
-      font-weight: bold;
-      color: white;
-      margin: 0;
     }
 
     /* 美化文件选择按钮 */
@@ -270,24 +234,6 @@ body {
     .file-input:focus + .file-label {
       outline: 2px solid #545454;
       outline-offset: 2px;
-    }
-
-    /* 滚动条美化 */
-    .overflow-y::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .overflow-y::-webkit-scrollbar-thumb {
-      background: #444;
-      border-radius: 4px;
-    }
-
-    .overflow-y::-webkit-scrollbar-thumb:hover {
-      background: #555;
-    }
-
-    .overflow-y::-webkit-scrollbar-track {
-      background: #222;
     }
 
     .agent-select {

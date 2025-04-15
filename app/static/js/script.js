@@ -60,18 +60,6 @@
       }
     });
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const bubbles = document.querySelectorAll(".bubble");
-
-    bubbles.forEach((bubble) => {
-      const markdownText = bubble.getAttribute("data-markdown");
-      if (markdownText) {
-        // 使用 marked.js 解析 Markdown
-        bubble.innerHTML = marked(markdownText);
-      }
-    });
-  });
-
 // Render markdown when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   // Configure marked to enable breaks
