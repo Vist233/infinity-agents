@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Infinite Agents</title>
-  <link rel="icon" type="image/png" href="./../static/logo.png">
-  <link rel="stylesheet" href="./../static/css/styles.css">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <!-- Socket.IO Client Library -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
 
 <body>
@@ -14,24 +16,28 @@
     <div class="chat-area">
       <!-- 消息区域 -->
       <div class="message-area" id="messageArea">
-        <!-- 循环渲染用户与AI的消息 -->
+        <!-- Initial messages loaded from session (optional, can be fully dynamic) -->
         {% if messages %}
           {% for message in messages %}
             <div class="message {{ message.type }}">
               {% if message.type == "ai" %}
-                <div class="bubble markdown-content">{{ message.text|safe }}</div>
+                <!-- AI messages will now have an ID for streaming updates -->
+                <div class="bubble markdown-content" id="ai-msg-{{ loop.index0 }}">{{ message.text|safe }}</div>
               {% else %}
                 <div class="bubble">{{ message.text }}</div>
               {% endif %}
             </div>
           {% endfor %}
         {% endif %}
+        <!-- Messages added dynamically by JS will appear here -->
       </div>
 
-      <!-- 输入框 -->
-      <form action="/" method="POST" class="input-area">
-        <select name="agent" class="agent-select">
-          <option value="paperai" selected>Paper Chat</option>
+      <!-- Input form - submission handled by JS -->
+      <form id="messageForm" class="input-area">
+        <select name="agent" id="agentSelect" class="agent-select">
+          <option value="paperai">Paper Chat</option>
+          <option value="chater" selected>Chater</option> <!-- Added Chater option and made it default -->
+          <!-- Add other agent options here if needed -->
         </select>
         <input
           type="text"
@@ -40,12 +46,15 @@
           name="userInput"
           placeholder="Input something here..."
           required
+          autocomplete="off"
         />
         <button type="submit" class="send-button">Send Message</button>
       </form>
     </div>
   </div>
+  <!-- Marked library for Markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="./../static/js/script.js"></script>
+  <!-- Custom JS for SocketIO and DOM manipulation -->
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

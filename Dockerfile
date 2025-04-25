@@ -36,7 +36,7 @@ RUN conda config --set solver classic && \
 # 6. 复制 requirements.txt 文件到容器中
 COPY requirements.txt /tmp/requirements.txt
 
-# 7. 安装 Python 依赖
+# 7. 安装 Python 依赖 (including eventlet now)
 RUN conda run -n base pip install -r /tmp/requirements.txt
 
 # 8. 设置工作目录
@@ -51,5 +51,5 @@ EXPOSE 8080
 # Use ENTRYPOINT to ensure conda environment is activated
 ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "base"]
 
-# Set the command to run Flask app
-CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8080"]
+# Set the command to run Flask-SocketIO app using eventlet
+CMD ["python", "app/app.py"]

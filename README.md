@@ -1,6 +1,6 @@
 # Infinity Agents
 
-An AI agent for paper searching and summarization.
+An AI agent for paper searching and summarization, now with real-time streaming responses via WebSockets.
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@ This AI Agent is designed for those who need to search and summarize academic pa
 
 ## Run it locally
 
-1.  Install the required dependencies:
+1.  Install the required dependencies (including `eventlet` for WebSockets):
     ```bash
     pip install -r requirements.txt
     ```
@@ -34,11 +34,11 @@ This AI Agent is designed for those who need to search and summarize academic pa
     API_KEY = os.environ.get("DEEPSEEK_API_KEY", "your API key here")
     ```
 
-3.  Run the Flask application:
+3.  Run the Flask-SocketIO application:
     ```bash
     python app/app.py
     ```
-    Access the application at `http://127.0.0.1:8080` (or the configured host/port).
+    The application now uses `eventlet` for handling WebSocket connections. Access the application at `http://127.0.0.1:8080` (or the configured host/port).
 
 ## Run it in Docker
 
@@ -52,6 +52,7 @@ This AI Agent is designed for those who need to search and summarize academic pa
     # Make sure to set your API key, e.g., by editing app/config.py before building
     # Or pass it as an environment variable during run time if the app is configured to read it
     docker build -t infinite-agents .
+    # The CMD in Dockerfile now runs `python app/app.py` which starts the SocketIO server
     docker run -p 8080:8080 -e DEEPSEEK_API_KEY="your_api_key_here" infinite-agents
     ```
     Access the application at `http://127.0.0.1:8080`.
