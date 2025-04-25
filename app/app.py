@@ -3,8 +3,10 @@ from flask import Flask, render_template, request, session
 from flask_socketio import SocketIO, emit
 import os
 from paperAI import paperai_agent
+# Import the new chater agent
+from chater import chater_agent
 from agno.agent import Agent
-from agno.models.deepseek import DeepSeek
+# Removed DeepSeek import as it's handled within agent files now
 from agno.utils.log import logger
 from config import API_KEY
 
@@ -87,12 +89,8 @@ os.makedirs(db_dir, exist_ok=True)
 
 paperai_manager = DialogueManager(paperai_agent, socketio)
 
-chater = Agent(
-    model=DeepSeek(api_key=API),
-    markdown=True,
-    description="A general conversational AI assistant.",
-)
-chater_manager = DialogueManager(chater, socketio)
+# Use the imported chater_agent
+chater_manager = DialogueManager(chater_agent, socketio)
 
 # --- Routes and SocketIO Events ---
 @app.route("/")
@@ -121,7 +119,12 @@ def handle_send_message(data):
         if agent_type == "paperai":
             socketio.start_background_task(paperai_manager.process_user_input, user_input, sid)
         elif agent_type == "chater":
+            # Use the chater_manager which now uses the imported chater_agent
             socketio.start_background_task(chater_manager.process_user_input, user_input, sid)
+        # Add CodeAI handling here later
+        # elif agent_type == "codeai":
+        #     # Placeholder for CodeAI integration
+        #     emit('error_message', {'error': 'CodeAI not yet implemented in frontend.'}, room=sid)
         else:
             emit('error_message', {'error': 'Invalid agent selected.'}, room=sid)
     else:
@@ -130,4 +133,5 @@ def handle_send_message(data):
 
 if __name__ == "__main__":
     logger.info("Starting Flask-SocketIO server...")
-    socketio.run(app, host='0.0.0.0', port=8080, debug=True, use_reloader=True)
+    # Ensure use_reloader is False if debugging causes issues with background tasks or state
+    socketio.run(app, host='0.0.0.0', port=8080, debug=True, use_reloader=False)
