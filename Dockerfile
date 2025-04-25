@@ -36,7 +36,7 @@ RUN conda config --set solver classic && \
 # 6. 复制 requirements.txt 文件到容器中
 COPY requirements.txt /tmp/requirements.txt
 
-# 7. 安装 Python 依赖 (including eventlet now)
+# 7. 安装 Python 依赖 (including eventlet now, using agno)
 RUN conda run -n base pip install -r /tmp/requirements.txt
 
 # 8. 设置工作目录

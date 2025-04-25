@@ -1,4 +1,4 @@
-1. 完善PaperAI的搜索和总结逻辑
+1. ~~完善PaperAI的搜索和总结逻辑~~ -> Refactored PaperAI to use single agent with Arxiv, PubMed, DuckDuckGo tools (Completed)
 2. ~~优化前端UI/UX~~ -> 改为WebSocket流式输出 (Completed)
 3. ~~-log优化 (If still relevant for PaperAI) - Review logging with WebSocket implementation~~ (Logging handled by phi/standard libs)
 4. Implement CodeAI agent integration with WebSocket streaming (Backend exists, needs frontend integration)

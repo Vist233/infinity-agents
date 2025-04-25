@@ -1,6 +1,6 @@
 # Infinity Agents
 
-An AI agent for paper searching and summarization, now with real-time streaming responses via WebSockets.
+An AI agent for paper searching and summarization, now with real-time streaming responses via WebSockets. Built using `agno`.
 
 ## Table of Contents
 
@@ -12,13 +12,13 @@ An AI agent for paper searching and summarization, now with real-time streaming 
 
 ## Introduction
 
-Infinity Agents is an AI-based tool designed to search for academic papers and provide summaries. This repository contains the necessary components to run the Paper AI agent.
+Infinity Agents is an AI-based tool designed to search for academic papers and provide summaries, built using the `agno` framework. This repository contains the necessary components to run the Paper AI agent.
 
 This AI Agent is designed for those who need to search and summarize academic papers efficiently.
 
 ## Features
 
-- **Paper AI**: Give it a topic, it will search articles on ArXiv and summarize the most relevant ones for you.
+- **Paper AI**: Give it a topic, it will search articles using ArXiv, PubMed, and DuckDuckGo, then summarize the most relevant ones for you.
 - **Code AI**: Provide instructions for coding or data analysis tasks (especially bioinformatics related). It breaks down the task, generates Python/Shell code, and executes it. (Note: Currently backend only, UI integration pending).
 - **Chater**: A general conversational AI.
 
