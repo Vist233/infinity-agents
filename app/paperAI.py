@@ -6,7 +6,7 @@ from phi.tools.arxiv_toolkit import ArxivToolkit
 from config import API_KEY
 from phi.model.deepseek import DeepSeekChat
 import os
-from typing import Optional, Dict, Iterator
+from typing import Optional, Iterator
 from pydantic import BaseModel, Field
 
 # Get the API key from environment variables OR set your API key here

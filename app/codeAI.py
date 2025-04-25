@@ -9,7 +9,6 @@ from config import API_KEY
 # from phi.tools.file import FileTools
 from tools.fileChanged import FileTools
 from tools.shellChanged import ShellTools
-from phi.utils.pprint import pprint_run_response
 import os
 from typing import Iterator
 import uuid
