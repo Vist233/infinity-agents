@@ -19,7 +19,7 @@
           {% for message in messages %}
             <div class="message {{ message.type }}">
               {% if message.type == "ai" %}
-                <div class="bubble markdown-content">{{ message.text }}</div>
+                <div class="bubble markdown-content">{{ message.text|safe }}</div>
               {% else %}
                 <div class="bubble">{{ message.text }}</div>
               {% endif %}

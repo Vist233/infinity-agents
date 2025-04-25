@@ -325,3 +325,97 @@ body {
   border-left: 0.25em solid #dfe2e5;
   margin: 0 0 16px 0;
 }
+
+/* Markdown content styling within AI bubbles */
+.message.ai .bubble.markdown-content {
+  line-height: 1.6; /* Improve readability */
+}
+
+.message.ai .bubble.markdown-content code {
+  background-color: #333; /* Darker background for inline code */
+  padding: 0.2em 0.4em;
+  margin: 0 0.2em;
+  border-radius: 3px;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+  color: #ccc; /* Lighter text for code */
+}
+
+.message.ai .bubble.markdown-content pre {
+  background-color: #2d2d2d; /* Slightly different background for code blocks */
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 16px;
+  overflow: auto;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  margin: 10px 0;
+  color: #ccc; /* Lighter text for code blocks */
+}
+
+.message.ai .bubble.markdown-content pre code {
+  background-color: transparent; /* Reset background for code inside pre */
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.message.ai .bubble.markdown-content h1,
+.message.ai .bubble.markdown-content h2,
+.message.ai .bubble.markdown-content h3,
+.message.ai .bubble.markdown-content h4,
+.message.ai .bubble.markdown-content h5,
+.message.ai .bubble.markdown-content h6 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+  border-bottom: 1px solid #555; /* Add subtle separator for headings */
+  padding-bottom: 0.3em;
+}
+
+.message.ai .bubble.markdown-content h1 { font-size: 1.8em; }
+.message.ai .bubble.markdown-content h2 { font-size: 1.5em; }
+.message.ai .bubble.markdown-content h3 { font-size: 1.3em; }
+
+.message.ai .bubble.markdown-content table {
+  border-collapse: collapse;
+  margin: 15px 0;
+  width: auto; /* Adjust width as needed */
+  border: 1px solid #555;
+}
+
+.message.ai .bubble.markdown-content table th,
+.message.ai .bubble.markdown-content table td {
+  border: 1px solid #555;
+  padding: 6px 13px;
+  text-align: left;
+}
+
+.message.ai .bubble.markdown-content table th {
+  background-color: #3a3a3a; /* Header background */
+  font-weight: bold;
+}
+
+.message.ai .bubble.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+  border-radius: 4px; /* Optional: slightly rounded images */
+}
+
+.message.ai .bubble.markdown-content blockquote {
+  padding: 0 1em;
+  color: #aaa; /* Lighter color for blockquotes */
+  border-left: 0.25em solid #555;
+  margin: 1em 0;
+}
+
+.message.ai .bubble.markdown-content ul,
+.message.ai .bubble.markdown-content ol {
+  padding-left: 2em; /* Indent lists */
+  margin: 1em 0;
+}
+
+.message.ai .bubble.markdown-content li {
+  margin-bottom: 0.4em; /* Spacing between list items */
+}
