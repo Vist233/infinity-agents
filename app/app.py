@@ -29,8 +29,6 @@ class DialogueManager:
             request_logs.append(f"User input '{user_input}' TO {assistant_name}\n")
             logger.info(f"Processing input for SID: {sid} with {assistant_name}")
 
-            self.socketio.emit('user_message', {'text': user_input}, room=sid)
-
             ai_message_id = f"ai-msg-{uuid.uuid4()}"
             self.socketio.emit('ai_message_start', {'id': ai_message_id}, room=sid)
 
@@ -126,10 +124,6 @@ def handle_send_message(data):
 
     if user_input and agent_type:
         logger.info(f"Received message from {sid}: Agent={agent_type}, Input='{user_input}'")
-        if "messages" not in session:
-            session["messages"] = []
-        session["messages"].append({"type": "user", "text": user_input})
-        session.modified = True
 
         if agent_type == "paperai":
             socketio.start_background_task(paperai_manager.process_user_input, user_input, sid)

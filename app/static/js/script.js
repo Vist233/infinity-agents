@@ -31,6 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const agent = agentSelect.value;
 
     if (messageText) {
+      // Add user message bubble immediately
+      appendMessage('user', messageText);
+      scrollToBottom(); // Scroll after adding user message
+
       // Emit the message to the server
       socket.emit('send_message', { userInput: messageText, agent: agent });
 
@@ -56,29 +60,25 @@ document.addEventListener("DOMContentLoaded", () => {
     appendMessage('error', `Error: ${data.error}`);
   });
 
-  // Handle user message confirmation from server (optional, good for consistency)
-  socket.on('user_message', (data) => {
-    console.log('User message confirmed:', data.text);
-    appendMessage('user', data.text);
-    scrollToBottom();
-  });
-
   // Handle start of AI message stream
   socket.on('ai_message_start', (data) => {
     console.log('AI message start:', data.id);
     // Create a placeholder for the AI message
     appendMessage('ai', '', data.id); // Pass ID to identify the bubble
+    const aiBubble = document.getElementById(data.id);
+    if (aiBubble) {
+        aiBubble.dataset.rawMarkdown = ''; // Initialize empty raw markdown
+    }
     scrollToBottom();
   });
 
   // Handle incoming AI message chunks
   socket.on('ai_message_chunk', (data) => {
-    // console.log('AI message chunk:', data.id, data.chunk);
     const aiBubble = document.getElementById(data.id);
     if (aiBubble) {
-      // Append the chunk and re-render markdown for this bubble
-      aiBubble.textContent += data.chunk; // Use textContent for raw appending
-      renderMarkdownInElement(aiBubble); // Re-render markdown
+      // Append to raw markdown and render
+      aiBubble.dataset.rawMarkdown += data.chunk;
+      renderMarkdownInElement(aiBubble);
       scrollToBottom(); // Keep scrolled to bottom as content grows
     } else {
       console.warn(`Could not find AI message bubble with ID: ${data.id}`);
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log('AI message end:', data.id);
     const aiBubble = document.getElementById(data.id);
     if (aiBubble) {
-      // Final render to ensure everything is correct
+      // Final render using the accumulated raw markdown
       renderMarkdownInElement(aiBubble);
       // Optionally add a class or attribute to indicate completion
       aiBubble.classList.add('message-complete');
@@ -127,17 +127,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Renders markdown within a specific element
   function renderMarkdownInElement(element) {
-    // Use textContent to get the raw markdown, avoiding potential HTML injection
-    const rawMarkdown = element.textContent || '';
+    const rawMarkdown = element.dataset.rawMarkdown || element.textContent || ''; // Fallback to textContent if dataset is missing
     // Only render if it hasn't been marked as fully rendered by the streaming end event
-    if (!element.classList.contains('message-complete')) {
+    // OR if it's the final render call
+    if (!element.classList.contains('message-complete') || event.type === 'ai_message_end') {
         element.innerHTML = marked.parse(rawMarkdown);
-        element.dataset.rendered = 'true'; // Mark as rendered (might be overwritten by stream)
-    } else {
-        // If message is complete, ensure final render uses the full text
-        // This handles cases where the last chunk might not have triggered a render
-        const finalMarkdown = element.textContent || ''; // Get potentially updated text content
-        element.innerHTML = marked.parse(finalMarkdown);
     }
   }
 
