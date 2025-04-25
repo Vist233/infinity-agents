@@ -20,15 +20,6 @@ class NewsArticle(BaseModel):
 class SearchResults(BaseModel):
     articles: list[NewsArticle]
 
-class ScrapedArticle(BaseModel):
-    title: str = Field(..., description="Title of the article.")
-    url: str = Field(..., description="Link to the article.")
-    summary: Optional[str] = Field(..., description="Summary of the article if available.")
-    content: Optional[str] = Field(
-        ...,
-        description="Content of the in markdown format if available. Return None if the content is not available or does not make sense.",
-    )
-
 class PaperSummaryGenerator(Workflow):
     searcher: Agent = Agent(
         model=DeepSeekChat(api_key=API),

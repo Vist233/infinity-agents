@@ -19,6 +19,8 @@ This AI Agent is designed for those who need to search and summarize academic pa
 ## Features
 
 - **Paper AI**: Give it a topic, it will search articles on ArXiv and summarize the most relevant ones for you.
+- **Code AI**: Provide instructions for coding or data analysis tasks (especially bioinformatics related). It breaks down the task, generates Python/Shell code, and executes it. (Note: Currently backend only, UI integration pending).
+- **Chater**: A general conversational AI.
 
 ## Run it locally
 
