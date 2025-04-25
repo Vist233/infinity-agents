@@ -59,6 +59,7 @@ body {
       display: flex;
       padding: 10px;
       background-color: #333;
+      align-items: center; /* Align items vertically */
     }
 
     .input-box {
@@ -67,39 +68,57 @@ body {
       background-color: #444;
       border: none;
       color: white;
-      border-radius: 5px 0 0 5px;
+      border-radius: 5px; /* Rounded corners for input */
+      margin-right: 5px; /* Space before buttons */
+    }
+
+    .send-button, .stop-button, .upload-button, .clear-button {
+      padding: 10px 15px; /* Uniform padding */
+      border: none;
+      color: white;
+      border-radius: 5px; /* Uniform radius */
+      cursor: pointer;
+      margin-left: 5px; /* Space between buttons */
+      white-space: nowrap; /* Prevent button text wrapping */
     }
 
     .send-button {
-      padding: 10px;
-      background-color: #000000;
-      border: none;
-      color: white;
-      border-radius: 0 5px 5px 0;
-      cursor: pointer;
+      background-color: #007bff; /* Blue send */
     }
-
     .send-button:hover {
-      background-color: #000000; /* Keep hover effect or adjust */
+      background-color: #0056b3;
     }
 
     .stop-button {
-      padding: 10px;
-      background-color: #dc3545; /* Red color for stop */
-      border: none;
-      color: white;
-      border-radius: 0 5px 5px 0;
-      cursor: pointer;
-      margin-left: -5px; /* Overlap slightly with input box if send is hidden */
+      background-color: #dc3545; /* Red stop */
+    }
+    .stop-button:hover {
+      background-color: #c82333;
     }
 
-    .stop-button:hover {
-      background-color: #c82333; /* Darker red on hover */
+    .upload-button {
+      background-color: #6c757d; /* Grey upload */
+    }
+    .upload-button:hover:not(:disabled) {
+      background-color: #5a6268;
+    }
+    .upload-button:disabled {
+        background-color: #495057;
+        cursor: not-allowed;
+        opacity: 0.65;
+    }
+
+    .clear-button {
+        background-color: #ffc107; /* Yellow clear */
+        color: #333;
+    }
+    .clear-button:hover {
+        background-color: #e0a800;
     }
 
     .agent-select {
       padding: 10px;
-      margin-right: 10px;
+      margin-right: 10px; /* Space after select */
       background-color: #444;
       border: 1px solid #555;
       color: white;
@@ -279,4 +298,31 @@ body {
 
 .message.ai .bubble.markdown-content li {
   margin-bottom: 0.4em; /* Spacing between list items */
+}
+
+/* Status Area Styling */
+.status-area {
+    padding: 5px 15px;
+    background-color: #333;
+    color: #ccc;
+    font-size: 0.9em;
+    text-align: center;
+    min-height: 28px; /* Ensure it has height even when empty */
+    line-height: 18px; /* Vertically center text */
+    transition: background-color 0.3s ease;
+}
+
+.status-area.status-info {
+    background-color: #17a2b8; /* Info blue */
+    color: white;
+}
+
+.status-area.status-success {
+    background-color: #28a745; /* Success green */
+    color: white;
+}
+
+.status-area.status-error {
+    background-color: #dc3545; /* Error red */
+    color: white;
 }

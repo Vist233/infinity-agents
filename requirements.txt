@@ -34,3 +34,11 @@ flask-socketio
 eventlet
 pubmed_toolkit
 duckduckgo-search
+# RAG Dependencies
+langchain
+langchain-community # For loaders, splitters, vectorstores
+pypdf
+python-docx
+sentence-transformers
+faiss-cpu # Or faiss-gpu if you have CUDA installed
+tiktoken # Often needed by langchain text splitters

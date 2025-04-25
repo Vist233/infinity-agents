@@ -18,6 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendButton = document.getElementById('sendButton');
   const stopButton = document.getElementById('stopButton'); // Get stop button
 
+  const statusArea = document.getElementById('statusArea');
+  const fileInput = document.getElementById('fileInput');
+  const selectFileButton = document.getElementById('selectFileButton');
+  const uploadButton = document.getElementById('uploadButton');
+  const clearRagButton = document.getElementById('clearRagButton');
+  let selectedFile = null;
+
   let currentAiMessageId = null; // Variable to store the ID of the message being generated
 
   // Scroll to bottom function
@@ -27,6 +34,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial scroll to bottom
   scrollToBottom();
+
+  // Function to display status messages
+  function showStatus(message, type = 'info') {
+    statusArea.textContent = message;
+    statusArea.className = `status-area status-${type}`; // Add class for styling
+  }
 
   // Handle form submission
   messageForm.addEventListener('submit', (e) => {
@@ -53,6 +66,78 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log(`Requesting stop for message ID: ${currentAiMessageId}`);
       socket.emit('stop_generation', { id: currentAiMessageId });
       // UI changes (hiding stop, showing send) will happen in ai_message_end handler
+    }
+  });
+
+  // Trigger hidden file input
+  selectFileButton.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  // Handle file selection
+  fileInput.addEventListener('change', (event) => {
+    selectedFile = event.target.files[0];
+    if (selectedFile) {
+      uploadButton.disabled = false;
+      showStatus(`Selected: ${selectedFile.name}`, 'info');
+    } else {
+      uploadButton.disabled = true;
+      showStatus(''); // Clear status if no file selected
+    }
+  });
+
+  // Handle file upload
+  uploadButton.addEventListener('click', async () => {
+    if (!selectedFile) {
+      showStatus('No file selected!', 'error');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    showStatus(`Uploading ${selectedFile.name}...`, 'info');
+    uploadButton.disabled = true; // Disable during upload
+
+    try {
+      const response = await fetch('/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        showStatus(`✅ ${selectedFile.name} processed. RAG active for Chater.`, 'success');
+        // Optionally clear file input for next upload
+        fileInput.value = '';
+        selectedFile = null;
+      } else {
+        showStatus(`❌ Error: ${result.error || 'Upload failed'}`, 'error');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      showStatus(`❌ Network or server error during upload.`, 'error');
+    } finally {
+      // Re-enable upload button conditionally if needed, or keep disabled until new file selected
+      uploadButton.disabled = true; // Keep disabled after attempt
+    }
+  });
+
+  // Handle Clear RAG Context
+  clearRagButton.addEventListener('click', async () => {
+    showStatus('Clearing RAG context...', 'info');
+    try {
+      const response = await fetch('/clear_rag', { method: 'POST' });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        showStatus('RAG context cleared.', 'success');
+      } else {
+        showStatus('Failed to clear RAG context.', 'error');
+      }
+    } catch (error) {
+      console.error('Clear RAG error:', error);
+      showStatus('Error clearing RAG context.', 'error');
     }
   });
 
@@ -84,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
     appendMessage('ai', '', data.id); // Pass ID to identify the bubble
     const aiBubble = document.getElementById(data.id);
     if (aiBubble) {
-        aiBubble.dataset.rawMarkdown = ''; // Initialize empty raw markdown
+      aiBubble.dataset.rawMarkdown = ''; // Initialize empty raw markdown
     }
     scrollToBottom();
   });
@@ -102,8 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-   // Handle end of AI message stream
-   socket.on('ai_message_end', (data) => {
+  // Handle end of AI message stream
+  socket.on('ai_message_end', (data) => {
     console.log('AI message end:', data.id);
     const aiBubble = document.getElementById(data.id);
     if (aiBubble) {
@@ -118,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
     currentAiMessageId = null; // Clear the current message ID
     scrollToBottom();
   });
-
 
   // --- Helper Functions ---
 
@@ -152,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Only render if it hasn't been marked as fully rendered by the streaming end event
     // OR if it's the final render call
     if (!element.classList.contains('message-complete') || event.type === 'ai_message_end') {
-        element.innerHTML = marked.parse(rawMarkdown);
+      element.innerHTML = marked.parse(rawMarkdown);
     }
   }
 
@@ -164,25 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- MutationObserver (Optional - might not be needed with direct updates) ---
-  // If dynamic additions outside of the socket handlers occur, this might be useful.
-  // For now, direct updates in socket handlers are likely sufficient.
-  /*
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(mutation => {
-      if (mutation.addedNodes.length > 0) {
-        mutation.addedNodes.forEach(node => {
-          if (node.nodeType === 1 && node.querySelector('.markdown-content')) {
-            renderAllMarkdown(); // Re-render if new messages with markdown are added
-            scrollToBottom();
-          } else if (node.nodeType === 1 && node.classList.contains('markdown-content')) {
-             renderMarkdownInElement(node);
-             scrollToBottom();
-          }
-        });
-      }
-    });
-  });
-  observer.observe(messageArea, { childList: true });
-  */
+  // Initial setup calls
+  renderAllMarkdown();
+  scrollToBottom();
 });
