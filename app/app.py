@@ -3,21 +3,16 @@ from flask import Flask, render_template, request, session
 from flask_socketio import SocketIO, emit
 import os
 from paperAI import paperai_agent
-# Import the new chater agent
 from chater import chater_agent
 from agno.agent import Agent
-# Removed DeepSeek import as it's handled within agent files now
-from agno.utils.log import logger
 from config import API_KEY
 
 app = Flask(__name__)
 convId = str(uuid.uuid4())
 app.secret_key = convId
 socketio = SocketIO(app, async_mode='eventlet')
-logs = ["系统初始化完成\n"]
 API = os.environ.get('DEEPSEEK_API_KEY') or API_KEY
 
-# --- DialogueManager ---
 class DialogueManager:
     def __init__(self, assistant, socketio_instance):
         self.assistant = assistant
@@ -25,10 +20,7 @@ class DialogueManager:
 
     def process_user_input(self, user_input, sid):
         try:
-            request_logs = []
             assistant_name = getattr(self.assistant, 'description', self.assistant.__class__.__name__)
-            request_logs.append(f"User input '{user_input}' TO {assistant_name}\n")
-            logger.info(f"Processing input for SID: {sid} with {assistant_name}")
 
             ai_message_id = f"ai-msg-{uuid.uuid4()}"
             self.socketio.emit('ai_message_start', {'id': ai_message_id}, room=sid)
@@ -40,15 +32,13 @@ class DialogueManager:
                 try:
                     response_stream = self.assistant.run(user_input, stream=True)
                 except Exception as agent_run_error:
-                    logger.error(f"Error running agent {assistant_name}: {agent_run_error}", exc_info=True)
                     raise agent_run_error
             else:
-                logger.error(f"Unknown assistant type: {type(self.assistant)}")
                 raise TypeError(f"Cannot process input for assistant type: {type(self.assistant)}")
 
             if hasattr(response_stream, '__iter__') and not isinstance(response_stream, str):
                 for chunk in response_stream:
-                    content_chunk = str(chunk.content)
+                    content_chunk = str(getattr(chunk, 'content', chunk))
                     if content_chunk:
                         full_response += content_chunk
                         self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': content_chunk}, room=sid)
@@ -58,41 +48,23 @@ class DialogueManager:
                 full_response = content
                 self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': content}, room=sid)
             else:
-                logger.warning(f"No response stream generated for input '{user_input}' with {assistant_name}")
                 full_response = "Assistant did not generate a response."
                 self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': full_response}, room=sid)
 
             self.socketio.emit('ai_message_end', {'id': ai_message_id, 'full_text': full_response}, room=sid)
 
-            global logs
-            logs.extend(request_logs)
-            logs.append(f"AI Response for '{user_input}': {full_response[:100]}...")
-            logger.info(f"Finished processing for SID: {sid}")
-
         except Exception as e:
-            error_msg = f"处理过程中出错: {e}"
-            logs.append(error_msg)
-            logger.error(f"Error processing input for SID {sid}: {e}", exc_info=True)
-            if 'ai_message_id' in locals():
-                self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': f"\n\n**Error:** {error_msg}"}, room=sid)
-                self.socketio.emit('ai_message_end', {'id': ai_message_id, 'full_text': full_response + f"\n\n**Error:** {error_msg}"}, room=sid)
-            else:
-                self.socketio.emit('error_message', {'error': error_msg}, room=sid)
+            error_msg = f"An error occurred: {e}"
+            if 'ai_message_id' not in locals():
+                ai_message_id = f"ai-msg-error-{uuid.uuid4()}"
+                self.socketio.emit('ai_message_start', {'id': ai_message_id}, room=sid)
 
-# --- Agent Initialization ---
-current_dir = os.path.dirname(os.path.abspath(__file__))
-main_dir = os.path.dirname(current_dir)
-Chatdb_file = os.path.join(main_dir, "Database", "ChatWorkflows.db")
-
-db_dir = os.path.join(main_dir, "Database")
-os.makedirs(db_dir, exist_ok=True)
+            self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': f"\n\n**Error:** {error_msg}"}, room=sid)
+            self.socketio.emit('ai_message_end', {'id': ai_message_id, 'full_text': full_response + f"\n\n**Error:** {error_msg}"}, room=sid)
 
 paperai_manager = DialogueManager(paperai_agent, socketio)
-
-# Use the imported chater_agent
 chater_manager = DialogueManager(chater_agent, socketio)
 
-# --- Routes and SocketIO Events ---
 @app.route("/")
 def index():
     if "messages" not in session:
@@ -101,11 +73,11 @@ def index():
 
 @socketio.on('connect')
 def handle_connect():
-    logger.info(f"Client connected: {request.sid}")
+    pass
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    logger.info(f"Client disconnected: {request.sid}")
+    pass
 
 @socketio.on('send_message')
 def handle_send_message(data):
@@ -114,24 +86,14 @@ def handle_send_message(data):
     sid = request.sid
 
     if user_input and agent_type:
-        logger.info(f"Received message from {sid}: Agent={agent_type}, Input='{user_input}'")
-
         if agent_type == "paperai":
             socketio.start_background_task(paperai_manager.process_user_input, user_input, sid)
         elif agent_type == "chater":
-            # Use the chater_manager which now uses the imported chater_agent
             socketio.start_background_task(chater_manager.process_user_input, user_input, sid)
-        # Add CodeAI handling here later
-        # elif agent_type == "codeai":
-        #     # Placeholder for CodeAI integration
-        #     emit('error_message', {'error': 'CodeAI not yet implemented in frontend.'}, room=sid)
         else:
             emit('error_message', {'error': 'Invalid agent selected.'}, room=sid)
     else:
-        logger.warning(f"Invalid message received from {sid}: {data}")
         emit('error_message', {'error': 'Missing input or agent type.'}, room=sid)
 
 if __name__ == "__main__":
-    logger.info("Starting Flask-SocketIO server...")
-    # Ensure use_reloader is False if debugging causes issues with background tasks or state
-    socketio.run(app, host='0.0.0.0', port=8080, debug=True, use_reloader=False)
+    socketio.run(app, host='0.0.0.0', port=8080, debug=False, use_reloader=False)
