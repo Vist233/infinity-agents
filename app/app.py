@@ -5,6 +5,7 @@ import os
 from agents import paperai_agent, chater_agent
 from agno.agent import Agent
 from config import API_KEY
+import threading
 
 app = Flask(__name__)
 convId = str(uuid.uuid4())
@@ -13,6 +14,7 @@ socketio = SocketIO(app, async_mode='eventlet')
 API = os.environ.get('DEEPSEEK_API_KEY') or API_KEY
 
 active_tasks = {}
+active_tasks_lock = threading.Lock()
 
 class DialogueManager:
     def __init__(self, assistant, socketio_instance):
@@ -20,10 +22,10 @@ class DialogueManager:
         self.socketio = socketio_instance
 
     def process_user_input(self, user_input, sid, ai_message_id):
-        active_tasks[ai_message_id] = False
+        with active_tasks_lock:
+            active_tasks[ai_message_id] = False
+        should_stop = False
         try:
-            assistant_name = getattr(self.assistant, 'description', self.assistant.__class__.__name__)
-
             full_response = ""
             response_stream = None
 
@@ -37,9 +39,11 @@ class DialogueManager:
 
             if hasattr(response_stream, '__iter__') and not isinstance(response_stream, str):
                 for chunk in response_stream:
-                    if active_tasks.get(ai_message_id, False):
-                        print(f"Stopping generation for {ai_message_id}")
-                        break
+                    with active_tasks_lock:
+                        if active_tasks.get(ai_message_id, False):
+                            print(f"Stopping generation for {ai_message_id}")
+                            should_stop = True
+                            break
 
                     content_chunk = None
                     is_tool_call_related = hasattr(chunk, 'tool_call_id') and hasattr(chunk, 'name')
@@ -60,16 +64,25 @@ class DialogueManager:
                         self.socketio.sleep(0.01)
 
             elif response_stream is not None:
-                if not active_tasks.get(ai_message_id, False):
-                    content = str(response_stream)
-                    full_response = content
-                    self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': content}, room=sid)
+                with active_tasks_lock:
+                    if not active_tasks.get(ai_message_id, False):
+                        content = str(response_stream)
+                        full_response = content
+                        self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': content}, room=sid)
+                    else:
+                        should_stop = True
             else:
-                if not active_tasks.get(ai_message_id, False):
-                    full_response = "Assistant did not generate a response."
-                    self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': full_response}, room=sid)
+                with active_tasks_lock:
+                    if not active_tasks.get(ai_message_id, False):
+                        full_response = "Assistant did not generate a response."
+                        self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': full_response}, room=sid)
+                    else:
+                        should_stop = True
 
-            self.socketio.emit('ai_message_end', {'id': ai_message_id, 'full_text': full_response}, room=sid)
+            final_text = full_response
+            if should_stop:
+                final_text += "\n\n*Generation stopped by user.*"
+            self.socketio.emit('ai_message_end', {'id': ai_message_id, 'full_text': final_text}, room=sid)
 
         except Exception as e:
             error_msg = f"An error occurred: {e}"
@@ -77,8 +90,9 @@ class DialogueManager:
             self.socketio.emit('ai_message_end', {'id': ai_message_id, 'full_text': full_response + f"\n\n**Error:** {error_msg}"}, room=sid)
             print(f"Error during processing for {ai_message_id}: {e}")
         finally:
-            if ai_message_id in active_tasks:
-                del active_tasks[ai_message_id]
+            with active_tasks_lock:
+                if ai_message_id in active_tasks:
+                    del active_tasks[ai_message_id]
 
 paperai_manager = DialogueManager(paperai_agent, socketio)
 chater_manager = DialogueManager(chater_agent, socketio)
@@ -126,11 +140,15 @@ def handle_send_message(data):
 def handle_stop_generation(data):
     ai_message_id = data.get('id')
     sid = request.sid
-    if ai_message_id and ai_message_id in active_tasks:
-        print(f"Received stop request for {ai_message_id} from {sid}")
-        active_tasks[ai_message_id] = True
+    if ai_message_id:
+        with active_tasks_lock:
+            if ai_message_id in active_tasks:
+                print(f"Received stop request for {ai_message_id} from {sid}")
+                active_tasks[ai_message_id] = True
+            else:
+                print(f"Received stop request for inactive/unknown task: {ai_message_id}")
     else:
-        print(f"Received stop request for unknown or inactive task: {ai_message_id}")
+        print(f"Received stop request without message ID from {sid}")
 
 if __name__ == "__main__":
     host = '0.0.0.0'

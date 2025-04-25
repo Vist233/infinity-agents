@@ -83,6 +83,20 @@ body {
       background-color: #000000; /* Keep hover effect or adjust */
     }
 
+    .stop-button {
+      padding: 10px;
+      background-color: #dc3545; /* Red color for stop */
+      border: none;
+      color: white;
+      border-radius: 0 5px 5px 0;
+      cursor: pointer;
+      margin-left: -5px; /* Overlap slightly with input box if send is hidden */
+    }
+
+    .stop-button:hover {
+      background-color: #c82333; /* Darker red on hover */
+    }
+
     .agent-select {
       padding: 10px;
       margin-right: 10px;

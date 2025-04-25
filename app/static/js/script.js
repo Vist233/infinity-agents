@@ -15,6 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const userInput = document.getElementById('userInput');
   const agentSelect = document.getElementById('agentSelect');
   const messageArea = document.getElementById('messageArea');
+  const sendButton = document.getElementById('sendButton');
+  const stopButton = document.getElementById('stopButton'); // Get stop button
+
+  let currentAiMessageId = null; // Variable to store the ID of the message being generated
 
   // Scroll to bottom function
   function scrollToBottom() {
@@ -30,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageText = userInput.value.trim();
     const agent = agentSelect.value;
 
-    if (messageText) {
+    if (messageText && sendButton.style.display !== 'none') { // Only send if send button is visible
       // Add user message bubble immediately
       appendMessage('user', messageText);
       scrollToBottom(); // Scroll after adding user message
@@ -40,6 +44,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Clear input field
       userInput.value = '';
+    }
+  });
+
+  // Add event listener for the stop button
+  stopButton.addEventListener('click', () => {
+    if (currentAiMessageId) {
+      console.log(`Requesting stop for message ID: ${currentAiMessageId}`);
+      socket.emit('stop_generation', { id: currentAiMessageId });
+      // UI changes (hiding stop, showing send) will happen in ai_message_end handler
     }
   });
 
@@ -63,6 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle start of AI message stream
   socket.on('ai_message_start', (data) => {
     console.log('AI message start:', data.id);
+    currentAiMessageId = data.id; // Store the current message ID
+    // Show stop button, hide send button
+    stopButton.style.display = 'inline-block';
+    sendButton.style.display = 'none';
     // Create a placeholder for the AI message
     appendMessage('ai', '', data.id); // Pass ID to identify the bubble
     const aiBubble = document.getElementById(data.id);
@@ -95,7 +112,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // Optionally add a class or attribute to indicate completion
       aiBubble.classList.add('message-complete');
     }
-     scrollToBottom();
+    // Hide stop button, show send button
+    stopButton.style.display = 'none';
+    sendButton.style.display = 'inline-block';
+    currentAiMessageId = null; // Clear the current message ID
+    scrollToBottom();
   });
 
 
