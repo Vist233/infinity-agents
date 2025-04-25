@@ -11,10 +11,11 @@ body {
     }
 
     .chat-area {
-      flex: 2;
+      /* Let chat area take full width */
+      flex: 1;
       display: flex;
       flex-direction: column;
-      border-right: 1px solid #333;
+      /* Removed border-right */
     }
 
     .message-area {
@@ -38,7 +39,7 @@ body {
     }
 
     .bubble {
-      max-width: 60%;
+      max-width: 80%; /* Allow bubbles to be wider */
       padding: 10px 15px;
       border-radius: 20px;
       word-wrap: break-word;
@@ -79,161 +80,7 @@ body {
     }
 
     .send-button:hover {
-      background-color: #000000;
-    }
-
-    .function-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
-    }
-
-    .file-header {
-      display: flex; /* 添加 flex 布局 */
-      justify-content: space-between; /* 左右两端对齐 */
-      align-items: center; /* 垂直方向居中 */
-      margin-bottom: 10px; /* 标题和文件列表之间的间距 */
-}
-    .file-area {
-      flex: 1;
-      background-color: #222;
-      margin-bottom: 10px;
-      border: 1px solid #444;
-      border-radius: 5px;
-      padding: 10px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-    .file-area .section-title {
-    font-family: 'Microsoft YaHei UI', monospace;
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: bold;
-    }
-
-    .log-area .section-title {
-    font-family: 'Microsoft YaHei UI', monospace;
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: bold;
-    }
-
-    .log-area .section-title {
-      background-color: #222;
-      padding: 5px 10px;
-      border-radius: 5px;
-    }
-
-    .file-list {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .file-list li {
-      display: flex;
-      align-items: center;
-      padding: 8px;
-      margin-bottom: 5px;
-      background-color: #333;
-      color: white;
-      border-radius: 5px;
-      transition: background-color 0.2s;
-      cursor: pointer;
-    }
-
-    .file-list li:hover {
-      background-color: #444;
-    }
-
-    .file-list li::before {
-      content: "📄";
-      margin-right: 10px;
-    }
-
-    .log-area {
-      flex: 1;
-      background-color: #222;
-      border: 1px solid #444;
-      border-radius: 5px;
-      padding: 10px;
-      overflow-y: auto;
-      font-size: 13px;
-      color: #56955b;
-    }
-
-    .section-title {
-      border-bottom: 1px solid #555;
-      margin-bottom: 10px;
-      padding-bottom: 5px;
-    }
-
-    /* 美化文件选择按钮 */
-    .file-input {
-      display: none;
-    }
-
-    #uploadForm {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 0;
-    }
-
-    .file-label {
-      display: inline-flex;  /* 使用flexbox布局，使图标居中 */
-      align-items: center;   /* 垂直居中对齐 */
-      justify-content: center; /* 水平居中对齐 */
-      padding: 8px 15px;
-      background-color: #444;
-      color: white;
-      border: 1px solid #555;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-
-    .file-label:hover {
-      background-color: #555;
-    }
-
-    .file-label img.icon {
-      height: 20px; /* 统一图标大小 */
-      width: 20px;
-      margin: 0;
-    }
-
-        /* 文件下载按钮 */
-    .download-button {
-      padding: 8px 15px;
-      background-color: #444;
-      color: white;
-      border: 1px solid #555;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .download-button:hover {
-      background-color: #555;
-    }
-
-    .download-button img.icon {
-      height: 20px; /* 统一图标大小 */
-      width: 20px;
-      margin: 0;
-    }
-
-    /* 让文件选择按钮与 label 绑定 */
-    .file-input:focus + .file-label {
-      outline: 2px solid #545454;
-      outline-offset: 2px;
+      background-color: #000000; /* Keep hover effect or adjust */
     }
 
     .agent-select {

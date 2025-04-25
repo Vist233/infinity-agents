@@ -1,11 +1,8 @@
-1. 修正主逻辑，实现网页前后端的正常交互 
-2. 
-3. -log优化
-4. 
-5. 
-6. 完善ProcessingSpace的逻辑
-
-
+1. 完善PaperAI的搜索和总结逻辑
+2. 优化前端UI/UX
+3. -log优化 (If still relevant for PaperAI)
+4.
+5.
 
 以上为beta版本的内容，完成之后就开始供他人使用以及上传GitHub。
 

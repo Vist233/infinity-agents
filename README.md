@@ -1,6 +1,6 @@
 # Infinity Agents
 
-An AI agent for excuting code and paper summary.
+An AI agent for paper searching and summarization.
 
 ## Table of Contents
 
@@ -12,48 +12,49 @@ An AI agent for excuting code and paper summary.
 
 ## Introduction
 
-Infinity Agents is an AI-based tool designed to excute the code in your local computer and search the paper. This repository contains multiple scripts and notebooks to assist in coding and analysis.
+Infinity Agents is an AI-based tool designed to search for academic papers and provide summaries. This repository contains the necessary components to run the Paper AI agent.
 
-Actually this AI Agent is design for those don't how to coding and need to search a lot of paper.
+This AI Agent is designed for those who need to search and summarize academic papers efficiently.
 
 ## Features
 
-- **Code Helper**:It will create a workspace in your computer. you could upload and download the files in your workspace. If you want to do something just tell it to the Code Helper, it will excute it in workspace automatically.
-- **Paper AI**:Give it a topic, it will search 15 paper in pubmed and summary the most relative 5 paper for you.
-
+- **Paper AI**: Give it a topic, it will search articles on ArXiv and summarize the most relevant ones for you.
 
 ## Run it locally
 
-1. To install the required dependencies, run:
+1.  Install the required dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-```bash
-pip install -r requirements.txt
-```
+2.  Set the environment variable `DEEPSEEK_API_KEY` to your DeepSeek API key, or modify the `API_KEY` variable in `app/config.py`.
 
-2. set the enviroment YI_API_KEY as your YI api key or change the API_KEY varible in app/codeAI.py and app/paperAI.py
+    ```python
+    # In app/config.py
+    API_KEY = os.environ.get("DEEPSEEK_API_KEY", "your API key here")
+    ```
 
-```
-# Get the API key from environment variables OR set your API key here
-API_KEY = os.environ.get("YI_API_KEY", "XXXXXXXXXXXXXXX Your Yi api goes here")
-```
+3.  Run the Flask application:
+    ```bash
+    python app/app.py
+    ```
+    Access the application at `http://127.0.0.1:8080` (or the configured host/port).
 
-## Run it in Docker(Safer compared to locally)
+## Run it in Docker
 
-To use the AI agent in web, follow these steps:
-
-1. Clone the repository:
+1.  Clone the repository:
     ```bash
     git clone https://github.com/Vist233/Infinity_Bio-Agents.git
     cd Infinity_Bio-Agents
     ```
-
-2. To use the app, run:
+2.  Build and run the Docker container:
     ```bash
+    # Make sure to set your API key, e.g., by editing app/config.py before building
+    # Or pass it as an environment variable during run time if the app is configured to read it
     docker build -t infinite-agents .
-    docker run -p 8080:8080 infinite-agents
+    docker run -p 8080:8080 -e DEEPSEEK_API_KEY="your_api_key_here" infinite-agents
     ```
-
-look at your http://127.0.0.1:5000
+    Access the application at `http://127.0.0.1:8080`.
 
 ## License
 

@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     echo "Etc/UTC" > /etc/timezone
 
-# 2. 安装基本依赖
+# 2. 安装基本依赖 (Keep wget, curl, ca-certificates, python dependencies might need others)
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -14,10 +14,6 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     libglib2.0-0 \
     libx11-6 \
-    libxext6 \
-    libsm6 \
-    libxi6 \
-    perl \
     && apt-get clean
 
 # 3. 安装 Miniconda
@@ -28,10 +24,6 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
 # 4. 设置环境变量：将 Conda 和 Python 路径添加到环境变量中
 ENV PATH="/opt/conda/bin:$PATH"
 ENV CONDA_DEFAULT_ENV=base
-COPY Bioinfomatics-Software/CPJSdraw-main/bin/CPJSdraw.pl /usr/local/bin/
-COPY Bioinfomatics-Software/Kaks_Calculator-main/kaks_slidingwindow.pl /usr/local/bin/
-COPY Bioinfomatics-Software/misa/misa.pl /usr/local/bin/
-COPY Bioinfomatics-Software/misa/misa.ini /usr/local/bin/
 
 # 5. 创建 Conda 环境并安装 Python 3.10
 RUN conda config --set solver classic && \
@@ -39,8 +31,7 @@ RUN conda config --set solver classic && \
     conda config --add channels defaults && \
     conda config --add channels bioconda && \
     conda config --add channels conda-forge && \
-    conda install python=3.10 -y && \
-    conda install -y raxml-ng modeltest-ng mafft CPSTools vcftools gatk samtools bwa snpeff pyinstaller
+    conda install python=3.10 -y
 
 # 6. 复制 requirements.txt 文件到容器中
 COPY requirements.txt /tmp/requirements.txt
@@ -55,8 +46,6 @@ WORKDIR /app
 COPY . .
 
 # 10. 确保每次运行时都在 `base` 环境中
-#     启动时默认使用 /bin/bash，激活 `base` 环境。
-# Remove the bash ENTRYPOINT and modify the CMD
 EXPOSE 8080
 
 # Use ENTRYPOINT to ensure conda environment is activated
