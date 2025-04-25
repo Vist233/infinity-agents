@@ -1,13 +1,14 @@
+import os
 from agno.agent import Agent
+from agno.models.deepseek import DeepSeek
 from agno.tools.arxiv import ArxivTools
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.pubmed import PubmedTools
 from config import API_KEY
-from agno.models.deepseek import DeepSeek
-import os
 
 API = os.environ.get('DEEPSEEK_API_KEY') or API_KEY
 
+# PaperAI Agent Definition
 paperai_agent = Agent(
     model=DeepSeek(api_key=API),
     tools=[ArxivTools(), PubmedTools(), DuckDuckGoTools()],
@@ -22,6 +23,14 @@ paperai_agent = Agent(
         "If no relevant information is found after searching, state that clearly.",
     ],
     markdown=True,
-    add_history_to_messages=True,
+    add_history_to_messages=False,
+    description="PaperAI: Searches Arxiv, PubMed, and DuckDuckGo for academic papers and summarizes them.",
 )
 
+# Chater Agent Definition
+chater_agent = Agent(
+    model=DeepSeek(api_key=API, id="deepseek-reasoner"),
+    markdown=True,
+    description="Chater: A general conversational AI assistant.",
+    add_history_to_messages=True,
+)

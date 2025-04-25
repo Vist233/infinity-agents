@@ -6,3 +6,5 @@ __pycache__/
 ./app/config.py
 Database/
 ProcessingSpace
+app/paperAI.py
+app/chater.py

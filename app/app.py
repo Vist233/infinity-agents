@@ -2,8 +2,8 @@ import uuid
 from flask import Flask, render_template, request, session
 from flask_socketio import SocketIO, emit
 import os
-from paperAI import paperai_agent
-from chater import chater_agent
+# Import agents from the new agents.py file
+from agents import paperai_agent, chater_agent
 from agno.agent import Agent
 from config import API_KEY
 
