@@ -32,7 +32,6 @@ tomli==2.0.2
 typer==0.12.5
 flask-socketio
 eventlet
-pubmed_toolkit
 duckduckgo-search
 # RAG Dependencies
 langchain
