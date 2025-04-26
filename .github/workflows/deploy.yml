@@ -23,4 +23,4 @@ jobs:
         script: |
           cd /var/www/infinity_agents
           git pull origin main
-          sudo systemctl restart infinity_agents
+          python3 /Infinite_Agents/app/app.py
