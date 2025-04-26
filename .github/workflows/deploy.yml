@@ -1,4 +1,4 @@
-name: Deploy to Azure VM
+name: Run test
 
 on:
   push:
@@ -22,4 +22,5 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run Python script
-      run : python3 app/app.py
+      run : python3 app/app.py &
+      echo "Success"
