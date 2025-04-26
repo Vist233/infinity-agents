@@ -57,7 +57,7 @@ This AI Agent is designed for those who need to search and summarize academic pa
     # The CMD in Dockerfile now runs `python app/app.py` which starts the SocketIO server
     docker run -p 8080:8080 -e DEEPSEEK_API_KEY="your_api_key_here" infinite-agents
     ```
-    Access the application at `http://127.0.0.1:8080`.
+    Access the application at `http://0.0.0.0:8080`.
 
 ## License
 
