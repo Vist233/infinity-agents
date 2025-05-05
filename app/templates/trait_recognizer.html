@@ -5,58 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>考种助手</title>
     <style>
-        /* Basic styles */
+        /* Dark theme styles */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
+            background-color: #1e1e1e; /* Dark background */
+            color: #ccc; /* Light grey text */
             margin: 0;
             padding: 20px;
             min-height: 100vh;
-            color: #333; /* Default text color */
         }
 
         /* Main container */
         .main-container {
             display: flex;
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 20px auto; /* Add some top/bottom margin */
             gap: 20px;
         }
 
         /* Left upload section */
         .upload-section {
             flex: 2;
-            background: white;
+            background: #2d2d2d; /* Darker card background */
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.3);
+            border: 1px solid #444; /* Subtle border */
         }
 
         /* Right display section */
         .programs-section {
             flex: 1;
-            background: white;
+            background: #2d2d2d; /* Darker card background */
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.3);
+            border: 1px solid #444; /* Subtle border */
         }
 
         h1, h2 {
-            color: #333;
+            color: #eee; /* Lighter heading color */
             margin-bottom: 2rem;
+            border-bottom: 1px solid #555; /* Heading separator */
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            color: #bbb; /* Slightly dimmer paragraph text */
+            line-height: 1.6;
         }
 
         .upload-container {
-            border: 2px dashed #ccc;
+            border: 2px dashed #555; /* Darker dashed border */
             border-radius: 5px;
             padding: 2rem;
             text-align: center; /* Center content */
             transition: all 0.3s ease;
+            background-color: #333; /* Slightly lighter background for drop zone */
         }
 
         .upload-container:hover {
-            border-color: #2196F3;
-            background-color: #f8f9ff;
+            border-color: #007bff; /* Blue border on hover */
+            background-color: #3a3a3a;
         }
 
         #fileInput {
@@ -65,28 +75,29 @@
 
         .upload-label {
             display: inline-block;
-            background-color: #2196F3;
+            background-color: #007bff; /* Blue button */
             color: white;
             padding: 12px 24px;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
             margin-bottom: 1rem; /* Space below button */
+            border: none;
         }
 
         .upload-label:hover {
-            background-color: #1976D2;
+            background-color: #0056b3; /* Darker blue on hover */
         }
 
         #status {
             margin-top: 1rem;
-            color: #666;
+            color: #aaa; /* Dimmer status text */
             min-height: 20px;
             font-size: 0.9em;
         }
 
         #error {
-            color: #dc3545;
+            color: #dc3545; /* Red error text */
             margin-top: 1rem;
             display: none;
             font-weight: bold;
@@ -96,9 +107,9 @@
             display: inline-block;
             width: 16px; /* Smaller spinner */
             height: 16px;
-            border: 2px solid rgba(0,0,0,0.1);
+            border: 2px solid rgba(255,255,255,0.2); /* Lighter border */
             border-radius: 50%;
-            border-top-color: #2196F3;
+            border-top-color: #007bff; /* Blue spinner top */
             animation: spin 1s ease-in-out infinite;
             vertical-align: middle; /* Align with text */
             margin-right: 5px;
@@ -113,6 +124,10 @@
             margin-top: 1rem;
             max-height: 400px; /* Limit height */
             overflow-y: auto; /* Add scroll if needed */
+            border: 1px solid #444; /* Border around list */
+            border-radius: 5px;
+            padding: 5px; /* Padding inside list container */
+            background-color: #333; /* Background for list area */
         }
 
         .program-item {
@@ -121,19 +136,20 @@
             justify-content: space-between;
             padding: 10px 12px; /* Slightly smaller padding */
             margin-bottom: 8px; /* Slightly smaller margin */
-            border: 1px solid #eee;
+            border: 1px solid #4a4a4a; /* Item border */
             border-radius: 5px;
             transition: all 0.3s ease;
+            background-color: #3a3a3a; /* Item background */
         }
 
         .program-item:hover {
-            background-color: #f8f9ff;
-            border-color: #2196F3;
+            background-color: #454545; /* Hover background */
+            border-color: #007bff; /* Blue border on hover */
         }
 
         .program-name {
             font-size: 14px;
-            color: #333;
+            color: #ddd; /* Lighter program name */
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -141,7 +157,7 @@
         }
 
         .download-btn {
-            background: #4CAF50;
+            background: #28a745; /* Green download button */
             color: white;
             padding: 6px 12px;
             border-radius: 3px;
@@ -153,17 +169,17 @@
         }
 
         .download-btn:hover {
-            background: #45a049;
+            background: #218838; /* Darker green on hover */
         }
 
         .loading-text, .error-text {
-            color: #666;
+            color: #aaa; /* Dimmer text */
             text-align: center;
             padding: 20px;
             font-style: italic;
         }
         .error-text {
-            color: #dc3545;
+            color: #dc3545; /* Red error text */
             font-weight: bold;
         }
     </style>
@@ -189,7 +205,7 @@
             <h2>预置考种程序库</h2>
             <p>下载预先生成的考种程序。</p>
             <div id="programs-list" class="programs-list">
-                <div class="loading-text">加载中...</div>
+                <div class="loading-text">加载中...</div> <!-- Initial state -->
             </div>
         </div>
     </div>

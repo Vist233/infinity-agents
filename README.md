@@ -10,6 +10,7 @@ An AI agent platform featuring paper searching/summarization and a trait recogni
 - [Usage](#usage)
 - [Run it locally](#run-it-locally)
 - [Run it in Docker](#run-it-in-docker)
+- [Testing](#testing)
 - [License](#license)
 
 ## Introduction
@@ -80,6 +81,20 @@ Infinity Agents is an AI-based tool designed to assist with research and specifi
       infinite-agents
     ```
 4.  Access the application interfaces at `http://localhost:8080/chat` and `http://localhost:8080/trait_recognizer`.
+
+## Testing
+
+This project uses `pytest` for unit testing.
+
+1.  Ensure you have installed the development dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+2.  Run the tests from the root directory:
+    ```bash
+    pytest tests/
+    ```
+Tests are automatically run via GitHub Actions on pushes and pull requests to the `main` branch (see `.github/workflows/ci.yml`).
 
 ## License
 
