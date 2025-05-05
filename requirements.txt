@@ -43,4 +43,14 @@ faiss-cpu # Or faiss-gpu if you have CUDA installed
 tiktoken # Often needed by langchain text splitters
 agno
 eventlet
-openai
+openai~=1.61.1 # Ensure openai version is compatible
+pyinstaller # Added for EXE packaging
+base64
+PIL # Already implicitly included via Pillow
+requests
+csv
+shutil
+
+pillow~=11.1.0
+numpy~=2.2.2
+werkzeug # Added as Flask dependency, good to be explicit

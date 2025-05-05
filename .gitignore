@@ -1,10 +1,36 @@
 .obsidian/
 compose-dev.yaml
 *.db
-.pyc
+*.pyc
 __pycache__/
 ./app/config.py
 Database/
 ProcessingSpace
 app/paperAI.py
 app/chater.py
+
+# Added for Trait Recognizer / PyInstaller
+app/uploads/
+uploads/
+*.exe
+*.spec
+build/
+dist/
+spade.py
+temp_spade_code.py
+hello_world_app.exe
+results.csv # If generated in root or app
+app/results.csv # If generated in app
+fixedQuantityProg/output/ # Exclude generated output from fixed prog
+fixedQuantityProg/results.csv # Exclude results from fixed prog
+
+# Environment files
+.env
+*.env
+
+# IDE / OS files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store

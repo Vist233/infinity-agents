@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考种助手</title>
+    <style>
+        /* Basic styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: #333; /* Default text color */
+        }
+
+        /* Main container */
+        .main-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+
+        /* Left upload section */
+        .upload-section {
+            flex: 2;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Right display section */
+        .programs-section {
+            flex: 1;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .upload-container {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            padding: 2rem;
+            text-align: center; /* Center content */
+            transition: all 0.3s ease;
+        }
+
+        .upload-container:hover {
+            border-color: #2196F3;
+            background-color: #f8f9ff;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-label {
+            display: inline-block;
+            background-color: #2196F3;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 1rem; /* Space below button */
+        }
+
+        .upload-label:hover {
+            background-color: #1976D2;
+        }
+
+        #status {
+            margin-top: 1rem;
+            color: #666;
+            min-height: 20px;
+            font-size: 0.9em;
+        }
+
+        #error {
+            color: #dc3545;
+            margin-top: 1rem;
+            display: none;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px; /* Smaller spinner */
+            height: 16px;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #2196F3;
+            animation: spin 1s ease-in-out infinite;
+            vertical-align: middle; /* Align with text */
+            margin-right: 5px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Programs list styles */
+        .programs-list {
+            margin-top: 1rem;
+            max-height: 400px; /* Limit height */
+            overflow-y: auto; /* Add scroll if needed */
+        }
+
+        .program-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px; /* Slightly smaller padding */
+            margin-bottom: 8px; /* Slightly smaller margin */
+            border: 1px solid #eee;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .program-item:hover {
+            background-color: #f8f9ff;
+            border-color: #2196F3;
+        }
+
+        .program-name {
+            font-size: 14px;
+            color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 10px; /* Space before button */
+        }
+
+        .download-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 12px;
+            border: none;
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        .download-btn:hover {
+            background: #45a049;
+        }
+
+        .loading-text, .error-text {
+            color: #666;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+        .error-text {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Left upload section -->
+        <div class="upload-section">
+            <h1>考种助手 - 标准生成</h1>
+            <p>上传一张包含判断标准的图片，系统将根据此标准生成一个可执行程序（.exe）。该程序可用于批量判断其他图片。</p>
+            <div class="upload-container">
+                <input type="file" id="fileInput" accept="image/png, image/jpeg, image/jpg">
+                <label for="fileInput" class="upload-label">
+                    <span>选择标准图片</span>
+                </label>
+                <div id="status">请选择一张图片文件。</div>
+                <div id="error"></div>
+            </div>
+        </div>
+
+        <!-- Right display section -->
+        <div class="programs-section">
+            <h2>预置考种程序库</h2>
+            <p>下载预先生成的考种程序。</p>
+            <div id="programs-list" class="programs-list">
+                <div class="loading-text">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const status = document.getElementById('status');
+        const error = document.getElementById('error');
+        const uploadLabel = document.querySelector('.upload-label span');
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) {
+                uploadLabel.textContent = '选择标准图片';
+                status.textContent = '请选择一张图片文件。';
+                error.style.display = 'none';
+                return;
+            }
+
+            // Basic file type check (client-side)
+            if (!file.type.startsWith('image/')) {
+                error.style.display = 'block';
+                error.textContent = '错误：请选择图片文件 (PNG, JPG, JPEG)。';
+                status.textContent = '';
+                fileInput.value = ''; // Reset file input
+                uploadLabel.textContent = '选择标准图片';
+                return;
+            }
+
+            uploadLabel.textContent = `已选择: ${file.name}`;
+            error.style.display = 'none';
+            status.innerHTML = '<div class="loading"></div> 正在上传并生成程序，请稍候... 这可能需要1-2分钟。';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                // *** Updated fetch URL ***
+                const response = await fetch('/upload_trait_standard', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    let errorText = `HTTP error ${response.status}`;
+                    try {
+                        // Try to get more specific error from response body
+                        const errorData = await response.json(); // Assuming server sends JSON error
+                        errorText = errorData.error || errorText;
+                    } catch (jsonError) {
+                        // If response is not JSON or parsing fails, use text
+                        errorText = await response.text() || errorText;
+                    }
+                     // Limit error text length
+                    if (errorText.length > 200) {
+                        errorText = errorText.substring(0, 200) + "...";
+                    }
+                    throw new Error(errorText);
+                }
+
+                const blob = await response.blob();
+                // Extract filename from Content-Disposition header if available
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = 'spade.exe'; // Default filename
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+                    if (filenameMatch && filenameMatch.length > 1) {
+                        filename = filenameMatch[1];
+                    }
+                }
+
+                const downloadUrl = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = downloadUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(downloadUrl);
+                document.body.removeChild(a);
+
+                status.innerHTML = `✅ 程序生成成功！'${filename}' 已自动下载。`;
+                setTimeout(() => {
+                    status.textContent = '您可以选择新的标准图片再次生成。';
+                    uploadLabel.textContent = '选择标准图片';
+                }, 5000); // Clear status after 5 seconds
+
+            } catch (err) {
+                console.error("Upload/Generation Error:", err);
+                error.style.display = 'block';
+                error.textContent = `生成失败：${err.message}`;
+                status.innerHTML = ''; // Clear loading status
+                uploadLabel.textContent = '选择标准图片';
+            } finally {
+                // Reset file input to allow selecting the same file again if needed
+                fileInput.value = '';
+            }
+        });
+
+        // Load fixed programs
+        async function loadFixedPrograms() {
+            const list = document.getElementById('programs-list');
+            list.innerHTML = '<div class="loading-text"><div class="loading"></div> 加载预置程序...</div>';
+
+            try {
+                // *** Fetch URL is correct ***
+                const response = await fetch('/get_fixed_programs');
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    list.innerHTML = `<div class="error-text">加载失败: ${data.error || '无法连接服务器'}</div>`;
+                    return;
+                }
+
+                if (data.programs && data.programs.length > 0) {
+                    list.innerHTML = data.programs.map(prog => `
+                        <div class="program-item">
+                            <span class="program-name" title="${prog}">${prog}</span>
+                            <button class="download-btn"
+                                    onclick="downloadProgram('${prog}')">
+                                下载
+                            </button>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div class="loading-text">没有找到预置程序。</div>';
+                }
+            } catch (err) {
+                console.error("Load Fixed Programs Error:", err);
+                list.innerHTML = `<div class="error-text">加载失败: ${err.message}</div>`;
+            }
+        }
+
+        function downloadProgram(filename) {
+            // *** Updated download URL ***
+            // Use encodeURIComponent to handle special characters in filenames
+            window.open(`/download_fixed/${encodeURIComponent(filename)}`, '_blank');
+        }
+
+        // Load programs when the page loads
+        window.addEventListener('DOMContentLoaded', loadFixedPrograms);
+    </script>
+</body>
+</html>
