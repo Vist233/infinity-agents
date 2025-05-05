@@ -45,7 +45,6 @@ agno
 eventlet
 openai~=1.61.1 # Ensure openai version is compatible
 pyinstaller # Added for EXE packaging
-PIL # Already implicitly included via Pillow
 requests
 
 pillow~=11.1.0
