@@ -1,0 +1,10 @@
+pyinstaller
+base64
+PIL
+openai~=1.61.1
+requests
+csv
+shutil
+
+pillow~=11.1.0
+numpy~=2.2.2
