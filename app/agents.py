@@ -7,7 +7,6 @@ from config import API_KEY
 
 API = os.environ.get('DEEPSEEK_API_KEY') or API_KEY
 
-# PaperAI Agent Definition
 paperai_agent = Agent(
     model=DeepSeek(api_key=API),
     tools=[ PubmedTools(), DuckDuckGoTools()],
@@ -26,7 +25,6 @@ paperai_agent = Agent(
     description="PaperAI: Searches Arxiv, PubMed, and DuckDuckGo for academic papers and summarizes them.",
 )
 
-# Chater Agent Definition
 chater_agent = Agent(
     model=DeepSeek(api_key=API, id="deepseek-reasoner"),
     markdown=True,

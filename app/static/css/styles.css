@@ -3,211 +3,7 @@ body {
       font-family: Arial, sans-serif;
       background-color: #1e1e1e;
       color: white;
-      overflow: hidden; /* Prevent body scroll when sidebar is open */
     }
-
-    /* Sidebar Styles */
-    .sidebar {
-        position: fixed;
-        top: 0;
-        right: -350px; /* Start off-screen */
-        width: 330px; /* Sidebar width */
-        height: 100%;
-        background-color: #2d2d2d;
-        border-left: 1px solid #444;
-        box-shadow: -2px 0 15px rgba(0,0,0,0.3);
-        transition: right 0.3s ease-in-out;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto; /* Allow scrolling within sidebar */
-    }
-
-    .sidebar.open {
-        right: 0; /* Slide in */
-    }
-
-    .sidebar-content {
-        padding: 20px;
-        flex-grow: 1;
-    }
-
-    .close-sidebar-btn {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        background: none;
-        border: none;
-        color: #ccc;
-        font-size: 24px;
-        cursor: pointer;
-    }
-    .close-sidebar-btn:hover {
-        color: #fff;
-    }
-
-    .sidebar h2, .sidebar h3 {
-        color: #eee;
-        margin-top: 0;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #555;
-        padding-bottom: 0.5rem;
-    }
-     .sidebar h3 {
-        font-size: 1.1em;
-        margin-top: 1.5rem;
-     }
-
-    .sidebar p {
-        color: #bbb;
-        line-height: 1.6;
-        font-size: 0.9em;
-        margin-bottom: 1rem;
-    }
-
-    .trait-section {
-        margin-bottom: 2rem;
-    }
-
-    /* Trait Recognizer Upload Container (inside sidebar) */
-    .upload-container {
-        border: 2px dashed #555;
-        border-radius: 5px;
-        padding: 1.5rem; /* Slightly smaller padding */
-        text-align: center;
-        transition: all 0.3s ease;
-        background-color: #333;
-    }
-
-    .upload-container:hover {
-        border-color: #007bff;
-        background-color: #3a3a3a;
-    }
-
-    .upload-label.trait-upload-label {
-        display: inline-block;
-        background-color: #007bff;
-        color: white;
-        padding: 10px 20px; /* Smaller button */
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        margin-bottom: 1rem;
-        border: none;
-        font-size: 0.9em;
-    }
-
-    .upload-label.trait-upload-label:hover {
-        background-color: #0056b3;
-    }
-
-    .trait-status {
-        margin-top: 1rem;
-        color: #aaa;
-        min-height: 18px; /* Adjust height */
-        font-size: 0.85em; /* Smaller font */
-    }
-
-    .trait-error {
-        color: #dc3545;
-        margin-top: 1rem;
-        display: none;
-        font-weight: bold;
-        font-size: 0.85em;
-    }
-
-    /* Loading spinner (can be reused) */
-    .loading {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border: 2px solid rgba(255,255,255,0.2);
-        border-radius: 50%;
-        border-top-color: #007bff;
-        animation: spin 1s ease-in-out infinite;
-        vertical-align: middle;
-        margin-right: 5px;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    /* Programs list styles (inside sidebar) */
-    .programs-list {
-        margin-top: 1rem;
-        max-height: 250px; /* Adjust height */
-        overflow-y: auto;
-        border: 1px solid #444;
-        border-radius: 5px;
-        padding: 5px;
-        background-color: #333;
-    }
-
-    .program-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 10px; /* Smaller padding */
-        margin-bottom: 6px; /* Smaller margin */
-        border: 1px solid #4a4a4a;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-        background-color: #3a3a3a;
-    }
-
-    .program-item:hover {
-        background-color: #454545;
-        border-color: #007bff;
-    }
-
-    .program-name {
-        font-size: 13px; /* Smaller font */
-        color: #ddd;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        margin-right: 10px;
-    }
-
-    .download-btn {
-        background: #28a745;
-        color: white;
-        padding: 5px 10px; /* Smaller button */
-        border-radius: 3px;
-        cursor: pointer;
-        transition: background 0.3s;
-        font-size: 11px; /* Smaller font */
-        border: none;
-        white-space: nowrap;
-    }
-
-    .download-btn:hover {
-        background: #218838;
-    }
-
-    .loading-text, .error-text {
-        color: #aaa;
-        text-align: center;
-        padding: 15px; /* Smaller padding */
-        font-style: italic;
-        font-size: 0.9em;
-    }
-    .error-text {
-        color: #dc3545;
-        font-weight: bold;
-    }
-
-
-    /* Main Content Area Adjustment when Sidebar is Open */
-    #mainContent {
-        transition: margin-right 0.3s ease-in-out;
-    }
-    body.sidebar-open #mainContent {
-        /* Optional: Adjust margin if needed, but fixed sidebar usually overlays */
-        /* margin-right: 350px; */
-    }
-
 
     .container-fluid {
       display: flex;
@@ -219,7 +15,6 @@ body {
       flex: 1;
       display: flex;
       flex-direction: column;
-      /* Removed border-right */
     }
 
     .message-area {
@@ -264,9 +59,7 @@ body {
       padding: 10px;
       background-color: #333;
       align-items: center; /* Align items vertically */
-    }
-
-    .input-box {
+    }    .input-box {
       flex: 1;
       padding: 10px;
       background-color: #444;
@@ -274,25 +67,7 @@ body {
       color: white;
       border-radius: 5px; /* Rounded corners for input */
       margin-right: 5px; /* Space before buttons */
-      margin-left: 5px; /* Space after sidebar toggle */
     }
-
-    .sidebar-toggle-button {
-        background: none;
-        border: 1px solid #555;
-        color: #ccc;
-        padding: 8px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 18px; /* Adjust icon size */
-        line-height: 1; /* Ensure button height matches input */
-        transition: background-color 0.2s, border-color 0.2s;
-    }
-    .sidebar-toggle-button:hover {
-        background-color: #444;
-        border-color: #777;
-    }
-
 
     .send-button, .stop-button, .upload-button, .clear-button {
       padding: 10px 15px; /* Uniform padding */

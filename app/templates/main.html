@@ -11,39 +11,6 @@
 </head>
 
 <body>
-  <!-- Sidebar for Trait Recognizer -->
-  <div class="sidebar" id="traitSidebar">
-    <button class="close-sidebar-btn" id="closeSidebarButton">&times;</button>
-    <!-- Trait Recognizer Content Start -->
-    <div class="sidebar-content">
-        <h2>考种助手</h2>
-
-        <!-- Standard Generator Section -->
-        <div class="trait-section">
-            <h3>标准生成</h3>
-            <p>上传标准图生成 .exe 程序。</p>
-            <div class="upload-container" id="traitUploadContainer">
-                <input type="file" id="traitFileInput" accept="image/png, image/jpeg, image/jpg" style="display: none;">
-                <label for="traitFileInput" class="upload-label trait-upload-label">
-                    <span>选择标准图片</span>
-                </label>
-                <div id="traitStatus" class="trait-status">请选择图片。</div>
-                <div id="traitError" class="trait-error"></div>
-            </div>
-        </div>
-
-        <!-- Pre-built Programs Section -->
-        <div class="trait-section">
-            <h3>预置程序库</h3>
-            <p>下载预生成的程序。</p>
-            <div id="programsList" class="programs-list">
-                <div class="loading-text">加载中...</div> <!-- Initial state -->
-            </div>
-        </div>
-    </div>
-    <!-- Trait Recognizer Content End -->
-  </div>
-
   <!-- Main Chat Area -->
   <div class="container-fluid vh-100 d-flex" id="mainContent">
     <!-- Chat area takes full width -->
@@ -62,19 +29,14 @@
               {% endif %}
             </div>
           {% endfor %}
-        {% endif %}
-        <!-- Messages added dynamically by JS will appear here -->
+        {% endif %}        <!-- Messages added dynamically by JS will appear here -->
       </div>
-
-      <!-- Status Area for Uploads/RAG -->
-      <div id="statusArea" class="status-area"></div>
 
       <!-- Input form - submission handled by JS -->
       <form id="messageForm" class="input-area">
-        <button type="button" class="sidebar-toggle-button" id="toggleSidebarButton" title="考种助手">&#x1F9EC;</button> <!-- DNA Emoji for Tools -->
         <select name="agent" id="agentSelect" class="agent-select">
           <option value="paperai">Paper Chat</option>
-          <option value="chater" selected>Chater (RAG)</option> <!-- Updated label -->
+          <option value="chater" selected>Chater</option>
           <!-- Add other agent options here if needed -->
         </select>
         <input
@@ -82,17 +44,12 @@
           class="input-box"
           id="userInput"
           name="userInput"
-          placeholder="Input something here or upload a file..."
+          placeholder="Input something here..."
           required
           autocomplete="off"
         />
         <button type="submit" class="send-button" id="sendButton">Send</button>
         <button type="button" class="stop-button" id="stopButton" style="display: none;">Stop</button>
-        <!-- File Upload Elements -->
-        <input type="file" id="fileInput" style="display: none;" accept=".pdf,.txt,.docx"> <!-- Hidden file input -->
-        <button type="button" class="upload-button" id="selectFileButton">File</button> <!-- Button to trigger file input -->
-        <button type="button" class="upload-button" id="uploadButton" disabled>Upload</button> <!-- Upload button -->
-        <button type="button" class="clear-button" id="clearRagButton">Clear</button> <!-- Clear RAG Context -->
       </form>
     </div>
   </div>
