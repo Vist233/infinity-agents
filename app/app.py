@@ -166,8 +166,7 @@ def handle_stop_generation(data):
 
 
 if __name__ == "__main__":
-    host = '0.0.0.0'
-    port = 8080
-    print(f"server on http://{host}:{port}")
+    port = 8935
+    print(f"server on http://127.0.0.1:{port}")
     print(f"UI on: http://127.0.0.1:{port}/chat")
-    socketio.run(app, host=host, port=port, debug=False, use_reloader=False)
+    socketio.run(app, host='127.0.0.1', port=port, debug=False, use_reloader=False)

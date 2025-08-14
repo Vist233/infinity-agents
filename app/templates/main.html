@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Infinite Agents</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <!-- Socket.IO Client Library -->
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -12,47 +16,54 @@
 
 <body>
   <!-- Main Chat Area -->
-  <div class="container-fluid vh-100 d-flex" id="mainContent">
-    <!-- Chat area takes full width -->
+  <div class="chat-container" id="mainContent">
     <div class="chat-area">
-      <!-- 消息区域 -->
+      <!-- Messages Area -->
       <div class="message-area" id="messageArea">
-        <!-- Initial messages loaded from session (optional, can be fully dynamic) -->
+        <!-- Initial messages loaded from session -->
         {% if messages %}
           {% for message in messages %}
             <div class="message {{ message.type }}">
               {% if message.type == "ai" %}
-                <!-- AI messages will now have an ID for streaming updates -->
                 <div class="bubble markdown-content" id="ai-msg-{{ loop.index0 }}">{{ message.text|safe }}</div>
               {% else %}
                 <div class="bubble">{{ message.text }}</div>
               {% endif %}
             </div>
           {% endfor %}
-        {% endif %}        <!-- Messages added dynamically by JS will appear here -->
+        {% endif %}
       </div>
 
-      <!-- Input form - submission handled by JS -->
+      <!-- Input Form -->
       <form id="messageForm" class="input-area">
         <select name="agent" id="agentSelect" class="agent-select">
           <option value="paperai">Paper Chat</option>
           <option value="chater" selected>Chater</option>
-          <!-- Add other agent options here if needed -->
         </select>
         <input
           type="text"
           class="input-box"
           id="userInput"
           name="userInput"
-          placeholder="Input something here..."
+          placeholder="Type your message here..."
           required
           autocomplete="off"
         />
-        <button type="submit" class="send-button" id="sendButton">Send</button>
-        <button type="button" class="stop-button" id="stopButton" style="display: none;">Stop</button>
+        <button type="submit" class="send-button" id="sendButton">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button type="button" class="stop-button" id="stopButton" style="display: none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="6" width="12" height="12" rx="1" fill="white"/>
+          </svg>
+        </button>
       </form>
     </div>
   </div>
+  
   <!-- Marked library for Markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- Custom JS for SocketIO and DOM manipulation -->
