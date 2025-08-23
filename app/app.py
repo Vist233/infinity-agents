@@ -3,18 +3,14 @@ from flask import Flask, render_template, request, session, send_file, jsonify, 
 from flask_socketio import SocketIO, emit
 import os
 from agents import paperai_agent, chater_agent
-from agno.agent import Agent
-from config import API_KEY
 import threading
 import traceback
-
-from openai import OpenAI
+from agno.agent import Agent
 
 app = Flask(__name__)
 convId = str(uuid.uuid4())
 app.secret_key = convId
 socketio = SocketIO(app, async_mode='eventlet')
-API = os.environ.get('DEEPSEEK_API_KEY') or API_KEY
 
 active_tasks = {}
 active_tasks_lock = threading.Lock()
@@ -111,6 +107,49 @@ def chat_page():
     return render_template("main.html", messages=session.get("messages", []))
 
 
+@app.route("/trait_recognizer")
+def trait_recognizer():
+    return render_template("trait_recognizer.html")
+
+
+@app.route("/generate_exe", methods=["POST"])
+def generate_exe():
+    """Placeholder for EXE generation endpoint"""
+    # This would normally:
+    # 1. Receive uploaded image
+    # 2. Use VLM to analyze image and generate classification criteria
+    # 3. Create Python script based on criteria
+    # 4. Use pyinstaller to compile to EXE
+    # 5. Return the EXE file
+    
+    # For now, return a placeholder response
+    return jsonify({"error": "EXE generation not implemented yet"}), 501
+
+
+@app.route("/download/<program_name>")
+def download_exe(program_name):
+    """Download pre-built EXE programs"""
+    # Map program names to actual EXE files
+    exe_files = {
+        "cabbage_classifier": "CabbageClassifier.exe",
+        "plant_analyzer": "PlantAnalyzer.exe"
+    }
+    
+    if program_name not in exe_files:
+        return "Program not found", 404
+    
+    # For testing, create a simple placeholder EXE
+    exe_path = f"./tools/{exe_files[program_name]}"
+    
+    # Create a simple executable placeholder if file doesn't exist
+    if not os.path.exists(exe_path):
+        # Create a simple Windows batch file as placeholder
+        with open(exe_path, 'w') as f:
+            f.write("@echo off\necho This is a placeholder EXE for testing\necho Place EXE generation logic here\npause")
+    
+    return send_file(exe_path, as_attachment=True)
+
+
 @socketio.on('connect')
 def handle_connect():
     print(f'Client connected: {request.sid}')
@@ -166,7 +205,8 @@ def handle_stop_generation(data):
 
 
 if __name__ == "__main__":
-    port = 8935
-    print(f"server on http://127.0.0.1:{port}")
-    print(f"UI on: http://127.0.0.1:{port}/chat")
+    port = 8080
+    print(f"🚀 Infinity Agents Server started")
+    print(f"📍 Chat Interface: http://127.0.0.1:{port}/chat")
+    print(f"🔧 Trait Recognizer: http://127.0.0.1:{port}/trait_recognizer")
     socketio.run(app, host='127.0.0.1', port=port, debug=False, use_reloader=False)

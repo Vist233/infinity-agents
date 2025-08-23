@@ -263,11 +263,6 @@ os.makedirs(output_folder, exist_ok=True)
 os.makedirs(center_output_folder, exist_ok=True)
 os.makedirs(hug_output_folder, exist_ok=True)
 
-# 创建输出目录
-os.makedirs(output_folder, exist_ok=True)
-os.makedirs(center_output_folder, exist_ok=True)
-os.makedirs(hug_output_folder, exist_ok=True)
-
 # 列出当前目录中的所有PNG文件
 png_files = [f for f in os.listdir(input_folder) if f.endswith('.JPG')]
 

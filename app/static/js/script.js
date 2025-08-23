@@ -26,7 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Scroll chat area to bottom
   function scrollToBottom() {
-    messageArea.scrollTop = messageArea.scrollHeight;
+    if (messageArea) {
+      messageArea.scrollTop = messageArea.scrollHeight;
+    }
   }
 
   // Render markdown in a specific element

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trait Recognizer - Infinite Agents</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Infinite Agents" class="logo">
+            <h1>✨ Infinite Agents</h1>
+            <nav class="nav-links">
+                <a href="/chat" class="nav-link">💬 Chat</a>
+                <a href="/trait_recognizer" class="nav-link active">🔧 Trait Recognizer</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>🎯 Trait Recognizer</h1>
+        
+        <!-- Standard Image Upload -->
+        <div class="section">
+            <h2>📁 Upload Standard Image</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="standardImage" accept="image/*" required>
+                <button type="submit">Generate EXE</button>
+            </form>
+            <div id="uploadStatus"></div>
+        </div>
+
+        <!-- Pre-built Programs -->
+        <div class="section">
+            <h2>📦 Pre-built Programs</h2>
+            <div class="exe-list">
+                <div class="exe-item">
+                    <span>🥬 Cabbage Classifier</span>
+                    <a href="/download/cabbage_classifier" class="download-btn">Download EXE</a>
+                </div>
+                <div class="exe-item">
+                    <span>🌿 Plant Analyzer</span>
+                    <a href="/download/plant_analyzer" class="download-btn">Download EXE</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="section">
+            <h2>📖 How to Use</h2>
+            <ol>
+                <li>Upload a standard image to generate a custom classifier EXE</li>
+                <li>Download pre-built programs for common tasks</li>
+                <li>Run the EXE on your local machine to classify images</li>
+                <li>Results will be saved to <code>results.csv</code></li>
+            </ol>
+        </div>
+
+        <a href="/chat" class="back-link">← Back to Chat</a>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('standardImage');
+            const statusDiv = document.getElementById('uploadStatus');
+            
+            if (!fileInput.files[0]) {
+                statusDiv.innerHTML = '<p class="error">Please select an image</p>';
+                return;
+            }
+            
+            statusDiv.innerHTML = '<p class="loading">Generating EXE... This may take a few minutes</p>';
+            
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('/generate_exe', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'classifier.exe';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    statusDiv.innerHTML = '<p class="success">EXE generated successfully! Download started.</p>';
+                } else {
+                    statusDiv.innerHTML = '<p class="error">Error generating EXE</p>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<p class="error">Network error: ' + error.message + '</p>';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -15,9 +15,33 @@
 </head>
 
 <body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Infinite Agents" class="logo">
+      <h1>✨ Infinite Agents</h1>
+      <nav class="nav-links">
+        <a href="/chat" class="nav-link active">💬 Chat</a>
+        <a href="/trait_recognizer" class="nav-link">🔧 Trait Recognizer</a>
+      </nav>
+    </div>
+  </div>
+
   <!-- Main Chat Area -->
   <div class="chat-container" id="mainContent">
     <div class="chat-area">
+      <!-- Welcome Message -->
+      <div class="welcome-message" id="welcomeMessage">
+        <div class="welcome-bubble">
+          <h3>🎉 Welcome to Infinite Agents!</h3>
+          <p>Choose an agent and start chatting:</p>
+          <ul>
+            <li><strong>PaperAI</strong>: Research assistant for academic papers</li>
+            <li><strong>Chater</strong>: General conversational AI</li>
+          </ul>
+        </div>
+      </div>
+
       <!-- Messages Area -->
       <div class="message-area" id="messageArea">
         <!-- Initial messages loaded from session -->
@@ -37,25 +61,25 @@
       <!-- Input Form -->
       <form id="messageForm" class="input-area">
         <select name="agent" id="agentSelect" class="agent-select">
-          <option value="paperai">Paper Chat</option>
-          <option value="chater" selected>Chater</option>
+          <option value="paperai">📄 PaperAI</option>
+          <option value="chater" selected>💬 Chater</option>
         </select>
         <input
           type="text"
           class="input-box"
           id="userInput"
           name="userInput"
-          placeholder="Type your message here..."
+          placeholder="Ask me anything..."
           required
           autocomplete="off"
         />
-        <button type="submit" class="send-button" id="sendButton">
+        <button type="submit" class="send-button" id="sendButton" title="Send message">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <button type="button" class="stop-button" id="stopButton" style="display: none;">
+        <button type="button" class="stop-button" id="stopButton" style="display: none;" title="Stop generation">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="6" y="6" width="12" height="12" rx="1" fill="white"/>
           </svg>
