@@ -14,6 +14,3 @@ def test_chat_route(client):
     response = client.get('/chat')
     assert response.status_code == 200
 
-def test_trait_recognizer_route(client):
-    response = client.get('/trait_recognizer')
-    assert response.status_code == 200

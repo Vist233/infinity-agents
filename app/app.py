@@ -107,9 +107,6 @@ def chat_page():
     return render_template("main.html", messages=session.get("messages", []))
 
 
-@app.route("/trait_recognizer")
-def trait_recognizer():
-    return render_template("trait_recognizer.html")
 
 
 @app.route("/generate_exe", methods=["POST"])
@@ -208,5 +205,4 @@ if __name__ == "__main__":
     port = 8080
     print(f"🚀 Infinity Agents Server started")
     print(f"📍 Chat Interface: http://127.0.0.1:{port}/chat")
-    print(f"🔧 Trait Recognizer: http://127.0.0.1:{port}/trait_recognizer")
     socketio.run(app, host='127.0.0.1', port=port, debug=False, use_reloader=False)

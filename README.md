@@ -1,6 +1,6 @@
 # Infinity Agents
 
-An AI agent platform featuring paper searching/summarization and a trait recognition tool, with real-time streaming responses via WebSockets. Built using `agno` and Flask.
+An AI agent platform featuring paper searching/summarization with real-time streaming responses via WebSockets. Built using `agno` and Flask.
 
 ## Table of Contents
 
@@ -15,16 +15,12 @@ An AI agent platform featuring paper searching/summarization and a trait recogni
 
 ## Introduction
 
-Infinity Agents is an AI-based tool designed to assist with research and specific image analysis tasks. It combines conversational AI agents with a specialized tool for generating image classification programs.
+Infinity Agents is an AI-based tool designed to assist with research tasks. It combines conversational AI agents for research assistance.
 
 ## Features
 
 - **Paper AI**: Give it a topic, it will search articles using ArXiv, PubMed, and DuckDuckGo, then summarize the most relevant ones for you. (Access via main chat interface)
 - **Chater**: A general conversational AI, optionally enhanced with Retrieval-Augmented Generation (RAG) using uploaded documents. (Access via main chat interface)
-- **Trait Recognizer**:
-    - **Standard Generator**: Upload a 'standard' image defining classification criteria. The tool uses a Vision Language Model (VLM) to understand the criteria and generates a standalone `.exe` program. This `.exe` can then be run locally to classify other images based on the provided standard, outputting results to a `results.csv` file.
-    - **Pre-built Programs**: Download `.exe` programs previously generated for common tasks (e.g., cabbage classification from `fixedQuantityProg`).
-    - Access this tool via the `/trait_recognizer` URL (e.g., `http://127.0.0.1:8080/trait_recognizer`).
 
 ## Quick Start
 
@@ -53,13 +49,11 @@ Infinity Agents is an AI-based tool designed to assist with research and specifi
 After starting the server, access:
 
 - **Chat Interface**: `http://127.0.0.1:8080/chat`
-- **Trait Recognizer**: `http://127.0.0.1:8080/trait_recognizer`
 
 ### Features
 
 - **PaperAI**: Research assistant that searches academic papers
 - **Chater**: General conversational AI assistant
-- **Trait Recognizer**: Image classification tool (under development)
 
 ## Docker Deployment
 
