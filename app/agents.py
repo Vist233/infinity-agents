@@ -2,12 +2,14 @@ import os
 from agno.agent import Agent
 from agno.models.deepseek import DeepSeek
 from agno.tools.pubmed import PubmedTools
+from agno.tools.arxiv import ArxivTools
+from agno.utils.pprint import pprint_run_response
 
 API_KEY = os.environ.get('DEEPSEEK_API_KEY', 'your API key here')
 
 paperai_agent = Agent(
     model=DeepSeek(api_key=API_KEY),
-    tools=[PubmedTools()],
+    tools=[PubmedTools(), ArxivTools()],
     instructions=[
         "You are an expert research assistant.",
         "Given a topic, your goal is to find relevant academic papers and articles using the available tools (PubMed).",
@@ -19,17 +21,20 @@ paperai_agent = Agent(
         "If no relevant information is found after searching, state that clearly.",
     ],
     markdown=True,
-    add_history_to_messages=False,
     description="PaperAI: Searches PubMed for academic papers and summarizes them.",
+    debug_mode=True,
 )
 
 chater_agent = Agent(
     model=DeepSeek(api_key=API_KEY, id="deepseek-reasoner"),
     markdown=True,
-    description="Chater: A general conversational AI assistant.",
-    add_history_to_messages=True,
+    description="Chater: An academic AI assistant.",
 )
 
 if __name__ == "__main__":
-    paperai_agent.run()
+    while True:
+        user_input = input("Enter a research topic (or 'exit' to quit): ")
+        if user_input.lower() == "exit":
+            break
+        pprint_run_response(paperai_agent.run(user_input))
     

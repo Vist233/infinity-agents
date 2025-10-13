@@ -1,7 +1,13 @@
 import uuid
-from flask import Flask, render_template, request, session, send_file, jsonify, url_for
+from flask import Flask, render_template, request, session, send_file, jsonify, url_for, after_this_request, current_app
 from flask_socketio import SocketIO, emit
 import os
+import tempfile
+import subprocess
+import shutil
+import json
+from datetime import datetime
+import sys
 from agents import paperai_agent, chater_agent
 import threading
 import traceback
@@ -109,18 +115,226 @@ def chat_page():
 
 
 
+ALLOWED_IMAGE_EXTS = {"jpg", "jpeg", "png", "bmp", "webp", "heic", "tif", "tiff"}
+
+
+def _write_packager_script(destination_path, trait_image_data_url):
+    """Builds a non-interactive copy of traitRecognizePackager.py."""
+    script_template = """import os
+from openai import OpenAI
+import base64
+import json
+import csv
+
+
+DASHSCOPE_API_KEY = os.environ.get("DASHSCOPE_API_KEY", "")
+trait_image_url = __TRAIT_IMAGE_DATA_URL__
+WORKSPACE = input("Please enter your image directory (default is current directory): ") or "./"
+WORKSPACE = os.path.abspath(WORKSPACE)
+
+
+def judge_image_type(trait_image_url):
+    lower_url = trait_image_url.lower()
+    if lower_url.endswith((".jpg", ".jpeg", ".jpe")):
+        return "jpeg"
+    if lower_url.endswith(".png"):
+        return "png"
+    if lower_url.endswith(".bmp"):
+        return "bmp"
+    if lower_url.endswith(".webp"):
+        return "webp"
+    if lower_url.endswith(".heic"):
+        return "heic"
+    if lower_url.endswith((".tif", ".tiff")):
+        return "tiff"
+    return ""
+
+
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
+
+
+def get_image_url(image_path):
+    image_base64 = encode_image(image_path)
+    image_type = judge_image_type(image_path)
+    if image_type == "":
+        raise ValueError("Unsupported image type")
+    return f"data:image/{{image_type}};base64,{{image_base64}}"
+
+
+def getClassify(trait_image_url, case_image_url):
+    completion = client.chat.completions.create(
+        model="qwen3-vl-plus",
+        messages=[
+            {
+                "role": "system",
+                "content": "请你按照{}的格式返回结果".format(
+                    {"reason": "string", "class": "string"}
+                ),
+            },
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": trait_image_url}},
+                    {"type": "image_url", "image_url": {"url": case_image_url}},
+                    {"type": "text", "text": "请你根据第一张图片的分类信息，得到第二张图片属于哪一个类并说明理由。"},
+                ],
+            }
+        ],
+        response_format={"type": "json_object"}
+    )
+    result = json.loads(completion.choices[0].message.content)
+    return result.get("class", ""), result.get("reason", "")
+
+
+client = OpenAI(
+    api_key=DASHSCOPE_API_KEY,
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+)
+
+
+def main():
+    csv_filename = "image_classification_results.csv"
+    with open(csv_filename, "w", newline="", encoding="utf-8") as csvfile:
+        fieldnames = ["filename", "class", "reason"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for root, dirs, files in os.walk(WORKSPACE):
+            for filename in files:
+                if filename.lower().endswith((".jpg", ".jpeg", ".png", ".bmp", ".webp", ".heic", ".tif", ".tiff")):
+                    image_url = get_image_url(os.path.join(root, filename))
+
+                    try:
+                        class_result, reason = getClassify(trait_image_url, image_url)
+
+                        writer.writerow({
+                            "filename": filename,
+                            "class": class_result,
+                            "reason": reason
+                        })
+
+                        print(f"Processed: {filename} -> Class: {class_result}")
+
+                    except Exception as e:
+                        print(f"Error processing {filename}: {e}")
+                        writer.writerow({
+                            "filename": filename,
+                            "class": "ERROR",
+                            "reason": str(e)
+                        })
+
+    print(f"Results saved to {csv_filename}")
+
+
+if __name__ == "__main__":
+    main()
+"""
+    script_content = script_template.replace(
+        "__TRAIT_IMAGE_DATA_URL__",
+        json.dumps(trait_image_data_url),
+    )
+    with open(destination_path, "w", encoding="utf-8") as script_file:
+        script_file.write(script_content)
+
+
+def _strip_data_url_prefix(data):
+    if not isinstance(data, str):
+        return data
+    if "," in data:
+        return data.split(",", 1)[1]
+    return data
+
+
+"""POST /generate_exe
+    {
+    "trait_image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD…",
+    "trait_image_ext": "jpeg",
+    "workspace_files": [
+        {"name": "case/a.jpg", "content": "/9j/4AAQ..."},
+        {"name": "case/b.png", "content": "iVBORw0KGgoAAA..."}
+    ]
+    }
+"""
 @app.route("/generate_exe", methods=["POST"])
 def generate_exe():
-    """Placeholder for EXE generation endpoint"""
-    # This would normally:
-    # 1. Receive uploaded image
-    # 2. Use VLM to analyze image and generate classification criteria
-    # 3. Create Python script based on criteria
-    # 4. Use pyinstaller to compile to EXE
-    # 5. Return the EXE file
-    
-    # For now, return a placeholder response
-    return jsonify({"error": "EXE generation not implemented yet"}), 501
+    request_data = request.get_json(silent=True)
+    if not request_data:
+        return jsonify({"error": "请求体必须是 JSON"}), 400
+
+    trait_image_base64 = request_data.get("trait_image_base64")
+    trait_image_ext = request_data.get("trait_image_ext")
+    if not trait_image_base64 or not trait_image_ext:
+        return jsonify({"error": "缺少 trait_image_base64 或 trait_image_ext"}), 400
+
+    trait_image_ext = str(trait_image_ext).lower().lstrip(".")
+    if trait_image_ext not in ALLOWED_IMAGE_EXTS:
+        return jsonify({"error": "不支持的图片格式", "allowed": sorted(ALLOWED_IMAGE_EXTS)}), 400
+
+    temp_dir = tempfile.mkdtemp(prefix="package_gen_")
+    cleanup_required = True
+
+    try:
+        trait_image_base64_clean = _strip_data_url_prefix(trait_image_base64)
+        trait_image_data_url = f"data:image/{trait_image_ext};base64,{trait_image_base64_clean}"
+        script_path = os.path.join(temp_dir, "traitRecognizePackager.py")
+        _write_packager_script(script_path, trait_image_data_url)
+
+        build_name = f"traitRecognizePackager_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        pyinstaller_cmd = [
+            sys.executable,
+            "-m",
+            "PyInstaller",
+            "--onefile",
+            "--name",
+            build_name,
+            script_path,
+        ]
+
+        result = subprocess.run(
+            pyinstaller_cmd,
+            cwd=temp_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        if result.returncode != 0:
+            current_app.logger.error("PyInstaller 打包失败: %s", result.stderr.strip())
+            return jsonify({
+                "error": "PyInstaller 打包失败",
+                "details": result.stderr[-2000:],
+            }), 500
+
+        dist_path = os.path.join(temp_dir, "dist", build_name)
+        if os.name == "nt":
+            dist_path += ".exe"
+        download_name = os.path.basename(dist_path)
+        if os.name != "nt":
+            download_name += ".bin"
+
+        if not os.path.exists(dist_path):
+            current_app.logger.error("未找到生成的可执行文件: %s", dist_path)
+            return jsonify({"error": "未找到生成的可执行文件"}), 500
+
+        @after_this_request
+        def cleanup(response):
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            return response
+
+        cleanup_required = False
+        return send_file(dist_path, as_attachment=True, download_name=download_name)
+
+    except FileNotFoundError as exc:
+        current_app.logger.exception("PyInstaller 未找到: %s", exc)
+        return jsonify({"error": "未找到 PyInstaller，请先安装依赖"}), 500
+    except Exception as exc:
+        current_app.logger.exception("生成 EXE 过程出错")
+        return jsonify({"error": "生成过程出错", "details": str(exc)}), 500
+    finally:
+        if cleanup_required:
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 @app.route("/download/<program_name>")
