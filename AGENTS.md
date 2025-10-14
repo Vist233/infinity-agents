@@ -31,6 +31,8 @@
 - Coordinate agent changes: highlight new external dependencies, model IDs, or configuration switches that contributors must adopt.
 
 ## Security & Configuration Tips
-- Never commit secrets; load `DEEPSEEK_API_KEY` or `DASHSCOPE_API_KEY` via environment variables or `.env` ignored by Git.
+- Never commit secrets; load `DEEPSEEK_API_KEY`, `DASHSCOPE_API_KEY`, and `FLASK_SECRET_KEY` via environment variables or `.env` ignored by Git.
+- `/generate_exe` enforces upload caps; adjust `MAX_REQUEST_BYTES`, `MAX_TRAIT_IMAGE_BASE64`, `MAX_WORKSPACE_FILE_BASE64`, and `MAX_TOTAL_WORKSPACE_BASE64` if larger artifacts are required, and document the change in PRs.
+- PyInstaller now runs inside a thread-pool with `PACKAGER_CONCURRENCY` workers and `PYINSTALLER_TIMEOUT_SEC` timeout—raise these carefully and monitor resource usage.
 - When testing `/generate_exe`, ensure temporary directories are cleaned and PyInstaller is available locally.
 - Review third-party API limits before enabling long-running background tasks in shared environments.

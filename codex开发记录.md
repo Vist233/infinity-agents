@@ -29,6 +29,12 @@
   4. 利用 `@after_this_request` 清理临时目录；若 PyInstaller 缺失或打包失败，会返回详细错误信息。
 - `GET /download/<program_name>` 提供预置 EXE 占位符下载（目前为占位的批处理脚本）。
 
+### 近期后端加固（2025-02-15）
+- Flask `secret_key` 现在优先读取 `FLASK_SECRET_KEY` 环境变量；若未设置仍回退至随机 UUID，建议生产环境显式配置。
+- 引入 `MAX_CONTENT_LENGTH`（默认 12MB）限制整体请求体，并增加 `MAX_TRAIT_IMAGE_BASE64`、`MAX_WORKSPACE_FILE_BASE64`、`MAX_TOTAL_WORKSPACE_BASE64` 三个环境可调阈值，防止超大 base64 数据拖垮服务。
+- `/generate_exe` 在提交 PyInstaller 任务前执行文件名合法性与 base64 校验，通过 `ThreadPoolExecutor`（并发度由 `PACKAGER_CONCURRENCY` 控制）运行打包流程，并附加 `PYINSTALLER_TIMEOUT_SEC` 超时，超时将返回 504 并写入日志。
+- 若用户终止对话，`DialogueManager` 会尝试关闭仍在流式输出的响应生成器，避免后台持续占用资源。
+
 ## traitRecognizePackager.py 逻辑概览
 - 交互式脚本：提示用户输入 `DASHSCOPE_API_KEY` 以及图像目录，默认读取环境变量。
 - 主要流程：
@@ -41,8 +47,16 @@
 - `script.js` 监听服务端推送事件，逐块拼接 Markdown 文本并渲染；提供“停止生成”按钮，可通过 Socket.IO 触发后端的停止标记。
 - 界面使用 `templates/main.html` + `static/css/styles.css` 构成单页聊天体验，初始展示欢迎提示与代理说明。
 
+## 当前前端状态记录（2025-02-15）
+- 已将聊天页统一为全屏暗色 UI：`app/templates/main.html` 现包含顶部 brand bar、居中对话容器及底部输入区域，整体样式由 `styles.css` 接管。
+- 欢迎横幅挂载在 `.chat-content` 内，绑定 `welcomeClose` 点击、首次消息发送和历史消息检测，脚本位于 `script.js:15-190`；状态通过 `dataset.dismissed` 记录。
+- 当前视觉问题：`.chat-content` 最高宽 860px，但外围 `.chat-topbar`、`.input-area` 仍以 viewport padding 渲染，导致顶部/底部留有大片空白；消息区域尚未触顶，滚动条出现前显示高度偏低。
+- 输入区改为 `input-inner > input-stack` 结构，支持焦点高亮与操作按钮并列，但在窗口缩放与移动端断点下仍需实测，确保 `.input-controls` 换行时布局稳定。
+- CSS 迭代集中在 `.app-shell`、`.chat-area`、`.chat-body`、`.message-area` 等选择器，部分老样式仍保留（如 traitRecognize 页面用到的 `.container`、`.section`），后续清理需注意不同模板的复用。
+- 后端逻辑未改动；所有交互更新均在 `app/templates/main.html`、`app/static/css/styles.css`、`app/static/js/script.js`。
+- 待办：收敛 padding 计算，让内容区垂直居中且填充屏幕；验证流式输出下欢迎横幅完全隐藏；针对移动端视图补充断点或缩放策略。
+
 ## 部署与运行
 - 本地运行：`python app/app.py`，默认监听 `127.0.0.1:8080`。
 - Docker：`Dockerfile` 支持构建镜像并通过环境变量注入 `DEEPSEEK_API_KEY`。
 - 打包功能依赖 `PyInstaller` 与 `dashscope` 兼容接口，需要在运行环境中提前安装并设置 `DASHSCOPE_API_KEY`（或在交互脚本中输入）。
-

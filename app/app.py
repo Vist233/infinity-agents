@@ -12,14 +12,22 @@ from agents import paperai_agent, chater_agent
 import threading
 import traceback
 from agno.agent import Agent
+import base64
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
 app = Flask(__name__)
 convId = str(uuid.uuid4())
-app.secret_key = convId
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", convId)
 socketio = SocketIO(app, async_mode='eventlet')
+app.config["MAX_CONTENT_LENGTH"] = int(os.environ.get("MAX_REQUEST_BYTES", 12 * 1024 * 1024))  # default 12MB
 
 active_tasks = {}
 active_tasks_lock = threading.Lock()
+packager_executor = ThreadPoolExecutor(max_workers=int(os.environ.get("PACKAGER_CONCURRENCY", 2)))
+MAX_TRAIT_IMAGE_BASE64 = int(os.environ.get("MAX_TRAIT_IMAGE_BASE64", 6 * 1024 * 1024))  # 6MB base64 string length
+MAX_WORKSPACE_FILE_BASE64 = int(os.environ.get("MAX_WORKSPACE_FILE_BASE64", 4 * 1024 * 1024))  # 4MB per file
+MAX_TOTAL_WORKSPACE_BASE64 = int(os.environ.get("MAX_TOTAL_WORKSPACE_BASE64", 10 * 1024 * 1024))  # 10MB total
+PYINSTALLER_TIMEOUT = int(os.environ.get("PYINSTALLER_TIMEOUT_SEC", 300))  # default 5 minutes
 
 
 class DialogueManager:
@@ -92,6 +100,11 @@ class DialogueManager:
             self.socketio.emit('ai_message_chunk', {'id': ai_message_id, 'chunk': f"\n\n**Error:** Processing failed. Please check server logs."}, room=sid)
             self.socketio.emit('ai_message_end', {'id': ai_message_id, 'full_text': full_response + f"\n\n**Error:** Processing failed."}, room=sid)
         finally:
+            try:
+                if should_stop and hasattr(response_stream, "close"):
+                    response_stream.close()
+            except Exception as close_exc:
+                print(f"Error closing response stream: {close_exc}")
             with active_tasks_lock:
                 if ai_message_id in active_tasks:
                     del active_tasks[ai_message_id]
@@ -272,11 +285,36 @@ def generate_exe():
     if trait_image_ext not in ALLOWED_IMAGE_EXTS:
         return jsonify({"error": "不支持的图片格式", "allowed": sorted(ALLOWED_IMAGE_EXTS)}), 400
 
+    trait_image_base64_clean = _strip_data_url_prefix(trait_image_base64)
+    if len(trait_image_base64_clean) > MAX_TRAIT_IMAGE_BASE64:
+        return jsonify({"error": "trait_image_base64 过大"}), 413
+
+    try:
+        base64.b64decode(trait_image_base64_clean, validate=True)
+    except Exception:
+        return jsonify({"error": "trait_image_base64 无法解析"}), 400
+
+    workspace_files = request_data.get("workspace_files") or []
+    total_workspace_len = 0
+    for file_entry in workspace_files:
+        if not isinstance(file_entry, dict):
+            return jsonify({"error": "workspace_files 项格式错误"}), 400
+        name = file_entry.get("name") or ""
+        if ".." in name or name.startswith(("/", "\\")):
+            return jsonify({"error": f"非法文件名: {name}"}), 400
+        content = file_entry.get("content", "")
+        if not isinstance(content, str):
+            return jsonify({"error": f"文件 {name} 的 content 非字符串"}), 400
+        if len(content) > MAX_WORKSPACE_FILE_BASE64:
+            return jsonify({"error": f"文件 {name} 体积超过限制"}), 413
+        total_workspace_len += len(content)
+    if total_workspace_len > MAX_TOTAL_WORKSPACE_BASE64:
+        return jsonify({"error": "workspace_files 总体积超过限制"}), 413
+
     temp_dir = tempfile.mkdtemp(prefix="package_gen_")
     cleanup_required = True
 
     try:
-        trait_image_base64_clean = _strip_data_url_prefix(trait_image_base64)
         trait_image_data_url = f"data:image/{trait_image_ext};base64,{trait_image_base64_clean}"
         script_path = os.path.join(temp_dir, "traitRecognizePackager.py")
         _write_packager_script(script_path, trait_image_data_url)
@@ -292,13 +330,26 @@ def generate_exe():
             script_path,
         ]
 
-        result = subprocess.run(
-            pyinstaller_cmd,
-            cwd=temp_dir,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
+        def _run_packager():
+            return subprocess.run(
+                pyinstaller_cmd,
+                cwd=temp_dir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=PYINSTALLER_TIMEOUT,
+            )
+
+        future = packager_executor.submit(_run_packager)
+        try:
+            result = future.result(timeout=PYINSTALLER_TIMEOUT + 5)
+        except FuturesTimeoutError:
+            future.cancel()
+            current_app.logger.error("PyInstaller 执行超时（线程阻塞）")
+            return jsonify({"error": "PyInstaller 执行超时"}), 504
+        except subprocess.TimeoutExpired as timeout_exc:
+            current_app.logger.error("PyInstaller 执行超时: %s", timeout_exc)
+            return jsonify({"error": "PyInstaller 执行超时"}), 504
 
         if result.returncode != 0:
             current_app.logger.error("PyInstaller 打包失败: %s", result.stderr.strip())
