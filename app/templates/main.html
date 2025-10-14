@@ -15,74 +15,85 @@
 </head>
 
 <body>
-  <!-- Header -->
-  <div class="header">
-    <div class="header-content">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="Infinite Agents" class="logo">
-      <h1>✨ Infinite Agents</h1>
-      <nav class="nav-links">
-        <a href="/chat" class="nav-link active">💬 Chat</a>
-      </nav>
-    </div>
-  </div>
-
-  <!-- Main Chat Area -->
-  <div class="chat-container" id="mainContent">
+  <div class="app-shell" id="mainContent">
     <div class="chat-area">
-      <!-- Welcome Message -->
-      <div class="welcome-message" id="welcomeMessage">
-        <div class="welcome-bubble">
-          <h3>🎉 Welcome to Infinite Agents!</h3>
-          <p>Choose an agent and start chatting:</p>
-          <ul>
-            <li><strong>PaperAI</strong>: Research assistant for academic papers</li>
-            <li><strong>Chater</strong>: General conversational AI</li>
-          </ul>
+      <div class="chat-topbar">
+        <div class="brand">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="Infinite Agents" class="logo">
+          <div class="brand-copy">
+            <span class="brand-title">Infinite Agents</span>
+            <span class="brand-subtitle">Conversational research assistant</span>
+          </div>
         </div>
+        <nav class="nav-links">
+          <a href="/chat" class="nav-link active">💬 Chat</a>
+        </nav>
       </div>
 
-      <!-- Messages Area -->
-      <div class="message-area" id="messageArea">
-        <!-- Initial messages loaded from session -->
-        {% if messages %}
-          {% for message in messages %}
-            <div class="message {{ message.type }}">
-              {% if message.type == "ai" %}
-                <div class="bubble markdown-content" id="ai-msg-{{ loop.index0 }}">{{ message.text|safe }}</div>
-              {% else %}
-                <div class="bubble">{{ message.text }}</div>
-              {% endif %}
+      <div class="chat-body">
+        <div class="chat-content">
+          <div class="welcome-banner" id="welcomeBanner">
+            <div class="welcome-content">
+              <h3>🎉 Welcome to Infinite Agents!</h3>
+              <p>Choose an agent and start chatting:</p>
+              <ul>
+                <li><strong>PaperAI</strong>: Research assistant for academic papers</li>
+                <li><strong>Chater</strong>: General conversational AI</li>
+              </ul>
             </div>
-          {% endfor %}
-        {% endif %}
+            <button type="button" class="welcome-close" id="welcomeClose" aria-label="Dismiss welcome">&times;</button>
+          </div>
+
+          <div class="message-area" id="messageArea">
+            {% if messages %}
+              {% for message in messages %}
+                <div class="message {{ message.type }}">
+                  {% if message.type == "ai" %}
+                    <div class="bubble markdown-content" id="ai-msg-{{ loop.index0 }}">{{ message.text|safe }}</div>
+                  {% else %}
+                    <div class="bubble">{{ message.text }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
       </div>
 
       <!-- Input Form -->
       <form id="messageForm" class="input-area">
-        <select name="agent" id="agentSelect" class="agent-select">
-          <option value="paperai">📄 PaperAI</option>
-          <option value="chater" selected>💬 Chater</option>
-        </select>
-        <input
-          type="text"
-          class="input-box"
-          id="userInput"
-          name="userInput"
-          placeholder="Ask me anything..."
-          required
-          autocomplete="off"
-        />
-        <button type="submit" class="send-button" id="sendButton" title="Send message">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button type="button" class="stop-button" id="stopButton" style="display: none;" title="Stop generation">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="6" y="6" width="12" height="12" rx="1" fill="white"/>
-          </svg>
-        </button>
+        <div class="input-inner">
+          <div class="input-controls">
+            <select name="agent" id="agentSelect" class="agent-select">
+              <option value="paperai">📄 PaperAI</option>
+              <option value="chater" selected>💬 Chater</option>
+            </select>
+            <div class="input-stack">
+              <input
+                type="text"
+                class="input-box"
+                id="userInput"
+                name="userInput"
+                placeholder="Ask me anything..."
+                required
+                autocomplete="off"
+              />
+              <div class="action-buttons">
+                <button type="submit" class="send-button" id="sendButton" title="Send message">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button type="button" class="stop-button" id="stopButton" style="display: none;" title="Stop generation">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="6" y="6" width="12" height="12" rx="1" fill="white"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </form>
     </div>
   </div>

@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const messageArea = document.getElementById('messageArea');
   const sendButton = document.getElementById('sendButton');
   const stopButton = document.getElementById('stopButton'); // Get stop button
+  const welcomeBanner = document.getElementById('welcomeBanner');
+  const welcomeClose = document.getElementById('welcomeClose');
 
   // --- State Variables ---
   let currentAiMessageId = null; // Variable to store the ID of the message being generated
@@ -45,6 +47,24 @@ document.addEventListener("DOMContentLoaded", () => {
     markdownElements.forEach(element => {
       renderMarkdownInElement(element);
     });
+  }
+
+  function dismissWelcomeBanner(options = {}) {
+    if (!welcomeBanner || welcomeBanner.dataset.dismissed === 'true') {
+      return;
+    }
+    const immediate = options.immediate ?? false;
+    welcomeBanner.dataset.dismissed = 'true';
+    if (immediate) {
+      welcomeBanner.style.display = 'none';
+    } else {
+      welcomeBanner.classList.add('hidden');
+      setTimeout(() => {
+        if (welcomeBanner) {
+          welcomeBanner.style.display = 'none';
+        }
+      }, 200);
+    }
   }
 
   // Appends a message bubble to the chat area
@@ -80,6 +100,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return normalized;
   }
   // --- Event Listeners ---
+  if (welcomeClose) {
+    welcomeClose.addEventListener('click', () => dismissWelcomeBanner());
+  }
 
   // Chat Form Submission
   messageForm.addEventListener('submit', (e) => {
@@ -88,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const agent = agentSelect.value;
 
     if (messageText && sendButton.style.display !== 'none') {
+      dismissWelcomeBanner();
       appendMessage('user', messageText);
       scrollToBottom();
       socket.emit('send_message', { userInput: messageText, agent: agent });
@@ -121,6 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
   socket.on('ai_message_start', (data) => {
     console.log('AI message start:', data.id);
     currentAiMessageId = data.id;
+    dismissWelcomeBanner();
     stopButton.style.display = 'inline-block';
     sendButton.style.display = 'none';
     appendMessage('ai', '', data.id);
@@ -159,5 +184,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   // --- Initial Setup Calls ---
   renderAllMarkdown();
+  if (messageArea && messageArea.children.length > 0) {
+    dismissWelcomeBanner({ immediate: true });
+  }
   scrollToBottom();
 });
