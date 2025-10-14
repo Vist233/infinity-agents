@@ -32,9 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Render markdown in a specific element
-  function renderMarkdownInElement(element) {
-    const rawMarkdown = element.dataset.rawMarkdown || element.textContent || '';
-    if (!element.classList.contains('message-complete') || event.type === 'ai_message_end') {
+  function renderMarkdownInElement(element, isFinal = false) {
+    const rawMarkdown = element.dataset.rawMarkdown ?? element.textContent ?? '';
+    if (!element.classList.contains('message-complete') || isFinal) {
       element.innerHTML = marked.parse(rawMarkdown);
     }
   }
@@ -67,6 +67,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (type === 'ai') {
       renderMarkdownInElement(bubbleDiv);
     }
+  }
+
+  function sanitizeChunk(chunk) {
+    if (chunk === null || chunk === undefined) {
+      return '';
+    }
+    const normalized = typeof chunk === 'string' ? chunk : String(chunk);
+    if (normalized.trim().toLowerCase() === 'none') {
+      return '';
+    }
+    return normalized;
   }
   // --- Event Listeners ---
 
@@ -123,8 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
   socket.on('ai_message_chunk', (data) => {
     const aiBubble = document.getElementById(data.id);
     if (aiBubble) {
-      aiBubble.dataset.rawMarkdown += data.chunk;
-      renderMarkdownInElement(aiBubble);
+      const safeChunk = sanitizeChunk(data.chunk);
+      if (safeChunk) {
+        aiBubble.dataset.rawMarkdown = (aiBubble.dataset.rawMarkdown || '') + safeChunk;
+        renderMarkdownInElement(aiBubble);
+      }
       scrollToBottom();
     } else {
       console.warn(`Could not find AI message bubble with ID: ${data.id}`);
@@ -135,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log('AI message end:', data.id);
     const aiBubble = document.getElementById(data.id);
     if (aiBubble) {
-      renderMarkdownInElement(aiBubble);
+      renderMarkdownInElement(aiBubble, true);
       aiBubble.classList.add('message-complete');
     }
     stopButton.style.display = 'none';
