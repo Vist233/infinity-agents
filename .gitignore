@@ -27,6 +27,9 @@ fixedQuantityProg/results.csv # Exclude results from fixed prog
 # Environment files
 .env
 *.env
+venv/
+.claude/
+
 
 # IDE / OS files
 .vscode/
