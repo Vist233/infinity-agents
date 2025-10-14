@@ -43,7 +43,8 @@ faiss-cpu # Or faiss-gpu if you have CUDA installed
 tiktoken # Often needed by langchain text splitters
 agno
 eventlet
-openai~=1.61.1 # Ensure openai version is compatible
+openai
+arxiv
 pyinstaller # Added for EXE packaging
 requests
 
